@@ -1,0 +1,21 @@
+﻿using StoreOrder.WebApplication.Data.Models.Account;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace StoreOrder.WebApplication.Data.Models.Orders
+{
+    public class UserCookingOrder
+    {
+        public string Id { get; set; }
+        public int? StatusCooking { get; set; }
+        public DateTime? DateRecieved { get; set; }
+        public DateTime? DateDone { get; set; }
+        public int? DurationTime { get; set; }
+        public string UserId { get; set; }
+        public virtual User User { get; set; }
+        public string OrderId { get; set; }
+        public virtual Order Order { get; set; }
+    }
+}
