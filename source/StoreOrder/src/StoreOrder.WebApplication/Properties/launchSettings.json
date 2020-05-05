@@ -21,7 +21,7 @@
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "APIOrder",
-      "applicationUrl": "https://localhost:5000/api/v1/home",
+      "applicationUrl": "https://localhost:5000/docs",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
