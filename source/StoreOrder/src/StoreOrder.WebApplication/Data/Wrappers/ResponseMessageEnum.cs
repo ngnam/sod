@@ -21,6 +21,6 @@ namespace StoreOrder.WebApplication.Data.Wrappers
         [Description("Request cannot be processed. Please contact a support.")]
         Unknown,
         [Description("Unhandled Exception occured. Unable to process the request.")]
-        Unhandled
+        Unhandled,
     }
 }

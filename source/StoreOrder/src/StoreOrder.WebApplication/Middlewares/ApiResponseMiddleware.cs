@@ -56,6 +56,10 @@ namespace StoreOrder.WebApplication.Middlewares
                             var bodyAsText = await FormatResponse(bodyStream);
                             await HandleSuccessRequestAsync(context, bodyAsText, context.Response.StatusCode);
                         }
+                        else if (context.Response.StatusCode == (int)HttpStatusCode.BadRequest) {
+                            var bodyAsText = await FormatResponse(bodyStream);
+                            await HandleErrorBadRequestRequestAsync(context, bodyAsText, context.Response.StatusCode);
+                        }
                         else
                         {
                             await HandleNotSuccessRequestAsync(context, context.Response.StatusCode);
@@ -177,6 +181,8 @@ namespace StoreOrder.WebApplication.Middlewares
                 apiError = new ApiError(ResponseMessageEnum.NotContent.GetDescription());
             else if (code == (int)HttpStatusCode.MethodNotAllowed)
                 apiError = new ApiError(ResponseMessageEnum.MethodNotAllowed.GetDescription());
+            else if (code == (int)HttpStatusCode.Unauthorized)
+                apiError = new ApiError(ResponseMessageEnum.UnAuthorized.GetDescription());
             else
                 apiError = new ApiError(ResponseMessageEnum.Unknown.GetDescription());
 
@@ -205,7 +211,32 @@ namespace StoreOrder.WebApplication.Middlewares
             {
                 jsonString = ConvertToJSONString(code, bodyContent);
             }
+            context.Response.StatusCode = code;
+            context.Response.ContentType = "application/json";
+            return context.Response.WriteAsync(jsonString);
+        }
 
+        private Task HandleErrorBadRequestRequestAsync(HttpContext context, object body, int code)
+        {
+            ApiError apiError = null;
+
+            var bodyText = !body.ToString().IsValidJson() ? ConvertToJSONString(body) : body.ToString();
+
+            dynamic bodyContent = JsonConvert.DeserializeObject<dynamic>(bodyText);
+            Type type = bodyContent?.GetType();
+            if (type.Equals(typeof(ApiError)))
+            {
+                apiError = bodyContent;
+            } else if (type.Equals(typeof(string)))
+            {
+                apiError = new ApiError(bodyContent);
+            } else
+            {
+                apiError = new ApiError(ResponseMessageEnum.Unknown.GetDescription());
+            }
+
+            context.Response.StatusCode = code;
+            var jsonString = ConvertToJSONString(GetErrorResponse(code, apiError));
             context.Response.ContentType = "application/json";
             return context.Response.WriteAsync(jsonString);
         }
@@ -224,7 +255,8 @@ namespace StoreOrder.WebApplication.Middlewares
         }
         private bool IsSwagger(HttpContext context)
         {
-            return context.Request.Path.StartsWithSegments("/swagger") || context.Request.Path.StartsWithSegments("/docs");
+            return context.Request.Path.StartsWithSegments("/swagger") || context.Request.Path.StartsWithSegments("/docs")
+                || context.Request.Path.Value.Contains("swagger.json");
 
         }
         private JsonSerializerSettings JSONSettings()

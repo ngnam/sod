@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using StoreOrder.WebApplication.Data;
@@ -9,8 +10,10 @@ using StoreOrder.WebApplication.Data.Models.Account;
 
 namespace StoreOrder.WebApplication.Controllers
 {
+    [Produces("application/json", "application/problem+json")]
     [Route("[controller]")]
     [ApiVersion("1")]
+    [Authorize]
     [ApiController]
     public class HomeController : ControllerBase
     {
@@ -39,7 +42,7 @@ namespace StoreOrder.WebApplication.Controllers
         [HttpGet(""), MapToApiVersion("2")]
         public IActionResult GetV2()
         {
-            return Ok(Summaries);
+            return Ok(HttpContext.GetRequestedApiVersion().ToString());
         }
     }
 }

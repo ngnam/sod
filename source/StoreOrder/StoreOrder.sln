@@ -7,7 +7,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F7F4CA9F-627
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{F127106B-39E0-4949-B0F0-542FA6380022}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoreOrder.WebApplication", "src\StoreOrder.WebApplication\StoreOrder.WebApplication.csproj", "{F83C235D-D36D-4F3D-B790-8B43567F0926}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StoreOrder.WebApplication", "src\StoreOrder.WebApplication\StoreOrder.WebApplication.csproj", "{F83C235D-D36D-4F3D-B790-8B43567F0926}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{264F8FCF-7DEB-4E81-A42A-A33BE98EC95A}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\Readme.md = ..\..\Readme.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
