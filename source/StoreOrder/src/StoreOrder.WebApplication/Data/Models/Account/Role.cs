@@ -9,6 +9,8 @@ namespace StoreOrder.WebApplication.Data.Models.Account
     {
         public Role()
         {
+            this.UserToRoles = new HashSet<UserToRole>();
+            this.RoleToPermissions = new HashSet<RoleToPermission>();
         }
         public string Id { get; set; }
         public string RoleName { get; set; } // Unique

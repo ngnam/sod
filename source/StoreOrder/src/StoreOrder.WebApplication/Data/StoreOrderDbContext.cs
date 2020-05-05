@@ -32,9 +32,9 @@ namespace StoreOrder.WebApplication.Data
                 c.Property(m => m.PhoneNumber).HasMaxLength(11);
                 c.Property(m => m.Email).HasMaxLength(50);
                 c.HasIndex(m => new { m.Email, m.UserName }).IsUnique();
-                c.Property(m => m.SaltPassword).HasMaxLength(255);
-                c.Property(m => m.HashPassword).HasMaxLength(255);
-                c.Property(m => m.OldPassword).HasMaxLength(255);
+                c.Property(m => m.SaltPassword).HasColumnType("TEXT");
+                c.Property(m => m.HashPassword).HasColumnType("TEXT");
+                c.Property(m => m.OldPassword).HasColumnType("TEXT");
                 c.HasMany(g => g.UserDevices).WithOne(c => c.CurrentUser).HasForeignKey(c => c.CurrentUserId).IsRequired(false);
                 c.HasMany(g => g.UseExternalSignIns).WithOne(c => c.User).HasForeignKey(c => c.UserId).IsRequired(false);
             });

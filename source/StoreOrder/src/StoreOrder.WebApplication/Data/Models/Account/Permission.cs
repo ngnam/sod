@@ -9,6 +9,7 @@ namespace StoreOrder.WebApplication.Data.Models.Account
     {
         public Permission()
         {
+            this.RoleToPermissions = new HashSet<RoleToPermission>();
         }
         public string Id { get; set; }
         public string PermissionName { get; set; } // unique // the tabs, screens, actions

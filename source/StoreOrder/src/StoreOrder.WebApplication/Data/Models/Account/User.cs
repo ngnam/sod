@@ -35,6 +35,9 @@ namespace StoreOrder.WebApplication.Data.Models.Account
             this.CreatedAt = DateTime.UtcNow;
             this.UserDevices = new HashSet<UserDevice>();
             this.UseExternalSignIns = new HashSet<ExternalSignIn>();
+            this.UserCookingOrders = new HashSet<UserCookingOrder>();
+            this.UserToRoles = new HashSet<UserToRole>();
+            this.Orders = new HashSet<Order>();
         }
         public string Id { get; set; }
         public string FirstName { get; set; }
