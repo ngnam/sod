@@ -28,7 +28,7 @@ namespace StoreOrder.WebApplication.Extensions
                         {
                             // we're only getting the first description we find
                             // others will be ignored
-                            description = ((DescriptionAttribute)descriptionAttributes[0]).Description;
+                            description = ((DescriptionAttribute)descriptionAttributes.First()).Description;
                         }
 
                         break;
