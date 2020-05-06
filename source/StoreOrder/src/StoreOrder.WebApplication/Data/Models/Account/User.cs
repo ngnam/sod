@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using StoreOrder.WebApplication.Data.Models.Orders;
+using StoreOrder.WebApplication.Data.Models.Products;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -38,6 +39,7 @@ namespace StoreOrder.WebApplication.Data.Models.Account
             this.UserCookingOrders = new HashSet<UserCookingOrder>();
             this.UserToRoles = new HashSet<UserToRole>();
             this.Orders = new HashSet<Order>();
+            this.Products = new HashSet<Product>();
         }
         public string Id { get; set; }
         public string FirstName { get; set; }
@@ -61,5 +63,6 @@ namespace StoreOrder.WebApplication.Data.Models.Account
         public virtual ICollection<UserToRole> UserToRoles { get; set; }
         public virtual ICollection<Order> Orders { get; set; }
         public virtual ICollection<UserCookingOrder> UserCookingOrders { get; set; }
+        public virtual ICollection<Product> Products { get; set; }
     }
 }

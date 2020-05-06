@@ -15,9 +15,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\..\.env = ..\..\.env
 		..\..\.npmrc = ..\..\.npmrc
 		..\..\appveyor.yml = ..\..\appveyor.yml
+		..\..\client-admin-web-app-readme.md = ..\..\client-admin-web-app-readme.md
+		..\..\client-android-app-readme.md = ..\..\client-android-app-readme.md
+		..\..\client-ios-app-readme.md = ..\..\client-ios-app-readme.md
 		..\..\Dockerfile = ..\..\Dockerfile
 		..\..\heroku.yml = ..\..\heroku.yml
 		..\..\Readme.md = ..\..\Readme.md
+		..\..\RELEASE.MD = ..\..\RELEASE.MD
 		..\..\run.sh = ..\..\run.sh
 	EndProjectSection
 EndProject

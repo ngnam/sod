@@ -7,6 +7,11 @@ namespace StoreOrder.WebApplication.Data.Models.Products
 {
     public class CategoryProduct
     {
+        public CategoryProduct()
+        {
+            this.Childs = new List<CategoryProduct>();
+            this.Products = new HashSet<Product>();
+        }
         public string Id { get; set; }
         public string CategoryName { get; set; }
         public string Slug { get; set; }

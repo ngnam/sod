@@ -42,7 +42,8 @@ namespace StoreOrder.WebApplication.Data
 
             #region UserDevice
             // UserDevice
-            modelBuilder.Entity<UserDevice>(c => {
+            modelBuilder.Entity<UserDevice>(c =>
+            {
                 c.ToTable("UserDevices", "Account");
                 c.HasKey(m => m.Id);
                 c.Property(m => m.Id).HasMaxLength(255);
@@ -57,12 +58,13 @@ namespace StoreOrder.WebApplication.Data
                 c.ToTable("ExternalSignIns", "Account");
                 c.HasKey(m => m.Id);
                 c.Property(m => m.Id).HasMaxLength(255);
-                c.Property(m => m.TokenLogin).HasMaxLength(500);
+                c.Property(m => m.TokenLogin).HasColumnType("TEXT");
             });
             #endregion
 
             // Role
-            modelBuilder.Entity<Role>(c => {
+            modelBuilder.Entity<Role>(c =>
+            {
                 c.ToTable("Roles", "Account");
                 c.HasKey(m => m.Id);
                 c.Property(m => m.Id).HasMaxLength(255);
@@ -72,7 +74,8 @@ namespace StoreOrder.WebApplication.Data
             });
 
             // Permistion
-            modelBuilder.Entity<Permission>(c => {
+            modelBuilder.Entity<Permission>(c =>
+            {
                 c.ToTable("Permissions", "Account");
                 c.HasKey(m => m.Id);
                 c.Property(m => m.Id).HasMaxLength(255);
@@ -108,7 +111,8 @@ namespace StoreOrder.WebApplication.Data
                 .HasForeignKey(bc => bc.PermissionId);
 
             // Location Provider
-            modelBuilder.Entity<Provider>(c => {
+            modelBuilder.Entity<Provider>(c =>
+            {
                 c.ToTable("Providers", "Location");
                 c.HasKey(c => c.Id);
                 c.Property(m => m.Id).HasMaxLength(50);
@@ -134,27 +138,34 @@ namespace StoreOrder.WebApplication.Data
             });
 
             // Store
-            modelBuilder.Entity<Store>(c => {
+            modelBuilder.Entity<Store>(c =>
+            {
                 c.ToTable("Stores", "Store");
                 c.HasKey(m => m.Id);
+                c.Property(m => m.Id).HasMaxLength(50);
                 c.Property(m => m.StoreName).HasMaxLength(250);
                 c.Property(m => m.StoreAddress).HasMaxLength(250).IsRequired(false);
                 c.Property(m => m.ProviderId).HasMaxLength(50);
+                c.Property(m => m.UserId).HasMaxLength(255);
                 c.HasOne(m => m.Provider).WithMany(m => m.Stores).HasForeignKey(m => m.ProviderId);
-                c.HasMany(m => m.StoreHasTables).WithOne(m => m.Store).HasForeignKey(m => m.StoreId);
+                c.HasMany(m => m.StoreTables).WithOne(m => m.Store).HasForeignKey(m => m.StoreId);
             });
 
             // Table
-            modelBuilder.Entity<StoreTable>(c => {
+            modelBuilder.Entity<StoreTable>(c =>
+            {
                 c.ToTable("StoreTables", "Store");
                 c.HasKey(m => m.Id);
                 c.Property(m => m.Id).HasMaxLength(50);
+                c.Property(m => m.TableName).HasMaxLength(250);
                 c.Property(m => m.TableCode).HasMaxLength(250);
+                c.Property(m => m.StoreId).HasMaxLength(50);
                 c.HasMany(m => m.Orders).WithOne(m => m.StoreTable).HasForeignKey(m => m.TableId);
             });
 
             // CategoryProduct
-            modelBuilder.Entity<CategoryProduct>(c => {
+            modelBuilder.Entity<CategoryProduct>(c =>
+            {
                 c.ToTable("CategoryProducts", "Product");
                 c.HasKey(m => m.Id);
                 c.Property(m => m.Id).HasMaxLength(50);
@@ -165,43 +176,87 @@ namespace StoreOrder.WebApplication.Data
                 c.HasMany(m => m.Products).WithOne(m => m.CategoryProduct).HasForeignKey(m => m.CategoryId);
             });
 
-            modelBuilder.Entity<Product>(c => {
+            modelBuilder.Entity<ProductSKUValue>(c =>
+            {
+                c.ToTable("ProductSKUValues", "Product");
+                c.HasOne<ProductSKU>()
+                    .WithMany(p => p.ProductSKUValues)
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<ProductSKU>(c =>
+            {
+                c.ToTable("ProductSKUs", "Product");
+                c.HasKey(p => new { p.ProductId, p.SkuId });
+                c.HasOne(p => p.Product)
+                .WithMany(ps => ps.ProductSKUs)
+                .HasForeignKey(x => x.ProductId);
+                c.HasIndex(p => p.Sku);
+                c.Property(p => p.SkuId);
+            });
+
+
+            modelBuilder.Entity<ProductSKUValue>(c =>
+            {
+                c.ToTable("ProductSKUValues", "Product");
+                c.HasOne<ProductSKU>()
+                    .WithMany(p => p.ProductSKUValues)
+                    .IsRequired(false)
+                    .OnDelete(DeleteBehavior.Restrict);
+                c.HasKey(p => new { p.ProductId, p.SkuId, p.OptionId });
+                c.HasOne(p => p.ProductOptionValue)
+                    .WithMany(ps => ps.ProductSKUValues)
+                    .HasForeignKey(x => new { x.ProductId, x.OptionId, x.ValueId })
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+
+            modelBuilder.Entity<ProductOptionValue>(c =>
+            {
+                c.ToTable("ProductOptionValues", "Product");
+                c.HasKey(p => new { p.ProductId, p.OptionId, p.ValueId });
+                c.HasOne(p => p.ProductOption)
+                    .WithMany(ps => ps.ProductOptionValues)
+                    .HasForeignKey(x => new { x.ProductId, x.OptionId });
+                c.Property(p => p.ValueId).HasMaxLength(256);
+            });
+
+
+            modelBuilder.Entity<ProductOption>(c =>
+            {
+                c.ToTable("ProductOptions", "Product");
+                c.HasKey(p => new { p.ProductId, p.OptionId });
+                c.HasOne(p => p.Product)
+                    .WithMany(po => po.ProductOptions)
+                    .HasForeignKey(x => new { x.ProductId })
+                    .OnDelete(DeleteBehavior.Restrict);
+                c.Property(p => p.OptionId).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<Product>(c =>
+            {
                 c.ToTable("Products", "Product");
                 c.HasKey(m => m.Id);
                 c.Property(m => m.Id).HasMaxLength(50);
                 c.Property(m => m.ProductName).HasMaxLength(250);
                 c.HasMany(m => m.ChildProducts).WithOne(m => m.ParentProduct).HasForeignKey(m => m.ProductParentId);
-                c.HasMany(m => m.Options).WithOne(m => m.Product).HasForeignKey(m => m.ProductId);
-                c.HasMany(m => m.ProductSkus).WithOne(m => m.Product).HasForeignKey(m => m.ProductId);
+                c.HasOne(m => m.User).WithMany(m => m.Products).HasForeignKey(m => m.UserId).OnDelete(DeleteBehavior.SetNull);
+                c.HasOne(m => m.Store).WithMany(m => m.Products).HasForeignKey(m => m.StoreId).OnDelete(DeleteBehavior.SetNull);
             });
 
-            modelBuilder.Entity<ProductSku>(c => {
-                c.ToTable("ProductSkus", "Product");
-                c.HasKey(m => m.SkuId);
-                c.Property(m => m.SkuId).HasMaxLength(50);
-                c.Property(m => m.SkuName).HasMaxLength(250);
+            modelBuilder.Entity<StoreOption>(c =>
+            {
+                c.ToTable("StoreOptions", "Store");
+                c.HasKey(m => m.OptionId);
+                c.Property(m => m.OptionId).HasMaxLength(50);
+                c.Property(m => m.StoreOptionName).HasMaxLength(250);
+                c.Property(m => m.StoreOptionDescription).HasMaxLength(250);
+                c.HasOne(m => m.Store).WithMany(m => m.StoreOptions).HasForeignKey(m => m.StoreId).OnDelete(DeleteBehavior.SetNull);
             });
 
-            modelBuilder.Entity<SkuValue>(c => {
-                c.ToTable("SkuValues", "Product");
-                c.HasKey(m => new { m.SkuId, m.ProductId, m.OptionId });
-            });
-
-            modelBuilder.Entity<Option>(c => {
-                c.ToTable("Options", "Product");
-                c.HasKey(m => m.Id);
-                c.Property(m => m.Id).HasMaxLength(50);
-                c.Property(m => m.OptionName).HasMaxLength(250);
-                c.HasMany(m => m.OptionValues).WithOne(m => m.Option).HasForeignKey(m => m.OptionId);
-            });
-
-            modelBuilder.Entity<OptionValue>(c => {
-                c.ToTable("OptionValues", "Product");
-                c.HasKey(m => new { m.ValueId, m.OptionId, m.ProductId });
-                c.Property(m => m.ValueName).HasMaxLength(250);
-            });
-
-            modelBuilder.Entity<Order>(c => {
+            modelBuilder.Entity<Order>(c =>
+            {
                 c.ToTable("Orders", "Order");
                 c.HasKey(m => m.Id);
                 c.Property(m => m.Id).HasMaxLength(50);
@@ -209,8 +264,9 @@ namespace StoreOrder.WebApplication.Data
                 c.HasMany(m => m.OrderDetails).WithOne(m => m.Order).HasForeignKey(m => m.OrderId);
                 c.HasMany(m => m.UserCookingOrders).WithOne(m => m.Order).HasForeignKey(m => m.OrderId);
             });
-            
-            modelBuilder.Entity<OrderDetail>(c => {
+
+            modelBuilder.Entity<OrderDetail>(c =>
+            {
                 c.ToTable("OrderDetails", "Order");
                 c.HasKey(m => m.Id);
                 c.Property(m => m.Id).HasMaxLength(50);
@@ -218,7 +274,8 @@ namespace StoreOrder.WebApplication.Data
                 c.Property(m => m.Note).HasMaxLength(250);
             });
 
-            modelBuilder.Entity<UserCookingOrder>(c => {
+            modelBuilder.Entity<UserCookingOrder>(c =>
+            {
                 c.ToTable("UserCookingOrders", "Order");
                 c.HasKey(m => m.Id);
                 c.Property(m => m.Id).HasMaxLength(50);
@@ -244,15 +301,15 @@ namespace StoreOrder.WebApplication.Data
         public DbSet<UserCookingOrder> UserCookingOrders { get; set; }
         // Product
         public DbSet<CategoryProduct> CategoryProducts { get; set; }
-        public DbSet<Option> Options { get; set; }
-        public DbSet<OptionValue> OptionValues { get; set; }
-        public DbSet<Product> Products { get; set; }
-        public DbSet<ProductSku> ProductSkus { get; set; }
-        public DbSet<SkuValue> SkuValues { get; set; }
+        public DbSet<ProductOption> ProductOptions { get; set; }
+        public DbSet<ProductOptionValue> ProductOptionValues { get; set; }
+        public DbSet<ProductSKU> ProductSKUs { get; set; }
+        public DbSet<ProductSKUValue> ProductSKUValues { get; set; }
         // Store
         public DbSet<CategoryStore> CategoryStores { get; set; }
         public DbSet<Store> Stores { get; set; }
         public DbSet<StoreTable> StoreTables { get; set; }
+        public DbSet<StoreOption> StoreOptions { get; set; }
         #endregion
     }
 }

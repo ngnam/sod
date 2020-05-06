@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
-using StoreOrder.WebApplication.Data;
 using StoreOrder.WebApplication.Data.Wrappers;
 using StoreOrder.WebApplication.Extensions;
 using System;
@@ -55,10 +53,6 @@ namespace StoreOrder.WebApplication.Middlewares
                         {
                             var bodyAsText = await FormatResponse(bodyStream);
                             await HandleSuccessRequestAsync(context, bodyAsText, context.Response.StatusCode);
-                        }
-                        else if (context.Response.StatusCode == (int)HttpStatusCode.BadRequest) {
-                            var bodyAsText = await FormatResponse(bodyStream);
-                            await HandleErrorBadRequestRequestAsync(context, bodyAsText, context.Response.StatusCode);
                         }
                         else
                         {
@@ -212,31 +206,6 @@ namespace StoreOrder.WebApplication.Middlewares
                 jsonString = ConvertToJSONString(code, bodyContent);
             }
             context.Response.StatusCode = code;
-            context.Response.ContentType = "application/json";
-            return context.Response.WriteAsync(jsonString);
-        }
-
-        private Task HandleErrorBadRequestRequestAsync(HttpContext context, object body, int code)
-        {
-            ApiError apiError = null;
-
-            var bodyText = !body.ToString().IsValidJson() ? ConvertToJSONString(body) : body.ToString();
-
-            dynamic bodyContent = JsonConvert.DeserializeObject<dynamic>(bodyText);
-            Type type = bodyContent?.GetType();
-            if (type.Equals(typeof(ApiError)))
-            {
-                apiError = bodyContent;
-            } else if (type.Equals(typeof(string)))
-            {
-                apiError = new ApiError(bodyContent);
-            } else
-            {
-                apiError = new ApiError(ResponseMessageEnum.Unknown.GetDescription());
-            }
-
-            context.Response.StatusCode = code;
-            var jsonString = ConvertToJSONString(GetErrorResponse(code, apiError));
             context.Response.ContentType = "application/json";
             return context.Response.WriteAsync(jsonString);
         }

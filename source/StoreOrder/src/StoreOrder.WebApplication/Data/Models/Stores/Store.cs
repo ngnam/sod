@@ -1,4 +1,5 @@
 ﻿using StoreOrder.WebApplication.Data.Models.Location;
+using StoreOrder.WebApplication.Data.Models.Products;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,13 @@ namespace StoreOrder.WebApplication.Data.Models.Stores
     }
     public class Store
     {
+        public Store()
+        {
+            this.CreatedAt = DateTime.UtcNow;
+            this.StoreTables = new HashSet<StoreTable>();
+            this.Products = new HashSet<Product>();
+            this.StoreOptions = new HashSet<StoreOption>();
+        }
         public string Id { get; set; }
         public string StoreName { get; set; }
         public string StoreAddress { get; set; }
@@ -25,8 +33,10 @@ namespace StoreOrder.WebApplication.Data.Models.Stores
         public string ProviderId { get; set; } // nullable
         public virtual Provider Provider { get; set; }
         public string UserId { get; set; }
-        public virtual ICollection<StoreTable> StoreHasTables { get; set; }
+        public virtual ICollection<StoreTable> StoreTables { get; set; }
         public string CategoryStoreId { get; set; }
         public virtual CategoryStore CategoryStore { get; set; }
+        public virtual ICollection<Product> Products { get; set; }
+        public virtual ICollection<StoreOption> StoreOptions { get; set; }
     }
 }

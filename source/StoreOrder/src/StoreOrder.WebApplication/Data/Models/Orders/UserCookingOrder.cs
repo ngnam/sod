@@ -10,8 +10,8 @@ namespace StoreOrder.WebApplication.Data.Models.Orders
     {
         public string Id { get; set; }
         public int? StatusCooking { get; set; }
-        public DateTime? DateRecieved { get; set; }
-        public DateTime? DateDone { get; set; }
+        public DateTime? CreateOn { get; set; }
+        public DateTime? UpdateOn { get; set; }
         public int? DurationTime { get; set; }
         public string UserId { get; set; }
         public virtual User User { get; set; }

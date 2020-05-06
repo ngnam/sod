@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
@@ -9,10 +11,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
 using StoreOrder.WebApplication.Data;
+using StoreOrder.WebApplication.Data.Wrappers;
 using StoreOrder.WebApplication.Extensions;
 using StoreOrder.WebApplication.Middlewares;
 using StoreOrder.WebApplication.Middlewares.Swagger;
+using StoreOrder.WebApplication.Validations;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
@@ -96,7 +101,17 @@ namespace StoreOrder.WebApplication
                 // set this option to TRUE to indent the JSON output
                 options.JsonSerializerOptions.WriteIndented = true;
                 // options.JsonSerializerOptions.PropertyNamingPolicy = null;
-            }); // set this option to NULL to use PascalCase instead of CamelCase (default)
+                // set this option to NULL to use PascalCase instead of CamelCase (default)
+            });
+
+            // Custom InvalidModelStateResponseFactory
+            services.Configure<ApiBehaviorOptions>(a =>
+            {
+                a.InvalidModelStateResponseFactory = context =>
+                {
+                    throw new ApiException(context.ModelState.AllErrors());
+                };
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -185,7 +200,6 @@ namespace StoreOrder.WebApplication
                 options.OperationFilter<AuthResponsesOperationFilter>();
             });
         }
-
 
         private void ConfigureVersionedDescription(SwaggerGenOptions options, ApiVersionDescription apiVersion)
         {

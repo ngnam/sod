@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Logging;
 using StoreOrder.WebApplication.Data;
 using StoreOrder.WebApplication.Data.Models.Account;
+using StoreOrder.WebApplication.Data.Models.Products;
+using StoreOrder.WebApplication.Data.Models.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +33,7 @@ namespace StoreOrder.WebApplication
                 var roleOrderUser = new Role { Id = Guid.NewGuid().ToString(), Code = Guid.NewGuid().ToString(), RoleName = "OrderUser", Desc = "NV Order of Store" };
                 var roleCookieUser = new Role { Id = Guid.NewGuid().ToString(), Code = Guid.NewGuid().ToString(), RoleName = "CookieUser", Desc = "NV phụ bếp of Store" };
                 var rolePayUser = new Role { Id = Guid.NewGuid().ToString(), Code = Guid.NewGuid().ToString(), RoleName = "PayUser", Desc = "Nv Thanh toán of Store" };
-                
+
                 //// I create the User 
                 //var lib = new Library();
                 var user1 = new User { Id = Guid.NewGuid().ToString(), Age = 29, BirthDay = new DateTime(1991, 1, 1).ToUniversalTime(), CountLoginFailed = 0, FirstName = "admin", LastName = "admin", IsActived = 1, Email = "admin01@gmail.com", UserName = "admin01", HashPassword = hashPass.Hash, SaltPassword = hashPass.Salt, Gender = 1, OldPassword = hashPass.Hash + ";" + hashPass.Salt, PhoneNumber = "1234567" };
@@ -104,6 +106,137 @@ namespace StoreOrder.WebApplication
                 logger.LogInformation("DatabaseDbContext", "---initial data of Surveys success---");
             }
 
+            if (!databaseDbContext.CategoryStores.Any())
+            {
+                var catStore = new CategoryStore { Id = Guid.NewGuid().ToString(), Name = "Store1" };
+                await databaseDbContext.CategoryStores.AddAsync(catStore);
+                await databaseDbContext.SaveChangesAsync();
+
+                var useradmin = databaseDbContext.Users.FirstOrDefault(x => x.UserName.ToLower().Equals("admin01"));
+                var store1 = new Store();
+                var optionSize = new StoreOption();
+                var optionToping = new StoreOption();
+                if (useradmin != null)
+                {
+                    if (!databaseDbContext.Stores.Any())
+                    {
+                        store1 = new Store
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            CategoryStoreId = catStore.Id,
+                            StatusStore = 1,
+                            StoreAddress = "Số 1, Xuân thủy, Cầu Giấy, Việt Nam",
+                            StoreName = "Store 1",
+                            UserId = useradmin.Id,
+                        };
+
+                        var lstStoreTable = new List<StoreTable>()
+                        {
+                             new StoreTable
+                             {
+                                Id = Guid.NewGuid().ToString(),
+                                Location = 1,
+                                LocationUnit = 1,
+                                StoreId = store1.Id,
+                                TableCode = Guid.NewGuid().ToString(),
+                                TableName = "Bàn 1",
+                                TableStatus = 1
+                             },
+                             new StoreTable
+                             {
+                                Id = Guid.NewGuid().ToString(),
+                                Location = 1,
+                                LocationUnit = 1,
+                                StoreId = store1.Id,
+                                TableCode = Guid.NewGuid().ToString(),
+                                TableName = "Bàn 2",
+                                TableStatus = 1
+                             },
+                             new StoreTable
+                             {
+                                Id = Guid.NewGuid().ToString(),
+                                Location = 1,
+                                LocationUnit = 1,
+                                StoreId = store1.Id,
+                                TableCode = Guid.NewGuid().ToString(),
+                                TableName = "Bàn 3",
+                                TableStatus = 1
+                             },
+                             new StoreTable
+                             {
+                                Id = Guid.NewGuid().ToString(),
+                                Location = 1,
+                                LocationUnit = 1,
+                                StoreId = store1.Id,
+                                TableCode = Guid.NewGuid().ToString(),
+                                TableName = "Bàn 4",
+                                TableStatus = 1
+                             },
+                             new StoreTable
+                             {
+                                Id = Guid.NewGuid().ToString(),
+                                Location = 1,
+                                LocationUnit = 1,
+                                StoreId = store1.Id,
+                                TableCode = Guid.NewGuid().ToString(),
+                                TableName = "Bàn 5",
+                                TableStatus = 1
+                             }
+                        };
+
+                        optionSize = new StoreOption { OptionId = Guid.NewGuid().ToString(), StoreId = store1.Id, StoreOptionName = "size", StoreOptionDescription = "Kích thước" };
+                        optionToping = new StoreOption { OptionId = Guid.NewGuid().ToString(), StoreId = store1.Id, StoreOptionName = "toping", StoreOptionDescription = "Toping" };
+
+                        var lstStoreOption = new List<StoreOption>() {
+                            optionSize,
+                            optionToping,
+                            new StoreOption { OptionId = Guid.NewGuid().ToString(), StoreId = store1.Id, StoreOptionName = "color", StoreOptionDescription = "Màu sắc" },
+                            new StoreOption { OptionId = Guid.NewGuid().ToString(), StoreId = store1.Id, StoreOptionName = "class", StoreOptionDescription = "Lớp" },
+                            new StoreOption { OptionId = Guid.NewGuid().ToString(), StoreId = store1.Id, StoreOptionName = "devo", StoreOptionDescription = "Dễ vỡ" },
+                        };
+
+
+                        store1.StoreTables = lstStoreTable;
+                        store1.StoreOptions = lstStoreOption;
+
+                        await databaseDbContext.Stores.AddAsync(store1);
+                        await databaseDbContext.SaveChangesAsync();
+                    }
+
+                    if (!databaseDbContext.CategoryProducts.Any())
+                    {
+                        var catProduct = new CategoryProduct
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            CategoryName = "Danh mục 1",
+                            Slug = "danh-muc-1",
+                            Code = "danhmuc1code",
+                            ParentId = null,
+                        };
+
+                        var lstProducts = new List<Product>() {
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 1",   UserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 02",   UserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 03",   UserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 04",   UserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 05",   UserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 06",   UserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 07",   UserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 08",   UserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 09",   UserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 10",   UserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 11",   UserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 12",   UserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 13",   UserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 14",   UserId = useradmin.Id, StoreId = store1.Id },
+                        };
+                        catProduct.Products = lstProducts;
+
+                        await databaseDbContext.AddAsync(catProduct);
+                        await databaseDbContext.SaveChangesAsync();
+                    }
+                }
+            }
         }
     }
 }

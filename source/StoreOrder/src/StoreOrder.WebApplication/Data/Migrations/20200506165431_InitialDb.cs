@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace StoreOrder.WebApplication.Data.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class InitialDb : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -62,10 +62,10 @@ namespace StoreOrder.WebApplication.Data.Migrations
                     PhoneNumber = table.Column<string>(maxLength: 11, nullable: true),
                     Email = table.Column<string>(maxLength: 50, nullable: true),
                     UserName = table.Column<string>(nullable: true),
-                    SaltPassword = table.Column<string>(maxLength: 255, nullable: true),
-                    HashPassword = table.Column<string>(maxLength: 255, nullable: true),
+                    SaltPassword = table.Column<string>(type: "TEXT", nullable: true),
+                    HashPassword = table.Column<string>(type: "TEXT", nullable: true),
                     CountLoginFailed = table.Column<int>(nullable: true),
-                    OldPassword = table.Column<string>(maxLength: 255, nullable: true),
+                    OldPassword = table.Column<string>(type: "TEXT", nullable: true),
                     IsActived = table.Column<int>(nullable: true),
                     Age = table.Column<int>(nullable: true),
                     BirthDay = table.Column<DateTime>(nullable: true),
@@ -129,21 +129,6 @@ namespace StoreOrder.WebApplication.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SkuValues",
-                schema: "Product",
-                columns: table => new
-                {
-                    SkuId = table.Column<string>(nullable: false),
-                    ProductId = table.Column<string>(nullable: false),
-                    OptionId = table.Column<string>(nullable: false),
-                    ValueId = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SkuValues", x => new { x.SkuId, x.ProductId, x.OptionId });
-                });
-
-            migrationBuilder.CreateTable(
                 name: "CategoryStores",
                 schema: "Store",
                 columns: table => new
@@ -192,7 +177,7 @@ namespace StoreOrder.WebApplication.Data.Migrations
                     TypeLogin = table.Column<int>(nullable: true),
                     IsVerified = table.Column<int>(nullable: true),
                     LastLogin = table.Column<DateTime>(nullable: true),
-                    TokenLogin = table.Column<string>(maxLength: 500, nullable: true),
+                    TokenLogin = table.Column<string>(type: "TEXT", nullable: true),
                     TimeLifeToken = table.Column<int>(nullable: true),
                     UserId = table.Column<string>(nullable: true)
                 },
@@ -261,53 +246,20 @@ namespace StoreOrder.WebApplication.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Products",
-                schema: "Product",
-                columns: table => new
-                {
-                    Id = table.Column<string>(maxLength: 50, nullable: false),
-                    ProductName = table.Column<string>(maxLength: 250, nullable: true),
-                    ProductPrice = table.Column<decimal>(nullable: true),
-                    CreatedAt = table.Column<DateTime>(nullable: true),
-                    UpdatedAt = table.Column<DateTime>(nullable: true),
-                    DeletedAt = table.Column<DateTime>(nullable: true),
-                    ProductStatus = table.Column<int>(nullable: true),
-                    ProductParentId = table.Column<string>(nullable: true),
-                    CategoryId = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Products", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Products_CategoryProducts_CategoryId",
-                        column: x => x.CategoryId,
-                        principalSchema: "Product",
-                        principalTable: "CategoryProducts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Products_Products_ProductParentId",
-                        column: x => x.ProductParentId,
-                        principalSchema: "Product",
-                        principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Stores",
                 schema: "Store",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
+                    Id = table.Column<string>(maxLength: 50, nullable: false),
                     StoreName = table.Column<string>(maxLength: 250, nullable: true),
+                    StoreAddress = table.Column<string>(maxLength: 250, nullable: true),
                     lat = table.Column<double>(nullable: true),
                     lon = table.Column<double>(nullable: true),
                     StatusStore = table.Column<int>(nullable: true),
                     CreatedAt = table.Column<DateTime>(nullable: true),
                     UpdatedAt = table.Column<DateTime>(nullable: true),
                     ProviderId = table.Column<string>(maxLength: 50, nullable: true),
-                    UserId = table.Column<string>(nullable: true),
+                    UserId = table.Column<string>(maxLength: 255, nullable: true),
                     CategoryStoreId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -330,46 +282,79 @@ namespace StoreOrder.WebApplication.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Options",
+                name: "Products",
                 schema: "Product",
                 columns: table => new
                 {
                     Id = table.Column<string>(maxLength: 50, nullable: false),
-                    OptionName = table.Column<string>(maxLength: 250, nullable: true),
-                    ProductId = table.Column<string>(nullable: true)
+                    ProductName = table.Column<string>(maxLength: 250, nullable: false),
+                    ProductPrice = table.Column<decimal>(nullable: true),
+                    UniversalProductCode = table.Column<string>(maxLength: 32, nullable: true),
+                    Height = table.Column<decimal>(nullable: false),
+                    Weight = table.Column<decimal>(nullable: false),
+                    NetWeight = table.Column<decimal>(nullable: false),
+                    Depth = table.Column<decimal>(nullable: false),
+                    CreateOn = table.Column<DateTime>(nullable: true),
+                    UpdateOn = table.Column<DateTime>(nullable: true),
+                    DeleteOn = table.Column<DateTime>(nullable: true),
+                    ProductParentId = table.Column<string>(nullable: true),
+                    CategoryId = table.Column<string>(nullable: true),
+                    UserId = table.Column<string>(nullable: true),
+                    StoreId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Options", x => x.Id);
+                    table.PrimaryKey("PK_Products", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Options_Products_ProductId",
-                        column: x => x.ProductId,
+                        name: "FK_Products_CategoryProducts_CategoryId",
+                        column: x => x.CategoryId,
+                        principalSchema: "Product",
+                        principalTable: "CategoryProducts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Products_Products_ProductParentId",
+                        column: x => x.ProductParentId,
                         principalSchema: "Product",
                         principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Products_Stores_StoreId",
+                        column: x => x.StoreId,
+                        principalSchema: "Store",
+                        principalTable: "Stores",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Products_Users_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "Account",
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductSkus",
-                schema: "Product",
+                name: "StoreOptions",
+                schema: "Store",
                 columns: table => new
                 {
-                    SkuId = table.Column<string>(maxLength: 50, nullable: false),
-                    ProductId = table.Column<string>(nullable: true),
-                    SkuName = table.Column<string>(maxLength: 250, nullable: true),
-                    Price = table.Column<decimal>(nullable: true)
+                    OptionId = table.Column<string>(maxLength: 50, nullable: false),
+                    StoreOptionName = table.Column<string>(maxLength: 250, nullable: true),
+                    StoreOptionDescription = table.Column<string>(maxLength: 250, nullable: true),
+                    StoreId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductSkus", x => x.SkuId);
+                    table.PrimaryKey("PK_StoreOptions", x => x.OptionId);
                     table.ForeignKey(
-                        name: "FK_ProductSkus_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalSchema: "Product",
-                        principalTable: "Products",
+                        name: "FK_StoreOptions_Stores_StoreId",
+                        column: x => x.StoreId,
+                        principalSchema: "Store",
+                        principalTable: "Stores",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -378,10 +363,12 @@ namespace StoreOrder.WebApplication.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(maxLength: 50, nullable: false),
+                    TableName = table.Column<string>(maxLength: 250, nullable: true),
                     TableCode = table.Column<string>(maxLength: 250, nullable: true),
                     Location = table.Column<int>(nullable: true),
+                    LocationUnit = table.Column<int>(nullable: true),
                     TableStatus = table.Column<int>(nullable: true),
-                    StoreId = table.Column<string>(nullable: true)
+                    StoreId = table.Column<string>(maxLength: 50, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -396,23 +383,44 @@ namespace StoreOrder.WebApplication.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OptionValues",
+                name: "ProductOptions",
                 schema: "Product",
                 columns: table => new
                 {
-                    ValueId = table.Column<string>(nullable: false),
                     ProductId = table.Column<string>(nullable: false),
-                    OptionId = table.Column<string>(nullable: false),
-                    ValueName = table.Column<string>(maxLength: 250, nullable: true)
+                    OptionId = table.Column<string>(maxLength: 50, nullable: false),
+                    OptionName = table.Column<string>(maxLength: 40, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OptionValues", x => new { x.ValueId, x.OptionId, x.ProductId });
+                    table.PrimaryKey("PK_ProductOptions", x => new { x.ProductId, x.OptionId });
                     table.ForeignKey(
-                        name: "FK_OptionValues_Options_OptionId",
-                        column: x => x.OptionId,
+                        name: "FK_ProductOptions_Products_ProductId",
+                        column: x => x.ProductId,
                         principalSchema: "Product",
-                        principalTable: "Options",
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductSKUs",
+                schema: "Product",
+                columns: table => new
+                {
+                    ProductId = table.Column<string>(nullable: false),
+                    SkuId = table.Column<string>(nullable: false),
+                    Sku = table.Column<string>(maxLength: 64, nullable: false),
+                    Price = table.Column<decimal>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductSKUs", x => new { x.ProductId, x.SkuId });
+                    table.ForeignKey(
+                        name: "FK_ProductSKUs_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalSchema: "Product",
+                        principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -448,6 +456,28 @@ namespace StoreOrder.WebApplication.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ProductOptionValues",
+                schema: "Product",
+                columns: table => new
+                {
+                    ProductId = table.Column<string>(nullable: false),
+                    ValueId = table.Column<string>(maxLength: 256, nullable: false),
+                    OptionId = table.Column<string>(nullable: false),
+                    ValueName = table.Column<string>(maxLength: 32, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductOptionValues", x => new { x.ProductId, x.OptionId, x.ValueId });
+                    table.ForeignKey(
+                        name: "FK_ProductOptionValues_ProductOptions_ProductId_OptionId",
+                        columns: x => new { x.ProductId, x.OptionId },
+                        principalSchema: "Product",
+                        principalTable: "ProductOptions",
+                        principalColumns: new[] { "ProductId", "OptionId" },
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "OrderDetails",
                 schema: "Order",
                 columns: table => new
@@ -479,8 +509,8 @@ namespace StoreOrder.WebApplication.Data.Migrations
                 {
                     Id = table.Column<string>(maxLength: 50, nullable: false),
                     StatusCooking = table.Column<int>(nullable: true),
-                    DateRecieved = table.Column<DateTime>(nullable: true),
-                    DateDone = table.Column<DateTime>(nullable: true),
+                    CreateOn = table.Column<DateTime>(nullable: true),
+                    UpdateOn = table.Column<DateTime>(nullable: true),
                     DurationTime = table.Column<int>(nullable: true),
                     UserId = table.Column<string>(nullable: true),
                     OrderId = table.Column<string>(nullable: true)
@@ -501,6 +531,51 @@ namespace StoreOrder.WebApplication.Data.Migrations
                         principalSchema: "Account",
                         principalTable: "Users",
                         principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductSKUValues",
+                schema: "Product",
+                columns: table => new
+                {
+                    ProductId = table.Column<string>(nullable: false),
+                    SkuId = table.Column<string>(nullable: false),
+                    OptionId = table.Column<string>(nullable: false),
+                    ValueId = table.Column<string>(nullable: true),
+                    ProductSKUProductId = table.Column<string>(nullable: true),
+                    ProductSKUSkuId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductSKUValues", x => new { x.ProductId, x.SkuId, x.OptionId });
+                    table.ForeignKey(
+                        name: "FK_ProductSKUValues_ProductOptions_ProductId_OptionId",
+                        columns: x => new { x.ProductId, x.OptionId },
+                        principalSchema: "Product",
+                        principalTable: "ProductOptions",
+                        principalColumns: new[] { "ProductId", "OptionId" },
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProductSKUValues_ProductSKUs_ProductId_SkuId",
+                        columns: x => new { x.ProductId, x.SkuId },
+                        principalSchema: "Product",
+                        principalTable: "ProductSKUs",
+                        principalColumns: new[] { "ProductId", "SkuId" },
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ProductSKUValues_ProductSKUs_ProductSKUProductId_ProductSKU~",
+                        columns: x => new { x.ProductSKUProductId, x.ProductSKUSkuId },
+                        principalSchema: "Product",
+                        principalTable: "ProductSKUs",
+                        principalColumns: new[] { "ProductId", "SkuId" },
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ProductSKUValues_ProductOptionValues_ProductId_OptionId_Val~",
+                        columns: x => new { x.ProductId, x.OptionId, x.ValueId },
+                        principalSchema: "Product",
+                        principalTable: "ProductOptionValues",
+                        principalColumns: new[] { "ProductId", "OptionId", "ValueId" },
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -578,18 +653,6 @@ namespace StoreOrder.WebApplication.Data.Migrations
                 column: "ParentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Options_ProductId",
-                schema: "Product",
-                table: "Options",
-                column: "ProductId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OptionValues_OptionId",
-                schema: "Product",
-                table: "OptionValues",
-                column: "OptionId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Products_CategoryId",
                 schema: "Product",
                 table: "Products",
@@ -602,10 +665,40 @@ namespace StoreOrder.WebApplication.Data.Migrations
                 column: "ProductParentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductSkus_ProductId",
+                name: "IX_Products_StoreId",
                 schema: "Product",
-                table: "ProductSkus",
-                column: "ProductId");
+                table: "Products",
+                column: "StoreId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_UserId",
+                schema: "Product",
+                table: "Products",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductSKUs_Sku",
+                schema: "Product",
+                table: "ProductSKUs",
+                column: "Sku");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductSKUValues_ProductSKUProductId_ProductSKUSkuId",
+                schema: "Product",
+                table: "ProductSKUValues",
+                columns: new[] { "ProductSKUProductId", "ProductSKUSkuId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductSKUValues_ProductId_OptionId_ValueId",
+                schema: "Product",
+                table: "ProductSKUValues",
+                columns: new[] { "ProductId", "OptionId", "ValueId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StoreOptions_StoreId",
+                schema: "Store",
+                table: "StoreOptions",
+                column: "StoreId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Stores_CategoryStoreId",
@@ -653,16 +746,12 @@ namespace StoreOrder.WebApplication.Data.Migrations
                 schema: "Order");
 
             migrationBuilder.DropTable(
-                name: "OptionValues",
+                name: "ProductSKUValues",
                 schema: "Product");
 
             migrationBuilder.DropTable(
-                name: "ProductSkus",
-                schema: "Product");
-
-            migrationBuilder.DropTable(
-                name: "SkuValues",
-                schema: "Product");
+                name: "StoreOptions",
+                schema: "Store");
 
             migrationBuilder.DropTable(
                 name: "Permissions",
@@ -677,7 +766,11 @@ namespace StoreOrder.WebApplication.Data.Migrations
                 schema: "Order");
 
             migrationBuilder.DropTable(
-                name: "Options",
+                name: "ProductSKUs",
+                schema: "Product");
+
+            migrationBuilder.DropTable(
+                name: "ProductOptionValues",
                 schema: "Product");
 
             migrationBuilder.DropTable(
@@ -685,11 +778,15 @@ namespace StoreOrder.WebApplication.Data.Migrations
                 schema: "Store");
 
             migrationBuilder.DropTable(
-                name: "Users",
-                schema: "Account");
+                name: "ProductOptions",
+                schema: "Product");
 
             migrationBuilder.DropTable(
                 name: "Products",
+                schema: "Product");
+
+            migrationBuilder.DropTable(
+                name: "CategoryProducts",
                 schema: "Product");
 
             migrationBuilder.DropTable(
@@ -697,8 +794,8 @@ namespace StoreOrder.WebApplication.Data.Migrations
                 schema: "Store");
 
             migrationBuilder.DropTable(
-                name: "CategoryProducts",
-                schema: "Product");
+                name: "Users",
+                schema: "Account");
 
             migrationBuilder.DropTable(
                 name: "CategoryStores",

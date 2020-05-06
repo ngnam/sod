@@ -10,8 +10,8 @@ using StoreOrder.WebApplication.Data;
 namespace StoreOrder.WebApplication.Data.Migrations
 {
     [DbContext(typeof(StoreOrderDbContext))]
-    [Migration("20200505035152_AddColumnAddressToStoreTable")]
-    partial class AddColumnAddressToStoreTable
+    [Migration("20200506171809_RemoveColumnProductPrice")]
+    partial class RemoveColumnProductPrice
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -37,8 +37,7 @@ namespace StoreOrder.WebApplication.Data.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("TokenLogin")
-                        .HasColumnType("character varying(500)")
-                        .HasMaxLength(500);
+                        .HasColumnType("TEXT");
 
                     b.Property<int?>("TypeLogin")
                         .HasColumnType("integer");
@@ -136,8 +135,7 @@ namespace StoreOrder.WebApplication.Data.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("HashPassword")
-                        .HasColumnType("character varying(255)")
-                        .HasMaxLength(255);
+                        .HasColumnType("TEXT");
 
                     b.Property<int?>("IsActived")
                         .HasColumnType("integer");
@@ -150,16 +148,14 @@ namespace StoreOrder.WebApplication.Data.Migrations
                         .HasMaxLength(50);
 
                     b.Property<string>("OldPassword")
-                        .HasColumnType("character varying(255)")
-                        .HasMaxLength(255);
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("character varying(11)")
                         .HasMaxLength(11);
 
                     b.Property<string>("SaltPassword")
-                        .HasColumnType("character varying(255)")
-                        .HasMaxLength(255);
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
@@ -300,10 +296,7 @@ namespace StoreOrder.WebApplication.Data.Migrations
                         .HasColumnType("character varying(50)")
                         .HasMaxLength(50);
 
-                    b.Property<DateTime?>("DateDone")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<DateTime?>("DateRecieved")
+                    b.Property<DateTime?>("CreateOn")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("DurationTime")
@@ -314,6 +307,9 @@ namespace StoreOrder.WebApplication.Data.Migrations
 
                     b.Property<int?>("StatusCooking")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdateOn")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("UserId")
                         .HasColumnType("character varying(255)");
@@ -355,48 +351,6 @@ namespace StoreOrder.WebApplication.Data.Migrations
                     b.ToTable("CategoryProducts","Product");
                 });
 
-            modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Products.Option", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("character varying(50)")
-                        .HasMaxLength(50);
-
-                    b.Property<string>("OptionName")
-                        .HasColumnType("character varying(250)")
-                        .HasMaxLength(250);
-
-                    b.Property<string>("ProductId")
-                        .HasColumnType("character varying(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("Options","Product");
-                });
-
-            modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Products.OptionValue", b =>
-                {
-                    b.Property<string>("ValueId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("OptionId")
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("ProductId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ValueName")
-                        .HasColumnType("character varying(250)")
-                        .HasMaxLength(250);
-
-                    b.HasKey("ValueId", "OptionId", "ProductId");
-
-                    b.HasIndex("OptionId");
-
-                    b.ToTable("OptionValues","Product");
-                });
-
             modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Products.Product", b =>
                 {
                     b.Property<string>("Id")
@@ -406,27 +360,44 @@ namespace StoreOrder.WebApplication.Data.Migrations
                     b.Property<string>("CategoryId")
                         .HasColumnType("character varying(50)");
 
-                    b.Property<DateTime?>("CreatedAt")
+                    b.Property<DateTime?>("CreateOn")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<DateTime?>("DeletedAt")
+                    b.Property<DateTime?>("DeleteOn")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<decimal>("Depth")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("Height")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("NetWeight")
+                        .HasColumnType("numeric");
 
                     b.Property<string>("ProductName")
+                        .IsRequired()
                         .HasColumnType("character varying(250)")
                         .HasMaxLength(250);
 
                     b.Property<string>("ProductParentId")
                         .HasColumnType("character varying(50)");
 
-                    b.Property<decimal?>("ProductPrice")
-                        .HasColumnType("numeric");
+                    b.Property<string>("StoreId")
+                        .HasColumnType("character varying(50)");
 
-                    b.Property<int?>("ProductStatus")
-                        .HasColumnType("integer");
+                    b.Property<string>("UniversalProductCode")
+                        .HasColumnType("character varying(32)")
+                        .HasMaxLength(32);
 
-                    b.Property<DateTime?>("UpdatedAt")
+                    b.Property<DateTime?>("UpdateOn")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<decimal>("Weight")
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 
@@ -434,49 +405,104 @@ namespace StoreOrder.WebApplication.Data.Migrations
 
                     b.HasIndex("ProductParentId");
 
+                    b.HasIndex("StoreId");
+
+                    b.HasIndex("UserId");
+
                     b.ToTable("Products","Product");
                 });
 
-            modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Products.ProductSku", b =>
+            modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Products.ProductOption", b =>
                 {
-                    b.Property<string>("SkuId")
-                        .HasColumnType("character varying(50)")
-                        .HasMaxLength(50);
-
-                    b.Property<decimal?>("Price")
-                        .HasColumnType("numeric");
-
                     b.Property<string>("ProductId")
                         .HasColumnType("character varying(50)");
 
-                    b.Property<string>("SkuName")
-                        .HasColumnType("character varying(250)")
-                        .HasMaxLength(250);
+                    b.Property<string>("OptionId")
+                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(50);
 
-                    b.HasKey("SkuId");
+                    b.Property<string>("OptionName")
+                        .IsRequired()
+                        .HasColumnType("character varying(40)")
+                        .HasMaxLength(40);
 
-                    b.HasIndex("ProductId");
+                    b.HasKey("ProductId", "OptionId");
 
-                    b.ToTable("ProductSkus","Product");
+                    b.ToTable("ProductOptions","Product");
                 });
 
-            modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Products.SkuValue", b =>
+            modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Products.ProductOptionValue", b =>
                 {
+                    b.Property<string>("ProductId")
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("OptionId")
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("ValueId")
+                        .HasColumnType("character varying(256)")
+                        .HasMaxLength(256);
+
+                    b.Property<string>("ValueName")
+                        .IsRequired()
+                        .HasColumnType("character varying(32)")
+                        .HasMaxLength(32);
+
+                    b.HasKey("ProductId", "OptionId", "ValueId");
+
+                    b.ToTable("ProductOptionValues","Product");
+                });
+
+            modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Products.ProductSKU", b =>
+                {
+                    b.Property<string>("ProductId")
+                        .HasColumnType("character varying(50)");
+
                     b.Property<string>("SkuId")
                         .HasColumnType("text");
 
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Sku")
+                        .IsRequired()
+                        .HasColumnType("character varying(64)")
+                        .HasMaxLength(64);
+
+                    b.HasKey("ProductId", "SkuId");
+
+                    b.HasIndex("Sku");
+
+                    b.ToTable("ProductSKUs","Product");
+                });
+
+            modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Products.ProductSKUValue", b =>
+                {
                     b.Property<string>("ProductId")
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("SkuId")
                         .HasColumnType("text");
 
                     b.Property<string>("OptionId")
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("ProductSKUProductId")
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("ProductSKUSkuId")
                         .HasColumnType("text");
 
                     b.Property<string>("ValueId")
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(256)");
 
-                    b.HasKey("SkuId", "ProductId", "OptionId");
+                    b.HasKey("ProductId", "SkuId", "OptionId");
 
-                    b.ToTable("SkuValues","Product");
+                    b.HasIndex("ProductSKUProductId", "ProductSKUSkuId");
+
+                    b.HasIndex("ProductId", "OptionId", "ValueId");
+
+                    b.ToTable("ProductSKUValues","Product");
                 });
 
             modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Stores.CategoryStore", b =>
@@ -497,7 +523,8 @@ namespace StoreOrder.WebApplication.Data.Migrations
             modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Stores.Store", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(50);
 
                     b.Property<string>("CategoryStoreId")
                         .HasColumnType("character varying(50)");
@@ -524,7 +551,8 @@ namespace StoreOrder.WebApplication.Data.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(255)")
+                        .HasMaxLength(255);
 
                     b.Property<double?>("lat")
                         .HasColumnType("double precision");
@@ -541,6 +569,30 @@ namespace StoreOrder.WebApplication.Data.Migrations
                     b.ToTable("Stores","Store");
                 });
 
+            modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Stores.StoreOption", b =>
+                {
+                    b.Property<string>("OptionId")
+                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(50);
+
+                    b.Property<string>("StoreId")
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("StoreOptionDescription")
+                        .HasColumnType("character varying(250)")
+                        .HasMaxLength(250);
+
+                    b.Property<string>("StoreOptionName")
+                        .HasColumnType("character varying(250)")
+                        .HasMaxLength(250);
+
+                    b.HasKey("OptionId");
+
+                    b.HasIndex("StoreId");
+
+                    b.ToTable("StoreOptions","Store");
+                });
+
             modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Stores.StoreTable", b =>
                 {
                     b.Property<string>("Id")
@@ -550,10 +602,18 @@ namespace StoreOrder.WebApplication.Data.Migrations
                     b.Property<int?>("Location")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("LocationUnit")
+                        .HasColumnType("integer");
+
                     b.Property<string>("StoreId")
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(50);
 
                     b.Property<string>("TableCode")
+                        .HasColumnType("character varying(250)")
+                        .HasMaxLength(250);
+
+                    b.Property<string>("TableName")
                         .HasColumnType("character varying(250)")
                         .HasMaxLength(250);
 
@@ -680,22 +740,6 @@ namespace StoreOrder.WebApplication.Data.Migrations
                         .HasForeignKey("ParentId");
                 });
 
-            modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Products.Option", b =>
-                {
-                    b.HasOne("StoreOrder.WebApplication.Data.Models.Products.Product", "Product")
-                        .WithMany("Options")
-                        .HasForeignKey("ProductId");
-                });
-
-            modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Products.OptionValue", b =>
-                {
-                    b.HasOne("StoreOrder.WebApplication.Data.Models.Products.Option", "Option")
-                        .WithMany("OptionValues")
-                        .HasForeignKey("OptionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Products.Product", b =>
                 {
                     b.HasOne("StoreOrder.WebApplication.Data.Models.Products.CategoryProduct", "CategoryProduct")
@@ -705,13 +749,66 @@ namespace StoreOrder.WebApplication.Data.Migrations
                     b.HasOne("StoreOrder.WebApplication.Data.Models.Products.Product", "ParentProduct")
                         .WithMany("ChildProducts")
                         .HasForeignKey("ProductParentId");
+
+                    b.HasOne("StoreOrder.WebApplication.Data.Models.Stores.Store", "Store")
+                        .WithMany("Products")
+                        .HasForeignKey("StoreId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("StoreOrder.WebApplication.Data.Models.Account.User", "User")
+                        .WithMany("Products")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
                 });
 
-            modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Products.ProductSku", b =>
+            modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Products.ProductOption", b =>
                 {
                     b.HasOne("StoreOrder.WebApplication.Data.Models.Products.Product", "Product")
-                        .WithMany("ProductSkus")
-                        .HasForeignKey("ProductId");
+                        .WithMany("ProductOptions")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Products.ProductOptionValue", b =>
+                {
+                    b.HasOne("StoreOrder.WebApplication.Data.Models.Products.ProductOption", "ProductOption")
+                        .WithMany("ProductOptionValues")
+                        .HasForeignKey("ProductId", "OptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Products.ProductSKU", b =>
+                {
+                    b.HasOne("StoreOrder.WebApplication.Data.Models.Products.Product", "Product")
+                        .WithMany("ProductSKUs")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Products.ProductSKUValue", b =>
+                {
+                    b.HasOne("StoreOrder.WebApplication.Data.Models.Products.ProductOption", "ProductOption")
+                        .WithMany("ProductSKUValues")
+                        .HasForeignKey("ProductId", "OptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("StoreOrder.WebApplication.Data.Models.Products.ProductSKU", null)
+                        .WithMany("ProductSKUValues")
+                        .HasForeignKey("ProductId", "SkuId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("StoreOrder.WebApplication.Data.Models.Products.ProductSKU", "ProductSKU")
+                        .WithMany()
+                        .HasForeignKey("ProductSKUProductId", "ProductSKUSkuId");
+
+                    b.HasOne("StoreOrder.WebApplication.Data.Models.Products.ProductOptionValue", "ProductOptionValue")
+                        .WithMany("ProductSKUValues")
+                        .HasForeignKey("ProductId", "OptionId", "ValueId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Stores.Store", b =>
@@ -725,10 +822,18 @@ namespace StoreOrder.WebApplication.Data.Migrations
                         .HasForeignKey("ProviderId");
                 });
 
+            modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Stores.StoreOption", b =>
+                {
+                    b.HasOne("StoreOrder.WebApplication.Data.Models.Stores.Store", "Store")
+                        .WithMany("StoreOptions")
+                        .HasForeignKey("StoreId")
+                        .OnDelete(DeleteBehavior.SetNull);
+                });
+
             modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Stores.StoreTable", b =>
                 {
                     b.HasOne("StoreOrder.WebApplication.Data.Models.Stores.Store", "Store")
-                        .WithMany("StoreHasTables")
+                        .WithMany("StoreTables")
                         .HasForeignKey("StoreId");
                 });
 

@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using StoreOrder.WebApplication.Data;
 using StoreOrder.WebApplication.Data.DTO;
 using StoreOrder.WebApplication.Data.Wrappers;
-using StoreOrder.WebApplication.Extensions;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace StoreOrder.WebApplication.Controllers
@@ -32,12 +30,6 @@ namespace StoreOrder.WebApplication.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] UserLoginAuthenticate model)
         {
-            if (!ModelState.IsValid)
-            {
-                throw new ApiException(ModelState.AllErrors(), (int)HttpStatusCode.BadRequest);
-                //return BadRequest(new ApiError(ResponseMessageEnum.ValidationError.GetDescription(), ModelState.AllErrors()));
-            }
-
             var user = await _authRepository.GetUserByUserNameOrEmail(model.UserNameOrEmail);
             if (user == null)
             {
@@ -48,7 +40,9 @@ namespace StoreOrder.WebApplication.Controllers
             {
                 throw new ApiException("Wrong password.");
                 //return BadRequest(new ApiError("Wrong password."));
-            } else { 
+            }
+            else
+            {
                 return Ok(new { data = _authRepository.GenerateToken(user) });
             }
         }
