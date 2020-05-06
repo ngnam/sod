@@ -17,7 +17,6 @@ using StoreOrder.WebApplication.Data.Wrappers;
 using StoreOrder.WebApplication.Extensions;
 using StoreOrder.WebApplication.Middlewares;
 using StoreOrder.WebApplication.Middlewares.Swagger;
-using StoreOrder.WebApplication.Validations;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
