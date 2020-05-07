@@ -154,10 +154,10 @@ namespace StoreOrder.WebApplication.Data
 
         private async Task<bool> LogoutUserAsync(string userId, string currentUserId)
         {
-            if (!(await _context.UserLogins.AnyAsync(u => u.UserId == userId && u.NameIdentifier == currentUserId && u.IsLoggedIn == true)))
+            if ((await CheckUserLogoutedAsync(userId, currentUserId)))
             {
                 _logger.LogInformation("User đã logout");
-                throw new ApiException("User đã logout", (int)HttpStatusCode.BadRequest);
+                throw new ApiException("User đã logout", (int)HttpStatusCode.Unauthorized);
             }
             var userLogin = await _context.UserLogins
                 .FirstOrDefaultAsync(p => p.UserId == userId && p.NameIdentifier == currentUserId && p.IsLoggedIn == true);

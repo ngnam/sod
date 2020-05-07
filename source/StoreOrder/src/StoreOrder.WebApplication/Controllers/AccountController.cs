@@ -62,10 +62,6 @@ namespace StoreOrder.WebApplication.Controllers
         [Authorize]
         public async Task<IActionResult> Logout()
         {
-            if (!HttpContext.User.Identity.IsAuthenticated)
-            {
-                throw new ApiException(ResponseMessageEnum.UnAuthorized.GetDescription(), (int)HttpStatusCode.Unauthorized);
-            }
             var isLogout = await _authRepository.LogoutAsync(this.userId, this.currentUserLogin);
             return Ok(new { isLogout = isLogout });
         }
