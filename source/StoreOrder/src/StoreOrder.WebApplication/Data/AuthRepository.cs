@@ -120,7 +120,7 @@ namespace StoreOrder.WebApplication.Data
                 } else
                 {
                     // Update to UserDevices
-                    var userDevice = userCreate.UserDevices.FirstOrDefault(uc => uc.CurrentUserId == userExist.Id && uc.CodeDevice == model.AppId);
+                    var userDevice = _context.UserDevices.FirstOrDefault(uc => uc.CurrentUserId == userExist.Id && uc.CodeDevice == model.AppId);
                     if (userDevice != null)
                     {
                         _context.Entry(userDevice).State = EntityState.Modified;
@@ -147,7 +147,7 @@ namespace StoreOrder.WebApplication.Data
                 else
                 {
                     // update To UserExternalSignIns
-                    var userExternalSignIn = userCreate.UseExternalSignIns.FirstOrDefault(ue => ue.UserId == userExist.Id && ue.TypeLogin == model.TypeLogin);
+                    var userExternalSignIn = _context.ExternalSignIns.FirstOrDefault(ue => ue.UserId == userExist.Id && ue.TypeLogin == model.TypeLogin);
                     if (userExternalSignIn != null)
                     {
                         _context.Entry(userExternalSignIn).State = EntityState.Modified;
