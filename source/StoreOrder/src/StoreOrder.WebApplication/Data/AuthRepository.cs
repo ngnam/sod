@@ -103,7 +103,7 @@ namespace StoreOrder.WebApplication.Data
                 _context.Entry(userCreate).State = EntityState.Modified;
                 userCreate.LastLogin = DateTime.UtcNow;
                 // check appId & currentUserId Exist
-                if (!userCreate.UserDevices.Any(uc => uc.CurrentUserId == userCreate.Id && uc.CodeDevice == model.AppId))
+                if (!_context.UserDevices.Any(uc => uc.CurrentUserId == userCreate.Id && uc.CodeDevice == model.AppId))
                 {
                     // Add to UserDevices
                     var userDevice = new UserDevice
@@ -130,7 +130,7 @@ namespace StoreOrder.WebApplication.Data
                     }
                 }
                 // check exist UseExternalSignIns
-                if (!userCreate.UseExternalSignIns.Any(ue => ue.UserId == userCreate.Id && ue.TypeLogin == model.TypeLogin))
+                if (!_context.ExternalSignIns.Any(ue => ue.UserId == userCreate.Id && ue.TypeLogin == model.TypeLogin))
                 {
                     var newUSERExternalSignIn = new ExternalSignIn
                     {
