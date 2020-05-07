@@ -45,7 +45,7 @@ namespace StoreOrder.WebApplication.Controllers
 
             var result = await ApiResult<StoreItemDTO>.CreateAsync(
                     _context.Stores
-                    .Where(c => c.UserId == this.userId && c.StatusStore == (int)TypeStatusStore.Open)
+                    .Where(c => c.StatusStore == (int)TypeStatusStore.Open)
                     .Select(c => new StoreItemDTO()
                     {
                         Id = c.Id,
