@@ -1,17 +1,19 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using StoreOrder.WebApplication.Controllers.ApiBase;
 using StoreOrder.WebApplication.Data;
 using StoreOrder.WebApplication.Data.DTO;
 using StoreOrder.WebApplication.Data.Wrappers;
+using StoreOrder.WebApplication.Extensions;
+using System;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace StoreOrder.WebApplication.Controllers
 {
-    [Produces("application/json", "application/problem+json")]
-    [Route("[controller]")]
     [ApiVersion("1")]
-    [ApiController]
-    public class AccountController : ControllerBase
+    public class AccountController : ApiBaseController
     {
         private readonly IAuthRepository _authRepository;
         public AccountController(IAuthRepository authRepository)
@@ -30,6 +32,11 @@ namespace StoreOrder.WebApplication.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] UserLoginAuthenticate model)
         {
+            if (HttpContext.User.Identity.IsAuthenticated)
+            {
+                return Ok(new { isAuthenicated = HttpContext.User.Identity.IsAuthenticated });
+            }
+
             var user = await _authRepository.GetUserByUserNameOrEmail(model.UserNameOrEmail);
             if (user == null)
             {
@@ -43,9 +50,24 @@ namespace StoreOrder.WebApplication.Controllers
             }
             else
             {
-                return Ok(new { data = _authRepository.GenerateToken(user) });
+                string currentUserId = Guid.NewGuid().ToString();
+                var userLogined = _authRepository.GenerateToken(user, currentUserId);
+                // save to login
+                await _authRepository.SaveToUserLoginAsync(user, userLogined, currentUserId);
+                return Ok(userLogined);
             }
         }
 
+        [HttpGet("logout"), MapToApiVersion("1")]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            if (!HttpContext.User.Identity.IsAuthenticated)
+            {
+                throw new ApiException(ResponseMessageEnum.UnAuthorized.GetDescription(), (int)HttpStatusCode.Unauthorized);
+            }
+            var isLogout = await _authRepository.LogoutAsync(this.userId, this.currentUserLogin);
+            return Ok(new { isLogout = isLogout });
+        }
     }
 }

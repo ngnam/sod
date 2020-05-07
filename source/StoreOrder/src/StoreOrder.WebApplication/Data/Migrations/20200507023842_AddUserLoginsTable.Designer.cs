@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using StoreOrder.WebApplication.Data;
@@ -9,9 +10,10 @@ using StoreOrder.WebApplication.Data;
 namespace StoreOrder.WebApplication.Data.Migrations
 {
     [DbContext(typeof(StoreOrderDbContext))]
-    partial class StoreOrderDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200507023842_AddUserLoginsTable")]
+    partial class AddUserLoginsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -216,13 +218,6 @@ namespace StoreOrder.WebApplication.Data.Migrations
 
                     b.Property<bool?>("IsLoggedIn")
                         .HasColumnType("boolean");
-
-                    b.Property<DateTime?>("LastLogin")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("NameIdentifier")
-                        .HasColumnType("character varying(50)")
-                        .HasMaxLength(50);
 
                     b.Property<string>("TokenType")
                         .HasColumnType("character varying(25)")

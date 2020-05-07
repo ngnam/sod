@@ -22,5 +22,7 @@ namespace StoreOrder.WebApplication.Data.Wrappers
         Unknown,
         [Description("Unhandled Exception occured. Unable to process the request.")]
         Unhandled,
+        [Description("Error Update Database.")]
+        UpdateDb,
     }
 }

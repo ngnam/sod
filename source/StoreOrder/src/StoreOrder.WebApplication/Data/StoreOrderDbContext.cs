@@ -62,6 +62,18 @@ namespace StoreOrder.WebApplication.Data
             });
             #endregion
 
+            #region UserLogin
+            modelBuilder.Entity<UserLogin>(c => {
+                c.ToTable("UserLogins", "Account");
+                c.HasKey(m => m.Id);
+                c.Property(m => m.Id).ValueGeneratedOnAdd();
+                c.Property(m => m.TokenType).HasMaxLength(25);
+                c.Property(m => m.NameIdentifier).HasMaxLength(50);
+                c.Property(m => m.AccessToken).HasColumnType("TEXT");
+                c.HasOne(m => m.User).WithMany(m => m.UserLogins).HasForeignKey(m => m.UserId).OnDelete(DeleteBehavior.Restrict);
+            });
+            #endregion
+
             // Role
             modelBuilder.Entity<Role>(c =>
             {
@@ -293,6 +305,7 @@ namespace StoreOrder.WebApplication.Data
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<RoleToPermission> RoleToPermissions { get; set; }
         public DbSet<ExternalSignIn> ExternalSignIns { get; set; }
+        public DbSet<UserLogin> UserLogins { get; set; }
         // Location
         public DbSet<Provider> Providers { get; set; }
         // Order
