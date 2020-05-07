@@ -12,7 +12,8 @@ namespace StoreOrder.WebApplication.Middlewares.Swagger
         private readonly List<OpenApiTag> _tags = new List<OpenApiTag>
         {
             new OpenApiTag { Name = "Home", Description = "Browse the Home API" },
-            new OpenApiTag { Name = "Account", Description = "Account API" }
+            new OpenApiTag { Name = "Account", Description = "Account API" },
+            new OpenApiTag { Name = "Stores", Description = "Stores API"}
         };
         public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
         {
