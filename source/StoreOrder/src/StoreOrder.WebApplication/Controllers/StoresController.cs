@@ -6,6 +6,7 @@ using StoreOrder.WebApplication.Controllers.ApiBase;
 using StoreOrder.WebApplication.Data;
 using StoreOrder.WebApplication.Data.DTO;
 using StoreOrder.WebApplication.Data.Enums;
+using StoreOrder.WebApplication.Data.Models.Stores;
 using StoreOrder.WebApplication.Data.Wrappers;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -65,6 +66,52 @@ namespace StoreOrder.WebApplication.Controllers
                     filterQuery);
 
             return Ok(result);
+        }
+
+        [HttpGet("{id}/tables"), MapToApiVersion("1")]
+        public async Task<IActionResult> GetListTables(
+            string id,
+            int pageIndex = 0,
+            int pageSize = 10,
+            string sortColumn = null,
+            string sortOrder = null,
+            string filterColumn = null,
+            string filterQuery = null
+            )
+        {
+            // check user logout
+            await CheckIsSignoutedAsync();
+
+            var result = await ApiResult<StoreTable>.CreateAsync(
+                    _context.StoreTables
+                    .Where(c => c.StoreId == id),
+                    pageIndex,
+                    pageSize,
+                    sortColumn,
+                    sortOrder,
+                    filterColumn,
+                    filterQuery);
+
+            var dataGroup =
+                result.Data.GroupBy(c => c.Location)
+                    .Select(c => new StoreTableDTOGroupByLocalionDTO
+                    {
+                        location = c.Key,
+                        lstTable = c.DefaultIfEmpty()
+                    .Select(table => new StoreTableDTO
+                    {
+                        Id = table.Id,
+                        Location = table.Location,
+                        LocationUnit = table.LocationUnit,
+                        StoreId = table.StoreId,
+                        TableName = table.TableName,
+                        TableCode = table.TableCode,
+                        TableStatus = table.TableStatus
+                    })
+                    });
+
+
+            return Ok(dataGroup);
         }
 
         private async Task CheckIsSignoutedAsync()
