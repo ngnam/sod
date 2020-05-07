@@ -5,14 +5,6 @@ using System.Threading.Tasks;
 
 namespace StoreOrder.WebApplication.Data.Models.Account
 {
-    public enum TypeLogin
-    {
-        GOOGLE, 
-        FACEBOOK,
-        QACODE,
-        ONTIMEPASSWORD,
-        SMSCODE
-    }
     public class ExternalSignIn
     {
         public ExternalSignIn()

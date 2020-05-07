@@ -29,10 +29,11 @@ namespace StoreOrder.WebApplication
                 //// I will add 1 user to one Role
                 //var book1 = new Book();
                 //var book2 = new Book();
-                var roleAdmin = new Role { Id = Guid.NewGuid().ToString(), Code = Guid.NewGuid().ToString(), RoleName = "Administrator", Desc = "Admin of Store" };
-                var roleOrderUser = new Role { Id = Guid.NewGuid().ToString(), Code = Guid.NewGuid().ToString(), RoleName = "OrderUser", Desc = "NV Order of Store" };
-                var roleCookieUser = new Role { Id = Guid.NewGuid().ToString(), Code = Guid.NewGuid().ToString(), RoleName = "CookieUser", Desc = "NV phụ bếp of Store" };
-                var rolePayUser = new Role { Id = Guid.NewGuid().ToString(), Code = Guid.NewGuid().ToString(), RoleName = "PayUser", Desc = "Nv Thanh toán of Store" };
+                var roleAdmin = new Role { Id = Guid.NewGuid().ToString(), Code = Guid.NewGuid().ToString(), RoleName = RoleTypeHelper.RoleAdmin, Desc = "Admin of Store" };
+                var roleOrderUser = new Role { Id = Guid.NewGuid().ToString(), Code = Guid.NewGuid().ToString(), RoleName = RoleTypeHelper.RoleOrderUser, Desc = "NV Order of Store" };
+                var roleCookieUser = new Role { Id = Guid.NewGuid().ToString(), Code = Guid.NewGuid().ToString(), RoleName = RoleTypeHelper.RoleCookieUser, Desc = "NV phụ bếp of Store" };
+                var rolePayUser = new Role { Id = Guid.NewGuid().ToString(), Code = Guid.NewGuid().ToString(), RoleName = RoleTypeHelper.RolePayUser, Desc = "Nv Thanh toán of Store" };
+                var roleCustomerUser = new Role { Id = Guid.NewGuid().ToString(), Code = Guid.NewGuid().ToString(), RoleName = RoleTypeHelper.roleCustomerUser, Desc = "Role Account of Customer" };
 
                 //// I create the User 
                 //var lib = new Library();
@@ -104,6 +105,13 @@ namespace StoreOrder.WebApplication
                 //await databaseDbContext.SaveChangesAsync();
 
                 logger.LogInformation("DatabaseDbContext", "---initial data of Surveys success---");
+            }
+
+            if (databaseDbContext.Roles.Count() == 4)
+            {
+                var roleCustomerUser = new Role { Id = Guid.NewGuid().ToString(), Code = Guid.NewGuid().ToString(), RoleName = RoleTypeHelper.roleCustomerUser, Desc = "Role Account of Customer" };
+                await databaseDbContext.Roles.AddAsync(roleCustomerUser);
+                await databaseDbContext.SaveChangesAsync();
             }
 
             if (!databaseDbContext.CategoryStores.Any())

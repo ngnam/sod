@@ -15,5 +15,6 @@ namespace StoreOrder.WebApplication.Data
         Task SaveToUserLoginAsync(User user, UserLogined userlogined, string currentUserId);
         Task<bool> LogoutAsync(string userId, string CurrentUserId);
         Task<bool> CheckUserLogoutedAsync(string userId, string currentUserId);
+        Task<UserLogined> SignInAndSignUpCustomerAsync(CustomerLoginDTO model);
     }
 }

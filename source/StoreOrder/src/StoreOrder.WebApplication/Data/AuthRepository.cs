@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using StoreOrder.WebApplication.Data.DTO;
+using StoreOrder.WebApplication.Data.Enums;
 using StoreOrder.WebApplication.Data.Models.Account;
 using StoreOrder.WebApplication.Data.Wrappers;
 using StoreOrder.WebApplication.Extensions;
@@ -78,6 +79,139 @@ namespace StoreOrder.WebApplication.Data
             return await _context.UserLogins.AnyAsync(u => u.UserId == userId && u.NameIdentifier == currentUserId && u.IsLoggedIn == false && u.ExpiresIn == DateTime.MinValue);
         }
 
+        public async Task<UserLogined> SignInAndSignUpCustomerAsync(CustomerLoginDTO model)
+        {
+            // GET roleCustomerUser 
+            var roleCustomerUser = await _context.Roles.FirstOrDefaultAsync(role => role.RoleName.Equals(RoleTypeHelper.roleCustomerUser));
+            User userCreate = new User();
+            
+            // CheckUserExist
+            var userExist = await _context.Users
+                .Include(u => u.UserToRoles)
+                .ThenInclude(x => x.Role)
+                .Where(u => u.UserToRoles.Any(x => x.RoleId == roleCustomerUser.Id))
+                .FirstOrDefaultAsync(u => u.Email.ToLower().Equals(model.Email.ToLower()) &&
+                    u.UseExternalSignIns.Count > 0 && u.UserDevices.Count > 0);
+
+            // case login lần sau:
+            if (userExist != null)
+            {
+                // if exist then update user
+                // update To UserDevices
+                // update To UserExternalSignIns
+                userCreate = userExist;
+                _context.Entry(userCreate).State = EntityState.Modified;
+                userCreate.LastLogin = DateTime.UtcNow;
+                // check appId & currentUserId Exist
+                if (!userCreate.UserDevices.Any(uc => uc.CurrentUserId == userCreate.Id && uc.CodeDevice == model.AppId))
+                {
+                    // Add to UserDevices
+                    var userDevice = new UserDevice
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        IsVerified = (int)TypeVerified.Verified,
+                        VerifiedCode = (int)(DateTime.Now.Ticks >> 23),
+                        CodeDevice = model.AppId,
+                        CurrentUserId = userCreate.Id,
+                        LastLogin = DateTime.UtcNow,
+                        TimeCode = 20
+                    };
+                    userCreate.UserDevices.Add(userDevice);
+                } else
+                {
+                    // Update to UserDevices
+                    var userDevice = userCreate.UserDevices.FirstOrDefault(uc => uc.CurrentUserId == userExist.Id && uc.CodeDevice == model.AppId);
+                    if (userDevice != null)
+                    {
+                        _context.Entry(userDevice).State = EntityState.Modified;
+                        userDevice.LastLogin = DateTime.UtcNow;
+                        // save tp db
+                        await _context.SaveChangesAsync();
+                    }
+                }
+                // check exist UseExternalSignIns
+                if (!userCreate.UseExternalSignIns.Any(ue => ue.UserId == userCreate.Id && ue.TypeLogin == model.TypeLogin))
+                {
+                    var newUSERExternalSignIn = new ExternalSignIn
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        IsVerified = (int)TypeVerified.Verified,
+                        LastLogin = DateTime.UtcNow,
+                        TimeLifeToken = 3600,
+                        TokenLogin = model.TokenLogin,
+                        TypeLogin = model.TypeLogin,
+                        UserId = userExist.Id
+                    };
+                    userCreate.UseExternalSignIns.Add(newUSERExternalSignIn);
+                } 
+                else
+                {
+                    // update To UserExternalSignIns
+                    var userExternalSignIn = userCreate.UseExternalSignIns.FirstOrDefault(ue => ue.UserId == userExist.Id && ue.TypeLogin == model.TypeLogin);
+                    if (userExternalSignIn != null)
+                    {
+                        _context.Entry(userExternalSignIn).State = EntityState.Modified;
+                        userExternalSignIn.LastLogin = DateTime.UtcNow;
+                        // save tp db
+                        await _context.SaveChangesAsync();
+                    }
+                }
+
+                // save to db
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                // if not exist then create user
+                userCreate.Id = Guid.NewGuid().ToString();
+                userCreate.FirstName = model.FirstName;
+                userCreate.LastLogin = DateTime.UtcNow;
+                userCreate.LastName = model.LastName;
+                userCreate.Email = model.Email;
+                userCreate.UserName = model.Email;
+                userCreate.PhoneNumber = model.PhoneNumber;
+
+                var userDevice = new UserDevice {
+                    Id = Guid.NewGuid().ToString(),
+                    CodeDevice = model.AppId,
+                    CurrentUserId = userCreate.Id,
+                    IsVerified = (int)TypeVerified.Verified,
+                    LastLogin = DateTime.UtcNow,
+                    TimeCode = 20,
+                    VerifiedCode = (int)(DateTime.Now.Ticks >> 23)
+                };
+                // Save to UserDevices
+                userCreate.UserDevices.Add(userDevice);
+
+                var externalSign = new ExternalSignIn
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    IsVerified = (int)TypeVerified.Verified,
+                    LastLogin = DateTime.UtcNow,
+                    TimeLifeToken = 3600,
+                    TokenLogin = model.TokenLogin,
+                    TypeLogin = model.TypeLogin,
+                    UserId = userCreate.Id
+                };
+                // Save to ExternalSignIns
+                userCreate.UseExternalSignIns.Add(externalSign);
+
+                // Save to UserToRole
+                var userToRole = new UserToRole();
+                userToRole.Role = roleCustomerUser;
+                userToRole.User = userCreate;
+                roleCustomerUser.UserToRoles.Add(userToRole);
+                _context.Users.Add(userCreate);
+
+                // Save All To Database
+                await _context.SaveChangesAsync();
+            }
+            // create token
+            // return
+            return CreateToken(userCreate, Guid.NewGuid().ToString());
+        }
+
+        #region PRIVATE METHOD
         private UserLogined CreateToken(User user, string curentUserId)
         {
             List<Claim> claims = new List<Claim>
@@ -182,5 +316,7 @@ namespace StoreOrder.WebApplication.Data
             }
             return true;
         }
+
+        #endregion
     }
 }

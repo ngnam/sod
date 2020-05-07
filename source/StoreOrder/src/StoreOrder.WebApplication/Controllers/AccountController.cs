@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StoreOrder.WebApplication.Controllers.ApiBase;
 using StoreOrder.WebApplication.Data;
 using StoreOrder.WebApplication.Data.DTO;
 using StoreOrder.WebApplication.Data.Wrappers;
-using StoreOrder.WebApplication.Extensions;
 using System;
 using System.Net;
 using System.Threading.Tasks;
@@ -40,13 +38,11 @@ namespace StoreOrder.WebApplication.Controllers
             var user = await _authRepository.GetUserByUserNameOrEmail(model.UserNameOrEmail);
             if (user == null)
             {
-                throw new ApiException("Wrong username or email.");
-                //return BadRequest(new ApiError("User not found."));
+                throw new ApiException("Wrong username or email.", (int)HttpStatusCode.BadRequest);
             }
             else if (!_authRepository.VerifyPasswordHash(model.Password, user.HashPassword, user.SaltPassword))
             {
-                throw new ApiException("Wrong password.");
-                //return BadRequest(new ApiError("Wrong password."));
+                throw new ApiException("Wrong password.", (int)HttpStatusCode.BadRequest);
             }
             else
             {
@@ -64,6 +60,16 @@ namespace StoreOrder.WebApplication.Controllers
         {
             var isLogout = await _authRepository.LogoutAsync(this.userId, this.currentUserLogin);
             return Ok(new { isLogout = isLogout });
+        }
+
+        [HttpPost("login/customer"), MapToApiVersion("1")]
+        [AllowAnonymous]
+        public async Task<IActionResult> LoginAndRegisterCustomer([FromBody] CustomerLoginDTO model)
+        {
+            var userLogined = new UserLogined();
+            if (ModelState.IsValid)
+                userLogined = await _authRepository.SignInAndSignUpCustomerAsync(model);
+            return Ok(userLogined);
         }
     }
 }
