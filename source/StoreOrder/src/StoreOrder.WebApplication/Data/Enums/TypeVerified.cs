@@ -2,7 +2,7 @@
 {
     public enum TypeVerified
     {
-        Verified,
+        Verified = 1,
         NotVerified
     }
 }

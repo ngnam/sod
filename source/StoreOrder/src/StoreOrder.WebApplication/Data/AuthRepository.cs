@@ -207,8 +207,13 @@ namespace StoreOrder.WebApplication.Data
                 await _context.SaveChangesAsync();
             }
             // create token
+            string currentUserId = Guid.NewGuid().ToString();
+            var userLogined = CreateToken(userCreate, currentUserId);
+            // save to login
+            await SaveToUserLoginAsync(userCreate, userLogined, currentUserId);
+            // save to login
             // return
-            return CreateToken(userCreate, Guid.NewGuid().ToString());
+            return userLogined;
         }
 
         #region PRIVATE METHOD

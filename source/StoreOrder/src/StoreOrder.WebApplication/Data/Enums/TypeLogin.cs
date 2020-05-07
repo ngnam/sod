@@ -2,7 +2,7 @@
 {
     public enum TypeLogin
     {
-        GOOGLE,
+        GOOGLE = 1,
         FACEBOOK,
         QACODE,
         ONTIMEPASSWORD,

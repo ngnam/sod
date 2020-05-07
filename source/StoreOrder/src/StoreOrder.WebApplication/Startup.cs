@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Newtonsoft.Json;
 using StoreOrder.WebApplication.Data;
 using StoreOrder.WebApplication.Data.Wrappers;
 using StoreOrder.WebApplication.Extensions;
@@ -21,7 +18,6 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -85,7 +81,8 @@ namespace StoreOrder.WebApplication
 
             ConfigureSwagger(services); // contains the services.AddSwaggerGen(options => {...} ) code see method definition below
 
-            services.AddApiVersioning(o => {
+            services.AddApiVersioning(o =>
+            {
                 o.AssumeDefaultVersionWhenUnspecified = true;
                 o.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
                 o.ReportApiVersions = true;
@@ -95,9 +92,11 @@ namespace StoreOrder.WebApplication
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest);
 
-            services.AddControllers(option => {
+            services.AddControllers(option =>
+            {
                 option.UseGeneralRoutePrefix("api/v{version:apiVersion}");
-            }).AddJsonOptions(options => {
+            }).AddJsonOptions(options =>
+            {
                 // set this option to TRUE to indent the JSON output
                 options.JsonSerializerOptions.WriteIndented = true;
                 // options.JsonSerializerOptions.PropertyNamingPolicy = null;
@@ -154,7 +153,7 @@ namespace StoreOrder.WebApplication
                     c.EnableFilter();
                     c.SupportedSubmitMethods(SubmitMethod.Get, SubmitMethod.Head, SubmitMethod.Patch, SubmitMethod.Post, SubmitMethod.Put, SubmitMethod.Delete, SubmitMethod.Options);
                 }
-                
+
             });
 
             app.UseEndpoints(endpoints =>

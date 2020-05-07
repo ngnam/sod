@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using StoreOrder.WebApplication.Controllers.ApiBase;
 using StoreOrder.WebApplication.Data;
-using StoreOrder.WebApplication.Data.Models.Account;
 using StoreOrder.WebApplication.Data.Wrappers;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace StoreOrder.WebApplication.Controllers
 {
