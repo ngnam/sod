@@ -6,11 +6,6 @@ using System.Threading.Tasks;
 
 namespace StoreOrder.WebApplication.Data.DTO
 {
-    public enum TypeLogin
-    {
-        GOOGLE,
-        FACEBOOK
-    }
     public class CustomerLoginDTO
     {
         [Required]

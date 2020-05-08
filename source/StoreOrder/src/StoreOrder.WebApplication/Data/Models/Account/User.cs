@@ -1,35 +1,10 @@
-﻿using Microsoft.AspNetCore.Builder;
-using StoreOrder.WebApplication.Data.DTO;
-using StoreOrder.WebApplication.Data.Models.Orders;
+﻿using StoreOrder.WebApplication.Data.Models.Orders;
 using StoreOrder.WebApplication.Data.Models.Products;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace StoreOrder.WebApplication.Data.Models.Account
 {
-    public enum ActiveUser
-    {
-        Actived,
-        Deactived
-    }
-
-    public enum VerifiUser
-    {
-        verified,
-        notVerified
-    }
-
-    public enum ScreenId
-    {
-        userAdmin,
-        userOrder,
-        userCooker,
-        userCrasher
-    }
-
     public class User
     {
         public User()
