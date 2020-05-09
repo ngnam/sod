@@ -128,11 +128,8 @@ namespace StoreOrder.WebApplication
             app.UseAuthorization();
 
             //Add our new middleware to the pipeline
-            ApiResponseOptions apiOptions = new ApiResponseOptions
-            {
-                ApiVersion = "1.0.0.0"
-            };
-            app.UseMiddleware<ApiResponseMiddleware>(apiOptions);
+      
+            app.UseMiddleware<ApiResponseMiddleware>(Configuration["AdminSafeList"]);
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();

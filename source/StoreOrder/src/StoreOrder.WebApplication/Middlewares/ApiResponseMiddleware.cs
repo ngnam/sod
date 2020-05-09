@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,17 +19,23 @@ namespace StoreOrder.WebApplication.Middlewares
     public class ApiResponseMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ApiResponseOptions _options;
+        private readonly ApiResponseOptions _options = new ApiResponseOptions
+        {
+            ApiVersion = "1.0.0.0"
+        };
         private readonly ILogger<ApiResponseMiddleware> _logger;
-        public ApiResponseMiddleware(RequestDelegate next, ApiResponseOptions options, ILogger<ApiResponseMiddleware> logger)
+        private readonly string _safelist;
+        public ApiResponseMiddleware(RequestDelegate next, ILogger<ApiResponseMiddleware> logger, string safelist)
         {
             _next = next;
-            _options = options;
             _logger = logger;
+            _safelist = safelist;
         }
 
         public async Task InvokeAsync(HttpContext context)
         {
+            // checkIP
+            CheckIpSafeList(context);
 
             if (IsSwagger(context))
                 await this._next(context);
@@ -253,6 +260,34 @@ namespace StoreOrder.WebApplication.Middlewares
         private string GetApiVersion()
         {
             return string.IsNullOrEmpty(_options.ApiVersion) ? "1.0.0.0" : _options.ApiVersion;
+        }
+
+        private void CheckIpSafeList(HttpContext context)
+        {
+            var remoteIp = context.Connection.RemoteIpAddress;
+            _logger.Log(LogLevel.Information, $"Request from Remote IP address: {remoteIp} -- Time--{DateTime.Now}");
+
+            string[] ip = _safelist.Split(';');
+
+            var bytes = remoteIp.GetAddressBytes();
+            var badIp = false;
+            foreach (var address in ip)
+            {
+                var testIp = IPAddress.Parse(address);
+                if (testIp.GetAddressBytes().SequenceEqual(bytes))
+                {
+                    badIp = true;
+                    break;
+                }
+            }
+
+            if (badIp)
+            {
+                _logger.Log(LogLevel.Warning,
+                    $"Forbidden Request from Remote IP address: {remoteIp} - {DateTime.Now}");
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                return;
+            }
         }
     }
 
