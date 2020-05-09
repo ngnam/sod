@@ -68,9 +68,9 @@ namespace StoreOrder.WebApplication.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id}/tables"), MapToApiVersion("1")]
+        [HttpGet("tables"), MapToApiVersion("1")]
         public async Task<IActionResult> GetListTables(
-            string id,
+            string id = "b4d32aca-665d-4253-83a5-6f6a8b7acade",
             int pageIndex = 0,
             int pageSize = 10,
             string sortColumn = null,

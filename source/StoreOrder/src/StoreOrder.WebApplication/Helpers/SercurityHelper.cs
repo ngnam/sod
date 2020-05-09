@@ -8,7 +8,7 @@ namespace StoreOrder.WebApplication.Helpers
 {
     public partial class SercurityHelper
     {
-        public static HashSalt GenerateSaltedHash(int size, string password)
+        public static HashSalt GenerateSaltedHash(string password, int size = 10)
         {
             byte[] saltBytes = new byte[size];
             RNGCryptoServiceProvider provider = new RNGCryptoServiceProvider();

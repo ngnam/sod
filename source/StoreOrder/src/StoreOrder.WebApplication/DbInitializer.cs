@@ -24,7 +24,7 @@ namespace StoreOrder.WebApplication
             if (!databaseDbContext.Roles.Any())
             {
                 string password = "string@1234";
-                var hashPass = Helpers.SercurityHelper.GenerateSaltedHash(10, password);
+                var hashPass = Helpers.SercurityHelper.GenerateSaltedHash(password);
 
                 //// I will add 1 user to one Role
                 //var book1 = new Book();
