@@ -33,7 +33,6 @@ namespace StoreOrder.WebApplication.Middlewares
         }
 
         public async Task InvokeAsync(HttpContext context)
-        
         {
             // checkIP
             var remoteIp = context.Connection.RemoteIpAddress;
@@ -42,13 +41,13 @@ namespace StoreOrder.WebApplication.Middlewares
             string[] ip = _safelist.Split(';');
 
             var bytes = remoteIp.GetAddressBytes();
-            var badIp = false;
+            var badIp = true;
             foreach (var address in ip)
             {
                 var testIp = IPAddress.Parse(address);
                 if (testIp.GetAddressBytes().SequenceEqual(bytes))
                 {
-                    badIp = true;
+                    badIp = false;
                     break;
                 }
             }
