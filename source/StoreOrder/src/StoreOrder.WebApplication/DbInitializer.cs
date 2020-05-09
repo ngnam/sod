@@ -116,7 +116,7 @@ namespace StoreOrder.WebApplication
 
             if (!databaseDbContext.CategoryStores.Any())
             {
-                var catStore = new CategoryStore { Id = Guid.NewGuid().ToString(), Name = "Store1" };
+                var catStore = new CategoryStore { Id = Guid.NewGuid().ToString(), Name = "Nhà hàng" };
                 await databaseDbContext.CategoryStores.AddAsync(catStore);
                 await databaseDbContext.SaveChangesAsync();
 
@@ -135,7 +135,7 @@ namespace StoreOrder.WebApplication
                             StatusStore = 1,
                             StoreAddress = "Số 1, Xuân thủy, Cầu Giấy, Việt Nam",
                             StoreName = "Store 1",
-                            UserId = useradmin.Id,
+                            CreateByUserId = useradmin.Id,
                         };
 
                         var lstStoreTable = new List<StoreTable>()

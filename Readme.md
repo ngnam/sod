@@ -27,6 +27,20 @@
 
 * show info pg:info - `pg:info -a storeorder`
 * show addons using - `heroku addons -a storeorder`
+* `heroku ps:scale web=0 --app myAppName `
+* Turn off 
+```
+USAGE
+  $ heroku maintenance
+
+OPTIONS
+  -a, --app=app        (required) app to run command against
+  -r, --remote=remote  git remote of app to use
+
+COMMANDS
+  maintenance:off  take the app out of maintenance mode
+  maintenance:on   put the app into maintenance mode
+```
 
 ## License
 

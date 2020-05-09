@@ -1,5 +1,6 @@
 ﻿using StoreOrder.WebApplication.Data.Models.Orders;
 using StoreOrder.WebApplication.Data.Models.Products;
+using StoreOrder.WebApplication.Data.Models.Stores;
 using System;
 using System.Collections.Generic;
 
@@ -42,5 +43,7 @@ namespace StoreOrder.WebApplication.Data.Models.Account
         public virtual ICollection<UserCookingOrder> UserCookingOrders { get; set; }
         public virtual ICollection<Product> Products { get; set; }
         public virtual ICollection<UserLogin> UserLogins { get; set; }
+        public string StoreId { get; set; }
+        public virtual Store Store { get; set; }
     }
 }

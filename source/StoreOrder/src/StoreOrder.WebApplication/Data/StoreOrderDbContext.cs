@@ -160,9 +160,10 @@ namespace StoreOrder.WebApplication.Data
                 c.Property(m => m.StoreName).HasMaxLength(250);
                 c.Property(m => m.StoreAddress).HasMaxLength(250).IsRequired(false);
                 c.Property(m => m.ProviderId).HasMaxLength(50);
-                c.Property(m => m.UserId).HasMaxLength(255);
+                c.Property(m => m.CreateByUserId).HasMaxLength(255);
                 c.HasOne(m => m.Provider).WithMany(m => m.Stores).HasForeignKey(m => m.ProviderId);
                 c.HasMany(m => m.StoreTables).WithOne(m => m.Store).HasForeignKey(m => m.StoreId);
+                c.HasMany(m => m.Users).WithOne(m => m.Store).HasForeignKey(m => m.StoreId);
             });
 
             // Table
