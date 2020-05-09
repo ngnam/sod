@@ -14,7 +14,8 @@ namespace StoreOrder.WebApplication.Middlewares.Swagger
             new OpenApiTag { Name = "Home", Description = "Browse the Home API" },
             new OpenApiTag { Name = "Account", Description = "Account API" },
             new OpenApiTag { Name = "Stores", Description = "Stores API"},
-            new OpenApiTag { Name = "Location", Description = "Location API"}
+            new OpenApiTag { Name = "Location", Description = "Location API"},
+            new OpenApiTag { Name = "UploadMedia", Description = "Upload Media API" }
         };
         public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
         {

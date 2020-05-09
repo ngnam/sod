@@ -16,6 +16,7 @@
 * [JSON WEB TOKENS (JWT) Implementation](https://dev.to/_patrickgod/authentication-with-json-web-tokens-in-net-core-3-1-29bd)
 * [Generate & verify password ](https://stackoverflow.com/questions/52146528/how-to-validate-salted-and-hashed-password-in-c-sharp)
 * [Convert `DateTime.Now.Tick` to int ](https://stackoverflow.com/questions/2695093/how-to-maintain-precision-using-datetime-now-ticks-in-c-sharp/2695525)
+* [Modeling product variants](https://help.akeneo.com/pim/serenity/articles/what-about-products-variants.html)
 
 ## Environment
 

@@ -25,6 +25,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\..\run.sh = ..\..\run.sh
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Imgur.API.NetCore", "src\Imgur-NetCore\Imgur.API.NetCore.csproj", "{855A620C-4062-4285-AB81-F5A7BA4A4B8E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,12 +37,17 @@ Global
 		{F83C235D-D36D-4F3D-B790-8B43567F0926}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F83C235D-D36D-4F3D-B790-8B43567F0926}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F83C235D-D36D-4F3D-B790-8B43567F0926}.Release|Any CPU.Build.0 = Release|Any CPU
+		{855A620C-4062-4285-AB81-F5A7BA4A4B8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{855A620C-4062-4285-AB81-F5A7BA4A4B8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{855A620C-4062-4285-AB81-F5A7BA4A4B8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{855A620C-4062-4285-AB81-F5A7BA4A4B8E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F83C235D-D36D-4F3D-B790-8B43567F0926} = {F7F4CA9F-6272-47DC-8262-D40E57AABD54}
+		{855A620C-4062-4285-AB81-F5A7BA4A4B8E} = {F7F4CA9F-6272-47DC-8262-D40E57AABD54}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {66A838EA-9096-4BB0-B0CE-7BB3E90B8C1C}
