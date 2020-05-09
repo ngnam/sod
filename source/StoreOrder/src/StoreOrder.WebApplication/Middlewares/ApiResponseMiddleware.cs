@@ -36,7 +36,8 @@ namespace StoreOrder.WebApplication.Middlewares
         {
             // checkIP
             var remoteIp = context.Connection.RemoteIpAddress;
-            _logger.Log(LogLevel.Information, $"Request from Remote IP address: {remoteIp} -- Time--{DateTime.Now}");
+            var ipAddr = context.Request.Headers["x-forwarded-for"];
+            _logger.Log(LogLevel.Information, $"Request from Remote IP address: {remoteIp} -- Time--{DateTime.UtcNow} -- fwd: {ipAddr}");
 
             string[] ip = _safelist.Split(';');
 
