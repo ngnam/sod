@@ -43,12 +43,13 @@ namespace StoreOrder.WebApplication.Data.Models.Products
         public string CategoryId { get; set; }
         public virtual CategoryProduct CategoryProduct { get; set; }
         public virtual IList<Product> ChildProducts { get; set; }
-        public string UserId { get; set; }
+        public string CreateByUserId { get; set; }
         public virtual User User { get; set; }
         public string StoreId { get; set; }
         public virtual Store Store { get; set; }
         public virtual ICollection<ProductSKU> ProductSKUs { get; set; }
         public virtual ICollection<ProductOption> ProductOptions { get; set; }
+        public virtual ProductDetail ProductDetail { get; set; }
 
     }
 }

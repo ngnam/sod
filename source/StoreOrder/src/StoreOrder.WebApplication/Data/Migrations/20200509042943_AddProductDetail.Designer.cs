@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using StoreOrder.WebApplication.Data;
@@ -9,9 +10,10 @@ using StoreOrder.WebApplication.Data;
 namespace StoreOrder.WebApplication.Data.Migrations
 {
     [DbContext(typeof(StoreOrderDbContext))]
-    partial class StoreOrderDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200509042943_AddProductDetail")]
+    partial class AddProductDetail
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -395,9 +397,6 @@ namespace StoreOrder.WebApplication.Data.Migrations
                     b.Property<string>("CategoryId")
                         .HasColumnType("character varying(50)");
 
-                    b.Property<string>("CreateByUserId")
-                        .HasColumnType("character varying(255)");
-
                     b.Property<DateTime?>("CreateOn")
                         .HasColumnType("timestamp without time zone");
 
@@ -431,6 +430,9 @@ namespace StoreOrder.WebApplication.Data.Migrations
                     b.Property<DateTime?>("UpdateOn")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("character varying(255)");
+
                     b.Property<decimal>("Weight")
                         .HasColumnType("numeric");
 
@@ -438,11 +440,11 @@ namespace StoreOrder.WebApplication.Data.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("CreateByUserId");
-
                     b.HasIndex("ProductParentId");
 
                     b.HasIndex("StoreId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Products","Product");
                 });
@@ -865,11 +867,6 @@ namespace StoreOrder.WebApplication.Data.Migrations
                         .WithMany("Products")
                         .HasForeignKey("CategoryId");
 
-                    b.HasOne("StoreOrder.WebApplication.Data.Models.Account.User", "User")
-                        .WithMany("Products")
-                        .HasForeignKey("CreateByUserId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("StoreOrder.WebApplication.Data.Models.Products.Product", "ParentProduct")
                         .WithMany("ChildProducts")
                         .HasForeignKey("ProductParentId");
@@ -877,6 +874,11 @@ namespace StoreOrder.WebApplication.Data.Migrations
                     b.HasOne("StoreOrder.WebApplication.Data.Models.Stores.Store", "Store")
                         .WithMany("Products")
                         .HasForeignKey("StoreId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("StoreOrder.WebApplication.Data.Models.Account.User", "User")
+                        .WithMany("Products")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.SetNull);
                 });
 

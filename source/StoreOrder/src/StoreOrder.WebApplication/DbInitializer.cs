@@ -223,20 +223,20 @@ namespace StoreOrder.WebApplication
                         };
 
                         var lstProducts = new List<Product>() {
-                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 1",   UserId = useradmin.Id, StoreId = store1.Id },
-                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 02",   UserId = useradmin.Id, StoreId = store1.Id },
-                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 03",   UserId = useradmin.Id, StoreId = store1.Id },
-                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 04",   UserId = useradmin.Id, StoreId = store1.Id },
-                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 05",   UserId = useradmin.Id, StoreId = store1.Id },
-                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 06",   UserId = useradmin.Id, StoreId = store1.Id },
-                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 07",   UserId = useradmin.Id, StoreId = store1.Id },
-                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 08",   UserId = useradmin.Id, StoreId = store1.Id },
-                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 09",   UserId = useradmin.Id, StoreId = store1.Id },
-                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 10",   UserId = useradmin.Id, StoreId = store1.Id },
-                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 11",   UserId = useradmin.Id, StoreId = store1.Id },
-                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 12",   UserId = useradmin.Id, StoreId = store1.Id },
-                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 13",   UserId = useradmin.Id, StoreId = store1.Id },
-                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 14",   UserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 1",   CreateByUserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 02",   CreateByUserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 03",   CreateByUserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 04",   CreateByUserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 05",   CreateByUserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 06",   CreateByUserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 07",   CreateByUserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 08",   CreateByUserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 09",   CreateByUserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 10",   CreateByUserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 11",   CreateByUserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 12",   CreateByUserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 13",   CreateByUserId = useradmin.Id, StoreId = store1.Id },
+                            new Product { Id = Guid.NewGuid().ToString(), CategoryId = catProduct.Id, ProductName = "Sản phẩm 14",   CreateByUserId = useradmin.Id, StoreId = store1.Id },
                         };
                         catProduct.Products = lstProducts;
 

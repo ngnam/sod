@@ -5,6 +5,7 @@ using StoreOrder.WebApplication.Data.Models.Orders;
 using StoreOrder.WebApplication.Data.Models.Products;
 using StoreOrder.WebApplication.Data.Models.Stores;
 using StoreOrder.WebApplication.Data.Orders;
+using System.Reflection.Metadata;
 
 namespace StoreOrder.WebApplication.Data
 {
@@ -63,7 +64,8 @@ namespace StoreOrder.WebApplication.Data
             #endregion
 
             #region UserLogin
-            modelBuilder.Entity<UserLogin>(c => {
+            modelBuilder.Entity<UserLogin>(c =>
+            {
                 c.ToTable("UserLogins", "Account");
                 c.HasKey(m => m.Id);
                 c.Property(m => m.Id).ValueGeneratedOnAdd();
@@ -253,8 +255,35 @@ namespace StoreOrder.WebApplication.Data
                 c.Property(m => m.Id).HasMaxLength(50);
                 c.Property(m => m.ProductName).HasMaxLength(250);
                 c.HasMany(m => m.ChildProducts).WithOne(m => m.ParentProduct).HasForeignKey(m => m.ProductParentId);
-                c.HasOne(m => m.User).WithMany(m => m.Products).HasForeignKey(m => m.UserId).OnDelete(DeleteBehavior.SetNull);
+                c.HasOne(m => m.User).WithMany(m => m.Products).HasForeignKey(m => m.CreateByUserId).OnDelete(DeleteBehavior.SetNull);
                 c.HasOne(m => m.Store).WithMany(m => m.Products).HasForeignKey(m => m.StoreId).OnDelete(DeleteBehavior.SetNull);
+            });
+
+            modelBuilder.Entity<ProductDetail>(c =>
+            {
+                c.ToTable("ProductDetails", "Product");
+                c.HasIndex(m => m.Id);
+                c.Property(m => m.Id).ValueGeneratedOnAdd();
+                c.Property(m => m.ShortDescription).HasMaxLength(250);
+                c.Property(m => m.LongDescription).HasMaxLength(500);
+                c.Property(m => m.ImageAlbumJson).HasColumnType("TEXT");
+                c.Property(m => m.ImageThumb).HasMaxLength(500);
+                c.Property(m => m.ImageOrigin).HasMaxLength(500);
+                c.HasOne(m => m.Product).WithOne(mc => mc.ProductDetail)
+                    .HasForeignKey<ProductDetail>(m => m.ProductId)
+                    .OnDelete(DeleteBehavior.SetNull);
+                c.HasMany(m => m.ProductImages)
+                    .WithOne(m => m.ProductDetail)
+                    .HasForeignKey(m => m.ProductDetailId)
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            modelBuilder.Entity<ProductImage>(c => {
+                c.ToTable("ProductImages", "Product");
+                c.HasKey(m => m.Id);
+                c.Property(m => m.Id).ValueGeneratedOnAdd();
+                c.Property(m => m.ImageThumb).HasMaxLength(500);
+                c.Property(m => m.ImageOrigin).HasMaxLength(500);
             });
 
             modelBuilder.Entity<StoreOption>(c =>
@@ -318,6 +347,8 @@ namespace StoreOrder.WebApplication.Data
         public DbSet<ProductOptionValue> ProductOptionValues { get; set; }
         public DbSet<ProductSKU> ProductSKUs { get; set; }
         public DbSet<ProductSKUValue> ProductSKUValues { get; set; }
+        public DbSet<ProductDetail> ProductDetails { get; set; }
+        public DbSet<ProductImage> ProductImages { get; set; }
         // Store
         public DbSet<CategoryStore> CategoryStores { get; set; }
         public DbSet<Store> Stores { get; set; }
