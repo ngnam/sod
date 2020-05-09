@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -8,6 +9,7 @@ using StoreOrder.WebApplication.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -38,14 +40,14 @@ namespace StoreOrder.WebApplication.Middlewares
             var remoteIp = context.Connection.RemoteIpAddress;
             var ipAddr = context.Request.Headers["x-forwarded-for"];
 
-            _logger.Log(LogLevel.Information, $"{DateTime.UtcNow}: Request from Remote IP address: {remoteIp}---fwd: {ipAddr}");
+            _logger.Log(LogLevel.Information, $"{DateTime.UtcNow.ToString("yyyy-MM-dd'T'HH:mm:ss.fffK", CultureInfo.InvariantCulture)}: Request from Remote IP address: {remoteIp}---fwd: {ipAddr}");
 
             string[] ip = _safelist.Split(';');
 
             if (ip.Contains(ipAddr.ToString()))
             {
                 _logger.Log(LogLevel.Warning,
-                    $"Forbidden Request from Remote IP address: {remoteIp} -- fwd: {ipAddr} -- {DateTime.UtcNow}");
+                    $"{DateTime.UtcNow.ToString("yyyy-MM-dd'T'HH:mm:ss.fffK", CultureInfo.InvariantCulture)} --- Forbidden Request from Remote IP address: {remoteIp} -- fwd: {ipAddr}");
                 context.Response.StatusCode = StatusCodes.Status403Forbidden;
                 return;
             }
