@@ -37,26 +37,15 @@ namespace StoreOrder.WebApplication.Middlewares
             // checkIP
             var remoteIp = context.Connection.RemoteIpAddress;
             var ipAddr = context.Request.Headers["x-forwarded-for"];
-            _logger.Log(LogLevel.Information, $"Request from Remote IP address: {remoteIp} -- Time--{DateTime.UtcNow} -- fwd: {ipAddr}");
+
+            _logger.Log(LogLevel.Information, $"{DateTime.UtcNow}: Request from Remote IP address: {remoteIp}---fwd: {ipAddr}");
 
             string[] ip = _safelist.Split(';');
 
-            var bytes = remoteIp.GetAddressBytes();
-            var badIp = true;
-            foreach (var address in ip)
-            {
-                var testIp = IPAddress.Parse(address);
-                if (testIp.GetAddressBytes().SequenceEqual(bytes))
-                {
-                    badIp = false;
-                    break;
-                }
-            }
-
-            if (badIp)
+            if (ip.Contains(ipAddr.ToString()))
             {
                 _logger.Log(LogLevel.Warning,
-                    $"Forbidden Request from Remote IP address: {remoteIp} - {DateTime.Now}");
+                    $"Forbidden Request from Remote IP address: {remoteIp} -- fwd: {ipAddr} -- {DateTime.UtcNow}");
                 context.Response.StatusCode = StatusCodes.Status403Forbidden;
                 return;
             }
