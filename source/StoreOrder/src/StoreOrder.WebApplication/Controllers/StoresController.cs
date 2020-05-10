@@ -340,7 +340,13 @@ namespace StoreOrder.WebApplication.Controllers
 
         [HttpGet("attribute"), MapToApiVersion("1")]
         [Authorize]
-        public async Task<IActionResult> GetListStoreOption()
+        public async Task<IActionResult> GetListStoreOption(
+            int pageIndex = 0,
+            int pageSize = 10,
+            string sortColumn = null,
+            string sortOrder = null,
+            string filterColumn = null,
+            string filterQuery = null)
         {
             await CheckIsSignoutedAsync();
 
@@ -360,13 +366,22 @@ namespace StoreOrder.WebApplication.Controllers
                 _logger.Log(LogLevel.Information, messager);
                 throw new ApiException(messager, (int)HttpStatusCode.BadRequest);
             }
-            var result = store.StoreOptions.Select(s => new StoreOptionItemDTO
-            {
-                OptionId = s.OptionId,
-                Name = s.StoreOptionName,
-                Desc = s.StoreOptionDescription
-            });
-            return Ok(new { Data = result });
+            var result = await ApiResult<StoreOptionItemDTO>.CreateAsync(
+                _context.StoreOptions.Select(s => new StoreOptionItemDTO
+                {
+                    OptionId = s.OptionId,
+                    Name = s.StoreOptionName,
+                    Desc = s.StoreOptionDescription
+                }),
+                pageIndex,
+                pageSize,
+                sortColumn,
+                sortOrder,
+                filterColumn,
+                filterQuery
+            );
+
+            return Ok(result);
         }
 
         [HttpGet("{storeId}/product")]
