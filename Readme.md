@@ -17,8 +17,8 @@
 * [Generate & verify password ](https://stackoverflow.com/questions/52146528/how-to-validate-salted-and-hashed-password-in-c-sharp)
 * [Convert `DateTime.Now.Tick` to int ](https://stackoverflow.com/questions/2695093/how-to-maintain-precision-using-datetime-now-ticks-in-c-sharp/2695525)
 * [Modeling product variants](https://help.akeneo.com/pim/serenity/articles/what-about-products-variants.html)
-
 * http://demo.akeneo.com/
+* [Logging SQL and Change-Tracking Events in EF Core](https://docs.microsoft.com/en-us/archive/msdn-magazine/2018/october/data-points-logging-sql-and-change-tracking-events-in-ef-core)
 
 ## Environment
 

@@ -28,14 +28,14 @@ namespace StoreOrder.WebApplication
 {
     public class Startup
     {
-        //public static readonly ILoggerFactory MyLoggerFactory = LoggerFactory.Create(builder =>
-        //    {
-        //        builder
-        //            .AddFilter((category, level) =>
-        //                category == DbLoggerCategory.Database.Command.Name
-        //                && level == LogLevel.Information)
-        //            .AddConsole();
-        //    });
+        public static readonly ILoggerFactory DbCommandConsoleLoggerFactory = LoggerFactory.Create(builder =>
+            {
+                builder
+                    .AddFilter((category, level) =>
+                        category == DbLoggerCategory.Database.Command.Name
+                        && level == LogLevel.Information)
+                    .AddConsole();
+            });
 
         public Startup(IConfiguration configuration)
         {
@@ -50,7 +50,9 @@ namespace StoreOrder.WebApplication
             // Add ApplicationDbContext.
             services.AddDbContext<StoreOrderDbContext>(options =>
             {
-                //options.UseLoggerFactory(MyLoggerFactory);
+#if DEBUG
+                options.UseLoggerFactory(DbCommandConsoleLoggerFactory);
+#endif
                 options.UseNpgsql(
                     Configuration.GetConnectionString("StoreOrderDbContext")
                     );
