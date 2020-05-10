@@ -18,6 +18,8 @@
 * [Convert `DateTime.Now.Tick` to int ](https://stackoverflow.com/questions/2695093/how-to-maintain-precision-using-datetime-now-ticks-in-c-sharp/2695525)
 * [Modeling product variants](https://help.akeneo.com/pim/serenity/articles/what-about-products-variants.html)
 
+* http://demo.akeneo.com/
+
 ## Environment
 
 * [Postgres 12.2](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads)

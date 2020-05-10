@@ -38,6 +38,7 @@ namespace StoreOrder.WebApplication.Data
                 c.Property(m => m.OldPassword).HasColumnType("TEXT");
                 c.HasMany(g => g.UserDevices).WithOne(c => c.CurrentUser).HasForeignKey(c => c.CurrentUserId).IsRequired(false);
                 c.HasMany(g => g.UseExternalSignIns).WithOne(c => c.User).HasForeignKey(c => c.UserId).IsRequired(false);
+                c.HasIndex(m => m.Email).IsUnique();
             });
             #endregion
 
@@ -85,6 +86,7 @@ namespace StoreOrder.WebApplication.Data
                 c.Property(m => m.RoleName).HasMaxLength(255);
                 c.Property(m => m.Desc).HasMaxLength(255);
                 c.Property(m => m.Code).HasMaxLength(255);
+                c.HasIndex(e => e.RoleName).IsUnique();
             });
 
             // Permistion
@@ -344,6 +346,7 @@ namespace StoreOrder.WebApplication.Data
         public DbSet<UserCookingOrder> UserCookingOrders { get; set; }
         // Product
         public DbSet<CategoryProduct> CategoryProducts { get; set; }
+        public DbSet<Product> Products { get; set; }
         public DbSet<ProductOption> ProductOptions { get; set; }
         public DbSet<ProductOptionValue> ProductOptionValues { get; set; }
         public DbSet<ProductSKU> ProductSKUs { get; set; }

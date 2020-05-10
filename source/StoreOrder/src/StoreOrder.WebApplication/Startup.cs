@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using StoreOrder.WebApplication.Data;
@@ -27,6 +28,15 @@ namespace StoreOrder.WebApplication
 {
     public class Startup
     {
+        //public static readonly ILoggerFactory MyLoggerFactory = LoggerFactory.Create(builder =>
+        //    {
+        //        builder
+        //            .AddFilter((category, level) =>
+        //                category == DbLoggerCategory.Database.Command.Name
+        //                && level == LogLevel.Information)
+        //            .AddConsole();
+        //    });
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -39,10 +49,12 @@ namespace StoreOrder.WebApplication
         {
             // Add ApplicationDbContext.
             services.AddDbContext<StoreOrderDbContext>(options =>
+            {
+                //options.UseLoggerFactory(MyLoggerFactory);
                 options.UseNpgsql(
                     Configuration.GetConnectionString("StoreOrderDbContext")
-                    )
-            );
+                    );
+            });
 
             // Add JWT
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
@@ -128,7 +140,7 @@ namespace StoreOrder.WebApplication
             app.UseAuthorization();
 
             //Add our new middleware to the pipeline
-      
+
             app.UseMiddleware<ApiResponseMiddleware>(Configuration["AdminSafeList"]);
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
