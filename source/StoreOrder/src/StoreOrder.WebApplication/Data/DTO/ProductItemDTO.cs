@@ -31,7 +31,6 @@ namespace StoreOrder.WebApplication.Data.DTO
     {
         public ProductItemGroupByNameDTO()
         {
-            this.ProductOptionDTOs = new List<ProductOptionDTO>();
         }
         public string ProductId { get; set; }
         public string ProductName { get; set; }
@@ -41,25 +40,32 @@ namespace StoreOrder.WebApplication.Data.DTO
         public string ImageThumb { get; set; }
         public int? ImageWidthThumb { get; set; }
         public int? ImageHeightThumb { get; set; }
-        public List<ProductOptionDTO> ProductOptionDTOs { get; set; }
+        public IEnumerable<ProductOptionDTO> ProductOptionDTOs { get; set; }
+        public IEnumerable<ProductSkuDTO> ProductSkuDTOs { get; set; }
     }
 
     public class ProductOptionDTO
     {
         public ProductOptionDTO()
         {
-            this.ProductOptionValueDTOs = new List<ProductOptionValueDTO>();
         }
         public string OptionId { get; set; }
         public string OptionName { get; set; }
-        public int poCount { get; set; }
-        public List<ProductOptionValueDTO> ProductOptionValueDTOs { get; set; }
+        public int? poCount { get; set; }
+        public decimal? price { get; set; }
+        public IEnumerable<ProductOptionValueDTO> ProductOptionValueDTOs { get; set; }
     }
 
     public class ProductOptionValueDTO
     {
         public string ValueId { get; set; }
         public string ValueName { get; set; }
+        public int? productSkuCount { get; set; }
+        public string SkuId { get; set; }
+    }
+
+    public class ProductSkuDTO
+    {
         public string SkuId { get; set; }
         public String Sku { get; set; }
         public decimal Price { get; set; }

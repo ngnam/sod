@@ -476,12 +476,17 @@ namespace StoreOrder.WebApplication.Controllers
                         ProductOptionValueDTOs = po.ProductOptionValues.Select(pov => new ProductOptionValueDTO
                         {
                             ValueId = pov.ValueId,
-                            ValueName =pov.ValueName,
-                            SkuId = po.ProductSKUValues.FirstOrDefault(x => x.ValueId == pov.ValueId).SkuId,
-                            Price = po.ProductSKUValues.FirstOrDefault(x => x.ValueId == pov.ValueId).ProductSKU.Price,
-                            Sku = po.ProductSKUValues.FirstOrDefault(x => x.ValueId == pov.ValueId).ProductSKU.Sku
-                        }).ToList()
-                    }).ToList()
+                            ValueName = pov.ValueName,
+                            productSkuCount = pov.ProductSKUValues.Count,
+                            SkuId = pov.ProductSKUValues.FirstOrDefault().SkuId
+                        })
+                    }),
+                    ProductSkuDTOs = p.ProductSKUs.Select(pku => new ProductSkuDTO
+                    {
+                        Price = pku.Price,
+                        Sku = pku.Sku,
+                        SkuId = pku.SkuId
+                    })
                 });
 
             var result = await ApiResult<ProductItemGroupByNameDTO>.CreateAsync(
@@ -588,15 +593,21 @@ namespace StoreOrder.WebApplication.Controllers
                     {
                         OptionId = po.OptionId,
                         OptionName = po.OptionName,
+                        poCount = po.ProductSKUValues.Count,
                         ProductOptionValueDTOs = po.ProductOptionValues.Select(pov => new ProductOptionValueDTO
                         {
                             ValueId = pov.ValueId,
                             ValueName = pov.ValueName,
-                            SkuId = po.ProductSKUValues.FirstOrDefault(x => x.ValueId == pov.ValueId).SkuId,
-                            Price = po.ProductSKUValues.FirstOrDefault(x => x.ValueId == pov.ValueId).ProductSKU.Price,
-                            Sku = po.ProductSKUValues.FirstOrDefault(x => x.ValueId == pov.ValueId).ProductSKU.Sku
-                        }).ToList()
-                    }).ToList()
+                            productSkuCount = pov.ProductSKUValues.Count,
+                            SkuId = pov.ProductSKUValues.FirstOrDefault().SkuId                            
+                        })
+                    }),
+                    ProductSkuDTOs = p.ProductSKUs.Select(pku => new ProductSkuDTO
+                    {
+                        Price = pku.Price,
+                        Sku = pku.Sku,
+                        SkuId = pku.SkuId
+                    })
                 });
 
             var result = await ApiResult<ProductItemGroupByNameDTO>.CreateAsync(
