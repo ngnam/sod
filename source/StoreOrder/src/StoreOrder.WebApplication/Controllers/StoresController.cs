@@ -395,6 +395,12 @@ namespace StoreOrder.WebApplication.Controllers
             string filterColumn = null,
             string filterQuery = null)
         {
+            var resultCat = await _context.CategoryStores.Select(c => new CategoryStoreDTO
+            {
+                Id = c.Id,
+                Name = c.Name
+            }).ToListAsync();
+
             var query = _context.ProductSKUs
                 .Where(p => p.Product.StoreId == storeId)
                 .Include(p => p.ProductSKUValues)
@@ -436,7 +442,7 @@ namespace StoreOrder.WebApplication.Controllers
                 filterQuery
             );
 
-            return Ok(result);
+            return Ok(new { cat = resultCat, result = result });
         }
 
         [HttpGet("{storeId}/product"), MapToApiVersion("2")]
@@ -450,6 +456,12 @@ namespace StoreOrder.WebApplication.Controllers
             string filterColumn = null,
             string filterQuery = null)
         {
+            var resultCat = await _context.CategoryStores.Select(c => new CategoryStoreDTO
+            {
+                Id = c.Id,
+                Name = c.Name
+            }).ToListAsync();
+
             var query = _context.Products
                 .Where(p => p.StoreId == storeId)
                 .Include(p => p.ProductSKUs)
@@ -499,7 +511,8 @@ namespace StoreOrder.WebApplication.Controllers
                 filterQuery
             );
 
-            return Ok(result);
+            //return Ok(result);
+            return Ok(new { cat = resultCat, result = result });
         }
 
 
@@ -515,6 +528,12 @@ namespace StoreOrder.WebApplication.Controllers
             string filterColumn = null,
             string filterQuery = null)
         {
+            var resultCat = await _context.CategoryStores.Select(c => new CategoryStoreDTO
+            {
+                Id = c.Id,
+                Name = c.Name
+            }).ToListAsync();
+
             var query = _context.ProductSKUs
                 .Where(p => p.Product.StoreId == storeId && p.Product.CategoryId == categoryId)
                 .Include(p => p.ProductSKUValues)
@@ -556,7 +575,8 @@ namespace StoreOrder.WebApplication.Controllers
                 filterQuery
             );
 
-            return Ok(result);
+            //return Ok(result);
+            return Ok(new { cat = resultCat, result = result });
         }
 
         [HttpGet("{storeId}/{categoryId}/product"), MapToApiVersion("2")]
@@ -571,6 +591,12 @@ namespace StoreOrder.WebApplication.Controllers
             string filterColumn = null,
             string filterQuery = null)
         {
+            var resultCat = await _context.CategoryStores.Select(c => new CategoryStoreDTO
+            {
+                Id = c.Id,
+                Name = c.Name
+            }).ToListAsync();
+
             var query = _context.Products
                 .Where(p => p.StoreId == storeId && p.CategoryId == categoryId)
                 .Include(p => p.ProductSKUs)
@@ -620,7 +646,8 @@ namespace StoreOrder.WebApplication.Controllers
                 filterQuery
             );
 
-            return Ok(result);
+            //return Ok(result);
+            return Ok(new { cat = resultCat, result = result });
         }
 
         [HttpPost("order"), MapToApiVersion("1")]
