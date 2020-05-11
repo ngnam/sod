@@ -623,6 +623,17 @@ namespace StoreOrder.WebApplication.Controllers
             return Ok(result);
         }
 
+        [HttpPost("order"), MapToApiVersion("1")]
+        public async Task<IActionResult> StoreOrder([FromBody] OrderProductDTO model)
+        {
+            await CheckIsSignoutedAsync();
+            if (ModelState.IsValid)
+            {
+                return Ok();
+            }
+            return Ok(1);
+        }
+
 
         private async Task CheckIsSignoutedAsync()
         {
