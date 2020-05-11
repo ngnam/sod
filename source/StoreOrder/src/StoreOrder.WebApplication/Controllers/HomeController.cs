@@ -14,11 +14,6 @@ namespace StoreOrder.WebApplication.Controllers
     public class HomeController : ApiBaseController
     {
         private readonly IAuthRepository _authRepository;
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(
@@ -34,7 +29,7 @@ namespace StoreOrder.WebApplication.Controllers
         {
             // check user logout
             await CheckIsSignoutedAsync();
-            return Ok(Summaries);
+            return Ok(1);
         }
 
         [HttpGet(""), MapToApiVersion("2")]
@@ -42,7 +37,7 @@ namespace StoreOrder.WebApplication.Controllers
         {
             // check user logout
             await CheckIsSignoutedAsync();
-            return Ok(HttpContext.GetRequestedApiVersion().ToString());
+            return Ok(1);
         }
 
         private async Task CheckIsSignoutedAsync()
