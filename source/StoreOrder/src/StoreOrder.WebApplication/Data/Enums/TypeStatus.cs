@@ -1,6 +1,6 @@
 ﻿namespace StoreOrder.WebApplication.Data.Enums
 {
-    public enum TypeStore
+    public enum TypeStatus
     {
         Actived = 1,
         Deactived,

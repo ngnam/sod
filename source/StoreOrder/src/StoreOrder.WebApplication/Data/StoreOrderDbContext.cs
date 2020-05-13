@@ -3,6 +3,7 @@ using StoreOrder.WebApplication.Data.Models.Account;
 using StoreOrder.WebApplication.Data.Models.Location;
 using StoreOrder.WebApplication.Data.Models.Orders;
 using StoreOrder.WebApplication.Data.Models.Products;
+using StoreOrder.WebApplication.Data.Models.Settings;
 using StoreOrder.WebApplication.Data.Models.Stores;
 using StoreOrder.WebApplication.Data.Orders;
 using System.Reflection.Metadata;
@@ -326,6 +327,18 @@ namespace StoreOrder.WebApplication.Data
                 c.Property(m => m.Id).HasMaxLength(50);
                 c.HasOne(m => m.User).WithMany(m => m.UserCookingOrders).HasForeignKey(m => m.UserId);
             });
+
+            modelBuilder.Entity<Setting>(c => {
+                c.ToTable("Settings", "Setting");
+                c.HasKey(c => c.Id);
+                c.Property(c => c.Id).ValueGeneratedOnAdd();
+                c.Property(c => c.SettingKey).HasMaxLength(64).IsRequired(true);
+                c.Property(c => c.SettingDataType).HasMaxLength(64).IsRequired(true);
+                c.Property(c => c.SettingValueVarchar).HasMaxLength(1024).IsRequired(false);
+                c.Property(c => c.SettingDesc).HasMaxLength(500).IsRequired(false);
+                c.Property(c => c.CreatedBy).HasMaxLength(50);
+                c.Property(c => c.LastUpdatedBy).HasMaxLength(50);
+            });
         }
         #endregion Methods
 
@@ -359,6 +372,8 @@ namespace StoreOrder.WebApplication.Data
         public DbSet<Store> Stores { get; set; }
         public DbSet<StoreTable> StoreTables { get; set; }
         public DbSet<StoreOption> StoreOptions { get; set; }
+        // Settings
+        public DbSet<Setting> Settings { get; set; }
         #endregion
     }
 }
