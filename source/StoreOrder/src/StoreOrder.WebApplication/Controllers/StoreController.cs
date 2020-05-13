@@ -37,7 +37,7 @@ namespace StoreOrder.WebApplication.Controllers
             _authRepository = authRepository;
         }
 
-        [HttpGet("product/category"), MapToApiVersion("1")]
+        [HttpGet("employee/product/category"), MapToApiVersion("1")]
         public async Task<IActionResult> GetCategoryProductsForEmployee(
             int pageIndex = 0,
             int pageSize = 10,
@@ -73,7 +73,7 @@ namespace StoreOrder.WebApplication.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{storeId}/product/category"), MapToApiVersion("1")]
+        [HttpGet("customer/{storeId}/product/category"), MapToApiVersion("1")]
         [AllowAnonymous]
         public async Task<IActionResult> GetCategoryProductsForCustomer(
             string storeId = "b4d32aca-665d-4253-83a5-6f6a8b7acade",
@@ -287,7 +287,7 @@ namespace StoreOrder.WebApplication.Controllers
             return Ok(new { data = messager });
         }
 
-        [HttpGet("product"), MapToApiVersion("1")]
+        [HttpGet("employee/product"), MapToApiVersion("1")]
         public async Task<IActionResult> GetListProductsOfStoreForEmployee(
             int pageIndex = 0,
             int pageSize = 10,
@@ -350,7 +350,7 @@ namespace StoreOrder.WebApplication.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{storeId}/product"), MapToApiVersion("1")]
+        [HttpGet("customer/{storeId}/product"), MapToApiVersion("1")]
         [AllowAnonymous]
         public async Task<IActionResult> GetListProductsOfStoreForCustomer(
             string storeId = "b4d32aca-665d-4253-83a5-6f6a8b7acade",
@@ -405,8 +405,129 @@ namespace StoreOrder.WebApplication.Controllers
 
             return Ok(result);
         }
+                
+        [HttpGet("employee/{categoryId}/product"), MapToApiVersion("1")]
+        public async Task<IActionResult> GetListProductsOfStoreWithCategoryForEmployee(
+            string categoryId = "ea76e2a8-873f-48bf-8ace-1415ee3758e8",
+            int pageIndex = 0,
+            int pageSize = 10,
+            string sortColumn = null,
+            string sortOrder = null,
+            string filterColumn = null,
+            string filterQuery = null)
+        {
+            await CheckIsSignoutedAsync();
 
-        [HttpGet("product"), MapToApiVersion("2")]
+            // get Store for user
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == this.userId);
+            if (user == null)
+            {
+                throw new ApiException("User not found");
+            }
+
+            var query = _context.ProductSKUs
+                .Where(p => p.Product.StoreId == user.StoreId && p.Product.CategoryId == categoryId)
+                .Include(p => p.ProductSKUValues)
+                .ThenInclude(p => p.ProductOptionValue)
+                .ThenInclude(p => p.ProductOption)
+                .ThenInclude(p => p.Product)
+                .ThenInclude(p => p.ProductDetail)
+                .Select(p => new ProductItemDTO
+                {
+                    ProductId = p.ProductId,
+                    Price = p.Price,
+                    ProductName = p.Product.ProductName,
+                    Weight = p.Product.Weight,
+                    Depth = p.Product.Depth,
+                    Height = p.Product.Height,
+                    UniversalProductCode = p.Product.UniversalProductCode,
+                    ImageHeightThumb = p.Product.ProductDetail.ImageHeightThumb,
+                    ImageOrigin = p.Product.ProductDetail.ImageOrigin,
+                    ImageThumb = p.Product.ProductDetail.ImageThumb,
+                    ImageWidthThumb = p.Product.ProductDetail.ImageWidthThumb,
+                    LongDescription = p.Product.ProductDetail.LongDescription,
+                    NetWeight = p.Product.NetWeight,
+                    Sku = p.Sku,
+                    SkuId = p.SkuId,
+                    ShortDescription = p.Product.ProductDetail.ShortDescription,
+                    OptionId = p.ProductSKUValues.FirstOrDefault(x => x.SkuId == p.SkuId).OptionId,
+                    OptionName = p.ProductSKUValues.FirstOrDefault(x => x.SkuId == p.SkuId).ProductOption.OptionName,
+                    ValueId = p.ProductSKUValues.FirstOrDefault(x => x.SkuId == p.SkuId).ProductOptionValue.ValueId,
+                    ValueName = p.ProductSKUValues.FirstOrDefault(x => x.SkuId == p.SkuId).ProductOptionValue.ValueName,
+                });
+
+            var result = await ApiResult<ProductItemDTO>.CreateAsync(
+                query,
+                pageIndex,
+                pageSize,
+                sortColumn,
+                sortOrder,
+                filterColumn,
+                filterQuery
+            );
+
+
+            return Ok(result);
+        }
+
+        [HttpGet("customer/{storeId}/{categoryId}/product"), MapToApiVersion("1")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetListProductsOfStoreWithCategoryForCustomer(
+            string storeId = "b4d32aca-665d-4253-83a5-6f6a8b7acade",
+            string categoryId = "ea76e2a8-873f-48bf-8ace-1415ee3758e8",
+            int pageIndex = 0,
+            int pageSize = 10,
+            string sortColumn = null,
+            string sortOrder = null,
+            string filterColumn = null,
+            string filterQuery = null)
+        {
+            var query = _context.ProductSKUs
+                .Where(p => p.Product.StoreId == storeId && p.Product.CategoryId == categoryId)
+                .Include(p => p.ProductSKUValues)
+                .ThenInclude(p => p.ProductOptionValue)
+                .ThenInclude(p => p.ProductOption)
+                .ThenInclude(p => p.Product)
+                .ThenInclude(p => p.ProductDetail)
+                .Select(p => new ProductItemDTO
+                {
+                    ProductId = p.ProductId,
+                    Price = p.Price,
+                    ProductName = p.Product.ProductName,
+                    Weight = p.Product.Weight,
+                    Depth = p.Product.Depth,
+                    Height = p.Product.Height,
+                    UniversalProductCode = p.Product.UniversalProductCode,
+                    ImageHeightThumb = p.Product.ProductDetail.ImageHeightThumb,
+                    ImageOrigin = p.Product.ProductDetail.ImageOrigin,
+                    ImageThumb = p.Product.ProductDetail.ImageThumb,
+                    ImageWidthThumb = p.Product.ProductDetail.ImageWidthThumb,
+                    LongDescription = p.Product.ProductDetail.LongDescription,
+                    NetWeight = p.Product.NetWeight,
+                    Sku = p.Sku,
+                    SkuId = p.SkuId,
+                    ShortDescription = p.Product.ProductDetail.ShortDescription,
+                    OptionId = p.ProductSKUValues.FirstOrDefault(x => x.SkuId == p.SkuId).OptionId,
+                    OptionName = p.ProductSKUValues.FirstOrDefault(x => x.SkuId == p.SkuId).ProductOption.OptionName,
+                    ValueId = p.ProductSKUValues.FirstOrDefault(x => x.SkuId == p.SkuId).ProductOptionValue.ValueId,
+                    ValueName = p.ProductSKUValues.FirstOrDefault(x => x.SkuId == p.SkuId).ProductOptionValue.ValueName,
+                });
+
+            var result = await ApiResult<ProductItemDTO>.CreateAsync(
+                query,
+                pageIndex,
+                pageSize,
+                sortColumn,
+                sortOrder,
+                filterColumn,
+                filterQuery
+            );
+
+
+            return Ok(result);
+        }
+
+        [HttpGet("employee/product/type2"), MapToApiVersion("1")]
         public async Task<IActionResult> GetListProductsOfStoreForEmployeeV2(
             int pageIndex = 0,
             int pageSize = 10,
@@ -483,7 +604,7 @@ namespace StoreOrder.WebApplication.Controllers
             });
         }
 
-        [HttpGet("{storeId}/product"), MapToApiVersion("2")]
+        [HttpGet("customer/{storeId}/product/type2"), MapToApiVersion("1")]
         [AllowAnonymous]
         public async Task<IActionResult> GetListProductsOfStoreForCustomerV2(
             string storeId = "b4d32aca-665d-4253-83a5-6f6a8b7acade",
@@ -557,128 +678,7 @@ namespace StoreOrder.WebApplication.Controllers
             });
         }
 
-        [HttpGet("{categoryId}/product"), MapToApiVersion("1")]
-        public async Task<IActionResult> GetListProductsOfStoreWithCategoryForEmployee(
-            string categoryId = "ea76e2a8-873f-48bf-8ace-1415ee3758e8",
-            int pageIndex = 0,
-            int pageSize = 10,
-            string sortColumn = null,
-            string sortOrder = null,
-            string filterColumn = null,
-            string filterQuery = null)
-        {
-            await CheckIsSignoutedAsync();
-
-            // get Store for user
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == this.userId);
-            if (user == null)
-            {
-                throw new ApiException("User not found");
-            }
-
-            var query = _context.ProductSKUs
-                .Where(p => p.Product.StoreId == user.StoreId && p.Product.CategoryId == categoryId)
-                .Include(p => p.ProductSKUValues)
-                .ThenInclude(p => p.ProductOptionValue)
-                .ThenInclude(p => p.ProductOption)
-                .ThenInclude(p => p.Product)
-                .ThenInclude(p => p.ProductDetail)
-                .Select(p => new ProductItemDTO
-                {
-                    ProductId = p.ProductId,
-                    Price = p.Price,
-                    ProductName = p.Product.ProductName,
-                    Weight = p.Product.Weight,
-                    Depth = p.Product.Depth,
-                    Height = p.Product.Height,
-                    UniversalProductCode = p.Product.UniversalProductCode,
-                    ImageHeightThumb = p.Product.ProductDetail.ImageHeightThumb,
-                    ImageOrigin = p.Product.ProductDetail.ImageOrigin,
-                    ImageThumb = p.Product.ProductDetail.ImageThumb,
-                    ImageWidthThumb = p.Product.ProductDetail.ImageWidthThumb,
-                    LongDescription = p.Product.ProductDetail.LongDescription,
-                    NetWeight = p.Product.NetWeight,
-                    Sku = p.Sku,
-                    SkuId = p.SkuId,
-                    ShortDescription = p.Product.ProductDetail.ShortDescription,
-                    OptionId = p.ProductSKUValues.FirstOrDefault(x => x.SkuId == p.SkuId).OptionId,
-                    OptionName = p.ProductSKUValues.FirstOrDefault(x => x.SkuId == p.SkuId).ProductOption.OptionName,
-                    ValueId = p.ProductSKUValues.FirstOrDefault(x => x.SkuId == p.SkuId).ProductOptionValue.ValueId,
-                    ValueName = p.ProductSKUValues.FirstOrDefault(x => x.SkuId == p.SkuId).ProductOptionValue.ValueName,
-                });
-
-            var result = await ApiResult<ProductItemDTO>.CreateAsync(
-                query,
-                pageIndex,
-                pageSize,
-                sortColumn,
-                sortOrder,
-                filterColumn,
-                filterQuery
-            );
-
-
-            return Ok(result);
-        }
-
-        [HttpGet("{storeId}/{categoryId}/product"), MapToApiVersion("1")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetListProductsOfStoreWithCategoryForCustomer(
-            string storeId = "b4d32aca-665d-4253-83a5-6f6a8b7acade",
-            string categoryId = "ea76e2a8-873f-48bf-8ace-1415ee3758e8",
-            int pageIndex = 0,
-            int pageSize = 10,
-            string sortColumn = null,
-            string sortOrder = null,
-            string filterColumn = null,
-            string filterQuery = null)
-        {
-            var query = _context.ProductSKUs
-                .Where(p => p.Product.StoreId == storeId && p.Product.CategoryId == categoryId)
-                .Include(p => p.ProductSKUValues)
-                .ThenInclude(p => p.ProductOptionValue)
-                .ThenInclude(p => p.ProductOption)
-                .ThenInclude(p => p.Product)
-                .ThenInclude(p => p.ProductDetail)
-                .Select(p => new ProductItemDTO
-                {
-                    ProductId = p.ProductId,
-                    Price = p.Price,
-                    ProductName = p.Product.ProductName,
-                    Weight = p.Product.Weight,
-                    Depth = p.Product.Depth,
-                    Height = p.Product.Height,
-                    UniversalProductCode = p.Product.UniversalProductCode,
-                    ImageHeightThumb = p.Product.ProductDetail.ImageHeightThumb,
-                    ImageOrigin = p.Product.ProductDetail.ImageOrigin,
-                    ImageThumb = p.Product.ProductDetail.ImageThumb,
-                    ImageWidthThumb = p.Product.ProductDetail.ImageWidthThumb,
-                    LongDescription = p.Product.ProductDetail.LongDescription,
-                    NetWeight = p.Product.NetWeight,
-                    Sku = p.Sku,
-                    SkuId = p.SkuId,
-                    ShortDescription = p.Product.ProductDetail.ShortDescription,
-                    OptionId = p.ProductSKUValues.FirstOrDefault(x => x.SkuId == p.SkuId).OptionId,
-                    OptionName = p.ProductSKUValues.FirstOrDefault(x => x.SkuId == p.SkuId).ProductOption.OptionName,
-                    ValueId = p.ProductSKUValues.FirstOrDefault(x => x.SkuId == p.SkuId).ProductOptionValue.ValueId,
-                    ValueName = p.ProductSKUValues.FirstOrDefault(x => x.SkuId == p.SkuId).ProductOptionValue.ValueName,
-                });
-
-            var result = await ApiResult<ProductItemDTO>.CreateAsync(
-                query,
-                pageIndex,
-                pageSize,
-                sortColumn,
-                sortOrder,
-                filterColumn,
-                filterQuery
-            );
-
-
-            return Ok(result);
-        }
-
-        [HttpGet("{categoryId}/product"), MapToApiVersion("2")]
+        [HttpGet("employee/{categoryId}/product/type2"), MapToApiVersion("1")]
         public async Task<IActionResult> GetListProductsOfStoreWithCategoryForEmployeeV2(
             string categoryId = "ea76e2a8-873f-48bf-8ace-1415ee3758e8",
             int pageIndex = 0,
@@ -756,7 +756,7 @@ namespace StoreOrder.WebApplication.Controllers
             });
         }
 
-        [HttpGet("{storeId}/{categoryId}/product"), MapToApiVersion("2")]
+        [HttpGet("customer/{storeId}/{categoryId}/product/type2"), MapToApiVersion("1")]
         [AllowAnonymous]
         public async Task<IActionResult> GetListProductsOfStoreWithCategoryForCustomerV2(
             string storeId = "b4d32aca-665d-4253-83a5-6f6a8b7acade",
