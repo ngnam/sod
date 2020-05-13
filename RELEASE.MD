@@ -10,3 +10,5 @@
 - Support API Upload Media Save to ImgUr.com
 * Date 10/5/2020
 - Add Middleware Block Ip spam from list IP safe list
+* Date 13/5/2020
+- Update API endpoints for employee, customer, login
