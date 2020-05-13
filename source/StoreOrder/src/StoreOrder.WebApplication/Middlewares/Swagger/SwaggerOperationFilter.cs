@@ -24,13 +24,13 @@ namespace StoreOrder.WebApplication.Middlewares.Swagger
                     Required = false,
                 });
 
-                operation.Parameters.Add(new OpenApiParameter
-                {
-                    Name = "Authorization",
-                    In = ParameterLocation.Header,
-                    Description = "Used for certain authorization policies such as Bearer token authentication",
-                    Required = false,
-                });
+                //operation.Parameters.Add(new OpenApiParameter
+                //{
+                //    Name = "Authorization",
+                //    In = ParameterLocation.Header,
+                //    Description = "Used for certain authorization policies such as Bearer token authentication",
+                //    Required = false,
+                //});
             }
         }
 
