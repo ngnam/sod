@@ -91,6 +91,7 @@ namespace StoreOrder.WebApplication.Controllers
                     setting.SettingType = typeSetting;
                     setting.SettingKey = model.SettingKey;
                     setting.SettingValueVarchar = model.SettingValue;
+                    setting.SettingDesc = model.SettingDesc;
                     _context.Settings.Add(setting);
                 }
 
