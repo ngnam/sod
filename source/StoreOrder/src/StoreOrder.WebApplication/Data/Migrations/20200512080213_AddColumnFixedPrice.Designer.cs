@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using StoreOrder.WebApplication.Data;
@@ -9,9 +10,10 @@ using StoreOrder.WebApplication.Data;
 namespace StoreOrder.WebApplication.Data.Migrations
 {
     [DbContext(typeof(StoreOrderDbContext))]
-    partial class StoreOrderDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200512080213_AddColumnFixedPrice")]
+    partial class AddColumnFixedPrice
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -390,14 +392,9 @@ namespace StoreOrder.WebApplication.Data.Migrations
                         .HasColumnType("character varying(250)")
                         .HasMaxLength(250);
 
-                    b.Property<string>("StoreId")
-                        .HasColumnType("character varying(50)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ParentId");
-
-                    b.HasIndex("StoreId");
 
                     b.ToTable("CategoryProducts","Product");
                 });
@@ -883,10 +880,6 @@ namespace StoreOrder.WebApplication.Data.Migrations
                     b.HasOne("StoreOrder.WebApplication.Data.Models.Products.CategoryProduct", "ParentCategory")
                         .WithMany("Childs")
                         .HasForeignKey("ParentId");
-
-                    b.HasOne("StoreOrder.WebApplication.Data.Models.Stores.Store", "Store")
-                        .WithMany("CategoryProducts")
-                        .HasForeignKey("StoreId");
                 });
 
             modelBuilder.Entity("StoreOrder.WebApplication.Data.Models.Products.Product", b =>

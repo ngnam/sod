@@ -88,7 +88,7 @@ namespace StoreOrder.WebApplication.Controllers
         public IActionResult GetProvinder(string code = null)
         {
             Dictionary<string, IEnumerable<ProviderDTO>> providersDictionary = new Dictionary<string, IEnumerable<ProviderDTO>>();
-            List<ProviderDTO> lstProviders = new List<ProviderDTO>(); 
+            List<ProviderDTO> lstProviders = new List<ProviderDTO>();
             if (!string.IsNullOrEmpty(code))
             {
                 code = code.Trim();
@@ -108,11 +108,13 @@ namespace StoreOrder.WebApplication.Controllers
                 if (providers.Count() == 0)
                 {
                     throw new ApiException("Không tìm thấy mã hành chính nào hợp lệ!", (int)HttpStatusCode.BadRequest);
-                } else
+                }
+                else
                 {
                     lstProviders = providers.ToList();
                 }
-            } else
+            }
+            else
             {
                 lstProviders = _context.Providers
                    .Where(p => p.ParentId == null && p.Path == null && p.PathWithType == null && (p.Type.Equals("tinh") || p.Type.Equals("thanh-pho")))

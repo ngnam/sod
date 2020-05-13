@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace StoreOrder.WebApplication.Data.DTO
 {
@@ -19,6 +20,7 @@ namespace StoreOrder.WebApplication.Data.DTO
         public string SkuId { get; set; }
         public String Sku { get; set; }
         public decimal Price { get; set; }
+        public decimal? FixedPrice { get; set; }
         public string ShortDescription { get; set; }
         public string LongDescription { get; set; }
         public string ImageThumb { get; set; }
@@ -34,6 +36,7 @@ namespace StoreOrder.WebApplication.Data.DTO
         }
         public string ProductId { get; set; }
         public string ProductName { get; set; }
+        public decimal? FixedPrice { get; set; }
         public String UniversalProductCode { get; set; }
         public string ShortDescription { get; set; }
         public string LongDescription { get; set; }
@@ -41,7 +44,6 @@ namespace StoreOrder.WebApplication.Data.DTO
         public int? ImageWidthThumb { get; set; }
         public int? ImageHeightThumb { get; set; }
         public IEnumerable<ProductOptionDTO> ProductOptionDTOs { get; set; }
-        public IEnumerable<ProductSkuDTO> ProductSkuDTOs { get; set; }
     }
 
     public class ProductOptionDTO
@@ -51,8 +53,6 @@ namespace StoreOrder.WebApplication.Data.DTO
         }
         public string OptionId { get; set; }
         public string OptionName { get; set; }
-        public int? poCount { get; set; }
-        public decimal? price { get; set; }
         public IEnumerable<ProductOptionValueDTO> ProductOptionValueDTOs { get; set; }
     }
 
@@ -60,8 +60,9 @@ namespace StoreOrder.WebApplication.Data.DTO
     {
         public string ValueId { get; set; }
         public string ValueName { get; set; }
-        public int? productSkuCount { get; set; }
         public string SkuId { get; set; }
+        public String Sku { get; set; }
+        public decimal Price { get; set; }
     }
 
     public class ProductSkuDTO

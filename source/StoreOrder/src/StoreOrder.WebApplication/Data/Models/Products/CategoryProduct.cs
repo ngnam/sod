@@ -1,7 +1,5 @@
-﻿using System;
+﻿using StoreOrder.WebApplication.Data.Models.Stores;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace StoreOrder.WebApplication.Data.Models.Products
 {
@@ -20,5 +18,7 @@ namespace StoreOrder.WebApplication.Data.Models.Products
         public virtual CategoryProduct ParentCategory { get; set; }
         public virtual IList<CategoryProduct> Childs { get; set; }
         public virtual ICollection<Product> Products { get; set; }
+        public string StoreId { get; set; }
+        public virtual Store Store { get; set; }
     }
 }

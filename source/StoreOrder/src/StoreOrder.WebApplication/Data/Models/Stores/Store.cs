@@ -18,6 +18,7 @@ namespace StoreOrder.WebApplication.Data.Models.Stores
             this.Products = new HashSet<Product>();
             this.StoreOptions = new HashSet<StoreOption>();
             this.Users = new HashSet<User>();
+            this.CategoryProducts = new HashSet<CategoryProduct>();
         }
         public string Id { get; set; }
         public string StoreName { get; set; }
@@ -36,5 +37,6 @@ namespace StoreOrder.WebApplication.Data.Models.Stores
         public virtual ICollection<Product> Products { get; set; }
         public virtual ICollection<StoreOption> StoreOptions { get; set; }
         public virtual ICollection<User> Users { get; set; }
+        public virtual ICollection<CategoryProduct> CategoryProducts { get; set; }
     }
 }

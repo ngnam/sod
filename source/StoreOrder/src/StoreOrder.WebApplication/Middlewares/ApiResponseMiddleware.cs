@@ -37,20 +37,20 @@ namespace StoreOrder.WebApplication.Middlewares
         public async Task InvokeAsync(HttpContext context)
         {
             // checkIP
-            var remoteIp = context.Connection.RemoteIpAddress;
-            var ipAddr = context.Request.Headers["x-forwarded-for"];
+            //var remoteIp = context.Connection.RemoteIpAddress;
+            //var ipAddr = context.Request.Headers["x-forwarded-for"];
 
-            _logger.Log(LogLevel.Information, $"{DateTime.UtcNow.ToString("yyyy-MM-dd'T'HH:mm:ss.fffK", CultureInfo.InvariantCulture)}: Request from Remote IP address: {remoteIp}---fwd: {ipAddr}");
+            //_logger.Log(LogLevel.Information, $"{DateTime.UtcNow.ToString("yyyy-MM-dd'T'HH:mm:ss.fffK", CultureInfo.InvariantCulture)}: Request from Remote IP address: {remoteIp}---fwd: {ipAddr}");
 
-            string[] ip = _safelist.Split(';');
+            //string[] ip = _safelist.Split(';');
 
-            if (ip.Contains(ipAddr.ToString()))
-            {
-                _logger.Log(LogLevel.Warning,
-                    $"{DateTime.UtcNow.ToString("yyyy-MM-dd'T'HH:mm:ss.fffK", CultureInfo.InvariantCulture)} --- Forbidden Request from Remote IP address: {remoteIp} -- fwd: {ipAddr}");
-                context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                return;
-            }
+            //if (ip.Contains(ipAddr.ToString()))
+            //{
+            //    _logger.Log(LogLevel.Warning,
+            //        $"{DateTime.UtcNow.ToString("yyyy-MM-dd'T'HH:mm:ss.fffK", CultureInfo.InvariantCulture)} --- Forbidden Request from Remote IP address: {remoteIp} -- fwd: {ipAddr}");
+            //    context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            //    return;
+            //}
 
             if (IsSwagger(context))
                 await this._next(context);

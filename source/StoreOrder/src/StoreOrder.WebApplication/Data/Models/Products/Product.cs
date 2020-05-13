@@ -29,6 +29,7 @@ namespace StoreOrder.WebApplication.Data.Models.Products
         public string Id { get; set; }
         [Required]
         public string ProductName { get; set; }
+        public decimal FixedPrice { get; set; }
         [MaxLength(32)]
         public String UniversalProductCode { get; set; }
         public Decimal Height { get; set; }

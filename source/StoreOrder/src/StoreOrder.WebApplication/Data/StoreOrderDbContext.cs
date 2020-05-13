@@ -191,6 +191,7 @@ namespace StoreOrder.WebApplication.Data
                 c.Property(m => m.Code).HasMaxLength(250);
                 c.HasMany(m => m.Childs).WithOne(m => m.ParentCategory).HasForeignKey(m => m.ParentId);
                 c.HasMany(m => m.Products).WithOne(m => m.CategoryProduct).HasForeignKey(m => m.CategoryId);
+                c.HasOne(m => m.Store).WithMany(m => m.CategoryProducts).HasForeignKey(m => m.StoreId);
             });
 
             modelBuilder.Entity<ProductSKUValue>(c =>
