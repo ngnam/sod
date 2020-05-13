@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 
 namespace StoreOrder.WebApplication.Controllers
 {
+    [Authorize]
     [ApiVersion("1")]
     [ApiVersion("2")]
     public class AccountController : ApiBaseController
@@ -32,97 +33,18 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpGet(""), MapToApiVersion("1")]
-        [AllowAnonymous]
         public IActionResult LoginTest()
         {
-            throw new ApiException("Wrong username or email.");
-        }
-
-        [HttpPost("login/staff"), MapToApiVersion("1")]
-        [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody] UserLoginAuthenticate model)
-        {
-            if (HttpContext.User.Identity.IsAuthenticated)
-            {
-                return Ok(new { isAuthenicated = HttpContext.User.Identity.IsAuthenticated });
-            }
-
-            var user = await _authRepository.GetUserByUserNameOrEmail(model.UserNameOrEmail);
-            if (user == null)
-            {
-                throw new ApiException("Wrong username or email.", (int)HttpStatusCode.BadRequest);
-            }
-            else if (!_authRepository.VerifyPasswordHash(model.Password, user.HashPassword, user.SaltPassword))
-            {
-                throw new ApiException("Wrong password.", (int)HttpStatusCode.BadRequest);
-            }
-            else
-            {
-                string currentUserId = Guid.NewGuid().ToString();
-                var userLogined = _authRepository.GenerateToken(user, currentUserId);
-                // save to login
-                await _authRepository.SaveToUserLoginAsync(user, userLogined, currentUserId);
-                return Ok(userLogined);
-            }
-        }
-
-        [HttpPost("login/staff"), MapToApiVersion("2")]
-        [AllowAnonymous]
-        public async Task<IActionResult> LoginV2([FromForm] UserLoginAuthenticate model)
-        {
-            if (HttpContext.User.Identity.IsAuthenticated)
-            {
-                return Ok(new { isAuthenicated = HttpContext.User.Identity.IsAuthenticated });
-            }
-
-            var user = await _authRepository.GetUserByUserNameOrEmail(model.UserNameOrEmail);
-            if (user == null)
-            {
-                throw new ApiException("Wrong username or email.", (int)HttpStatusCode.BadRequest);
-            }
-            else if (!_authRepository.VerifyPasswordHash(model.Password, user.HashPassword, user.SaltPassword))
-            {
-                throw new ApiException("Wrong password.", (int)HttpStatusCode.BadRequest);
-            }
-            else
-            {
-                string currentUserId = Guid.NewGuid().ToString();
-                var userLogined = _authRepository.GenerateToken(user, currentUserId);
-                // save to login
-                await _authRepository.SaveToUserLoginAsync(user, userLogined, currentUserId);
-                return Ok(userLogined);
-            }
+            throw new ApiException("Đi chỗ khác chơi đi, vào đây phá tao báo công an :)");
         }
 
         [HttpGet("logout"), MapToApiVersion("1")]
-        [Authorize]
         public async Task<IActionResult> Logout()
         {
             var isLogout = await _authRepository.LogoutAsync(this.userId, this.currentUserLogin);
             return Ok(new { isLogout = isLogout });
         }
 
-        [HttpPost("login/customer"), MapToApiVersion("1")]
-        [AllowAnonymous]
-        public async Task<IActionResult> LoginAndRegisterCustomer([FromBody] CustomerLoginDTO model)
-        {
-            var userLogined = new UserLogined();
-            if (ModelState.IsValid)
-                userLogined = await _authRepository.SignInAndSignUpCustomerAsync(model);
-            return Ok(userLogined);
-        }
-
-        [HttpPost("login/customer"), MapToApiVersion("2")]
-        [AllowAnonymous]
-        public async Task<IActionResult> LoginAndRegisterCustomerV2([FromForm] CustomerLoginDTO model)
-        {
-            var userLogined = new UserLogined();
-            if (ModelState.IsValid)
-                userLogined = await _authRepository.SignInAndSignUpCustomerAsync(model);
-            return Ok(userLogined);
-        }
-
-        [Authorize]
         [HttpPost("registration/{storeId}"), MapToApiVersion("1")]
         public async Task<IActionResult> RegistrationUser([FromBody] RegistrationUserDTO model, string storeId)
         {
@@ -198,7 +120,6 @@ namespace StoreOrder.WebApplication.Controllers
             return Ok(new { data = messager });
         }
 
-        [Authorize]
         [HttpPost("registration/{storeId}"), MapToApiVersion("2")]
         public async Task<IActionResult> RegistrationUserV2([FromForm] RegistrationUserDTO model, string storeId)
         {
