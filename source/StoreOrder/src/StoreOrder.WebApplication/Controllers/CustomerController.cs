@@ -262,11 +262,11 @@ namespace StoreOrder.WebApplication.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{storeId}/{categoryId}/product/type1"), MapToApiVersion("1")]
+        [HttpGet("{storeId}/{categoryIdOrCode}/product/type1"), MapToApiVersion("1")]
         [AllowAnonymous]
         public async Task<IActionResult> GetListProductsOfStoreWithCategoryForCustomer(
             string storeId = "b4d32aca-665d-4253-83a5-6f6a8b7acade",
-            string categoryId = "ea76e2a8-873f-48bf-8ace-1415ee3758e8",
+            string categoryIdOrCode = "ea76e2a8-873f-48bf-8ace-1415ee3758e8",
             int pageIndex = 0,
             int pageSize = 10,
             string sortColumn = null,
@@ -274,8 +274,13 @@ namespace StoreOrder.WebApplication.Controllers
             string filterColumn = null,
             string filterQuery = null)
         {
+            var cat = await _context.CategoryProducts.FirstOrDefaultAsync(c => c.Id == categoryIdOrCode || c.Code == categoryIdOrCode);
+            if (cat == null)
+            {
+                throw new ApiException("Category not found", (int)HttpStatusCode.BadRequest);
+            }
             var query = _context.ProductSKUs
-                .Where(p => p.Product.StoreId == storeId && p.Product.CategoryId == categoryId)
+                .Where(p => p.Product.StoreId == storeId && p.Product.CategoryId == cat.Id)
                 .Include(p => p.ProductSKUValues)
                 .ThenInclude(p => p.ProductOptionValue)
                 .ThenInclude(p => p.ProductOption)
@@ -393,11 +398,11 @@ namespace StoreOrder.WebApplication.Controllers
             });
         }
 
-        [HttpGet("{storeId}/{categoryId}/product/type2"), MapToApiVersion("1")]
+        [HttpGet("{storeId}/{categoryIdOrCode}/product/type2"), MapToApiVersion("1")]
         [AllowAnonymous]
         public async Task<IActionResult> GetListProductsOfStoreWithCategoryForCustomerV2(
             string storeId = "b4d32aca-665d-4253-83a5-6f6a8b7acade",
-            string categoryId = "ea76e2a8-873f-48bf-8ace-1415ee3758e8",
+            string categoryIdOrCode = "ea76e2a8-873f-48bf-8ace-1415ee3758e8",
             int pageIndex = 0,
             int pageSize = 10,
             string sortColumn = null,
@@ -405,8 +410,13 @@ namespace StoreOrder.WebApplication.Controllers
             string filterColumn = null,
             string filterQuery = null)
         {
+            var cat = await _context.CategoryProducts.FirstOrDefaultAsync(c => c.Id == categoryIdOrCode || c.Code == categoryIdOrCode);
+            if (cat == null)
+            {
+                throw new ApiException("Category not found", (int)HttpStatusCode.BadRequest);
+            }
             var query = _context.Products
-                .Where(p => p.StoreId == storeId && p.CategoryId == categoryId)
+                .Where(p => p.StoreId == storeId && p.CategoryId == cat.Id)
                 .Include(p => p.ProductDetail)
                 .Include(p => p.ProductSKUs)
                 .ThenInclude(p => p.ProductSKUValues)

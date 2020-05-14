@@ -253,9 +253,9 @@ namespace StoreOrder.WebApplication.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{categoryId}/product"), MapToApiVersion("1")]
+        [HttpGet("{categoryIdOrCode}/product"), MapToApiVersion("1")]
         public async Task<IActionResult> GetListProductsOfStoreWithCategoryForEmployee(
-            string categoryId = "ea76e2a8-873f-48bf-8ace-1415ee3758e8",
+            string categoryIdOrCode = "ea76e2a8-873f-48bf-8ace-1415ee3758e8",
             int pageIndex = 0,
             int pageSize = 10,
             string sortColumn = null,
@@ -271,9 +271,14 @@ namespace StoreOrder.WebApplication.Controllers
             {
                 throw new ApiException("User not found");
             }
+            var cat = await _context.CategoryProducts.FirstOrDefaultAsync(c => c.Id == categoryIdOrCode || c.Code == categoryIdOrCode);
+            if (cat == null)
+            {
+                throw new ApiException("Category not found", (int)HttpStatusCode.BadRequest);
+            }
 
             var query = _context.ProductSKUs
-                .Where(p => p.Product.StoreId == user.StoreId && p.Product.CategoryId == categoryId)
+                .Where(p => p.Product.StoreId == user.StoreId && p.Product.CategoryId == cat.Id)
                 .Include(p => p.ProductSKUValues)
                 .ThenInclude(p => p.ProductOptionValue)
                 .ThenInclude(p => p.ProductOption)
@@ -395,9 +400,9 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
 
-        [HttpGet("{categoryId}/product/type2"), MapToApiVersion("1")]
+        [HttpGet("{categoryIdOrCode}/product/type2"), MapToApiVersion("1")]
         public async Task<IActionResult> GetListProductsOfStoreWithCategoryForEmployeeV2(
-            string categoryId = "ea76e2a8-873f-48bf-8ace-1415ee3758e8",
+            string categoryIdOrCode = "ea76e2a8-873f-48bf-8ace-1415ee3758e8",
             int pageIndex = 0,
             int pageSize = 10,
             string sortColumn = null,
@@ -410,10 +415,15 @@ namespace StoreOrder.WebApplication.Controllers
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == this.userId);
             if (user == null)
             {
-                throw new ApiException("User not found");
+                throw new ApiException("User not found", (int)HttpStatusCode.BadRequest);
+            }
+            var cat = await _context.CategoryProducts.FirstOrDefaultAsync(c => c.Id == categoryIdOrCode || c.Code == categoryIdOrCode);
+            if (cat == null)
+            {
+                throw new ApiException("Category not found", (int)HttpStatusCode.BadRequest);
             }
             var query = _context.Products
-                .Where(p => p.StoreId == user.StoreId && p.CategoryId == categoryId)
+                .Where(p => p.StoreId == user.StoreId && p.CategoryId == cat.Id)
                 .Include(p => p.ProductDetail)
                 .Include(p => p.ProductSKUs)
                 .ThenInclude(p => p.ProductSKUValues)
