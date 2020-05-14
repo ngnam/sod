@@ -6,6 +6,6 @@
         public const string RoleOrderUser = "OrderUser";
         public const string RoleCookieUser = "CookieUser";
         public const string RolePayUser = "PayUser";
-        public const string roleCustomerUser = "CustomerUser";
+        public const string RoleCustomerUser = "CustomerUser";
     }
 }

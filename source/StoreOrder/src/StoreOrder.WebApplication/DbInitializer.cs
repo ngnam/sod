@@ -33,7 +33,7 @@ namespace StoreOrder.WebApplication
                 var roleOrderUser = new Role { Id = Guid.NewGuid().ToString(), Code = Guid.NewGuid().ToString(), RoleName = RoleTypeHelper.RoleOrderUser, Desc = "NV Order of Store" };
                 var roleCookieUser = new Role { Id = Guid.NewGuid().ToString(), Code = Guid.NewGuid().ToString(), RoleName = RoleTypeHelper.RoleCookieUser, Desc = "NV phụ bếp of Store" };
                 var rolePayUser = new Role { Id = Guid.NewGuid().ToString(), Code = Guid.NewGuid().ToString(), RoleName = RoleTypeHelper.RolePayUser, Desc = "Nv Thanh toán of Store" };
-                var roleCustomerUser = new Role { Id = Guid.NewGuid().ToString(), Code = Guid.NewGuid().ToString(), RoleName = RoleTypeHelper.roleCustomerUser, Desc = "Role Account of Customer" };
+                var roleCustomerUser = new Role { Id = Guid.NewGuid().ToString(), Code = Guid.NewGuid().ToString(), RoleName = RoleTypeHelper.RoleCustomerUser, Desc = "Role Account of Customer" };
 
                 //// I create the User 
                 //var lib = new Library();
@@ -109,7 +109,7 @@ namespace StoreOrder.WebApplication
 
             if (databaseDbContext.Roles.Count() == 4)
             {
-                var roleCustomerUser = new Role { Id = Guid.NewGuid().ToString(), Code = Guid.NewGuid().ToString(), RoleName = RoleTypeHelper.roleCustomerUser, Desc = "Role Account of Customer" };
+                var roleCustomerUser = new Role { Id = Guid.NewGuid().ToString(), Code = Guid.NewGuid().ToString(), RoleName = RoleTypeHelper.RoleCustomerUser, Desc = "Role Account of Customer" };
                 await databaseDbContext.Roles.AddAsync(roleCustomerUser);
                 await databaseDbContext.SaveChangesAsync();
             }

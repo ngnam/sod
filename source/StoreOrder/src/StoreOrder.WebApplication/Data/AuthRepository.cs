@@ -82,7 +82,7 @@ namespace StoreOrder.WebApplication.Data
         public async Task<UserLogined> SignInAndSignUpCustomerAsync(CustomerLoginDTO model)
         {
             // GET roleCustomerUser 
-            var roleCustomerUser = await _context.Roles.FirstOrDefaultAsync(role => role.RoleName.Equals(RoleTypeHelper.roleCustomerUser));
+            var roleCustomerUser = await _context.Roles.FirstOrDefaultAsync(role => role.RoleName.Equals(RoleTypeHelper.RoleCustomerUser));
             User userCreate = new User();
             
             // CheckUserExist
