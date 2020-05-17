@@ -9,7 +9,6 @@ using StoreOrder.WebApplication.Data.Models.Account;
 using StoreOrder.WebApplication.Data.Models.Stores;
 using StoreOrder.WebApplication.Data.Wrappers;
 using System;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace StoreOrder.WebApplication.Controllers
@@ -17,24 +16,22 @@ namespace StoreOrder.WebApplication.Controllers
     [Authorize]
     [ApiVersion("1")]
     [ApiVersion("2")]
-    public class AccountController : ApiBaseController
+    public class AccountController : ApiBaseController<AccountController>
     {
         private readonly StoreOrderDbContext _context;
-        private readonly IAuthRepository _authRepository;
-        private readonly ILogger<AccountController> _logger;
+
         public AccountController(
             IAuthRepository authRepository,
-            ILogger<AccountController> logger,
-            StoreOrderDbContext context)
+            ILoggerFactory loggerFactory,
+            StoreOrderDbContext context) : base(loggerFactory, authRepository)
         {
-            _authRepository = authRepository;
-            _logger = logger;
             _context = context;
         }
 
         [HttpGet(""), MapToApiVersion("1")]
         public IActionResult LoginTest()
         {
+            _logger.LogInformation("LoginTest test");
             throw new ApiException("Đi chỗ khác chơi đi, vào đây phá tao báo công an :)");
         }
 
@@ -48,6 +45,7 @@ namespace StoreOrder.WebApplication.Controllers
         [HttpPost("registration/{storeId}"), MapToApiVersion("1")]
         public async Task<IActionResult> RegistrationUser([FromBody] RegistrationUserDTO model, string storeId)
         {
+            _logger.Log(LogLevel.Information, "call registration/{@storeId}", storeId);
             await CheckIsSignoutedAsync();
             string messager = string.Empty;
             if (ModelState.IsValid)
@@ -193,18 +191,6 @@ namespace StoreOrder.WebApplication.Controllers
 
             _logger.Log(LogLevel.Information, messager);
             return Ok(new { data = messager });
-        }
-
-        private async Task CheckIsSignoutedAsync()
-        {
-            if (HttpContext.User.Identity.IsAuthenticated)
-            {
-                bool isLogouted = await this._authRepository.CheckUserLogoutedAsync(this.userId, this.currentUserLogin);
-                if (isLogouted)
-                {
-                    throw new ApiException("User đã logout", (int)HttpStatusCode.Unauthorized);
-                }
-            }
         }
     }
 }

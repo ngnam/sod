@@ -12,7 +12,7 @@ namespace StoreOrder.WebApplication.Data
 {
     public class StoreOrderDbContext : DbContext
     {
-        public StoreOrderDbContext(DbContextOptions options) : base(options)
+        public StoreOrderDbContext(DbContextOptions<StoreOrderDbContext> options) : base(options)
         {
         }
 

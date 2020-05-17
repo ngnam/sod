@@ -26,10 +26,10 @@ namespace StoreOrder.WebApplication.Controllers
         private readonly StoreOrderDbContext _context;
 
         public ConfigController(
-             ILogger<ConfigController> logger,
+             ILoggerFactory loggerFactory,
              StoreOrderDbContext context)
         {
-            _logger = logger;
+            _logger = loggerFactory.CreateLogger<ConfigController>();
             _context = context;
         }
 

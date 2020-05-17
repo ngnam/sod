@@ -1,0 +1,17 @@
+{
+  "Serilog": {
+    "MinimumLevel": "Information",
+    "WriteTo": [
+      {
+        "Name": "Console"
+      },
+      {
+        "Name": "File",
+        "Args": {
+          "path": "Log\\admin_log.txt",
+          "rollingInterval": "Day"
+        }
+      }
+    ]
+  }
+}

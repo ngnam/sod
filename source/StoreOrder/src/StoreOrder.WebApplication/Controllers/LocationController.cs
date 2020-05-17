@@ -26,11 +26,11 @@ namespace StoreOrder.WebApplication.Controllers
 
         public LocationController(
              IWebHostEnvironment env,
-             ILogger<LocationController> logger,
+             ILoggerFactory loggerFactory,
              StoreOrderDbContext context)
         {
             _env = env;
-            _logger = logger;
+            _logger = loggerFactory.CreateLogger<LocationController>();
             _context = context;
         }
 

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using StoreOrder.WebApplication.Controllers.ApiBase;
@@ -18,20 +17,16 @@ namespace StoreOrder.WebApplication.Controllers
     [Authorize]
     [ApiVersion("1")]
     [ApiController]
-    public class AdminStoreController : ApiBaseController
+    public class AdminStoreController : ApiBaseController<AdminStoreController>
     {
         private readonly StoreOrderDbContext _context;
-        private readonly IAuthRepository _authRepository;
-        private readonly ILogger<AdminStoreController> _logger;
 
         public AdminStoreController(
               StoreOrderDbContext context,
               IAuthRepository authRepository,
-              ILogger<AdminStoreController> logger)
+              ILoggerFactory loggerFactory) : base(loggerFactory, authRepository)
         {
-            _logger = logger;
             _context = context;
-            _authRepository = authRepository;
         }
 
         [HttpGet(""), MapToApiVersion("1")]
@@ -195,18 +190,6 @@ namespace StoreOrder.WebApplication.Controllers
                 filterQuery
             );
             return Ok(result);
-        }
-
-        private async Task CheckIsSignoutedAsync()
-        {
-            if (HttpContext.User.Identity.IsAuthenticated)
-            {
-                bool isLogouted = await this._authRepository.CheckUserLogoutedAsync(this.userId, this.currentUserLogin);
-                if (isLogouted)
-                {
-                    throw new ApiException("User đã logout", (int)HttpStatusCode.Unauthorized);
-                }
-            }
         }
 
     }

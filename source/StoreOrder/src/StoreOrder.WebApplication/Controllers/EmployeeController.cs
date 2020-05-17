@@ -18,19 +18,15 @@ namespace StoreOrder.WebApplication.Controllers
     [Authorize]
     [ApiVersion("1")]
     [ApiVersion("2")]
-    public class EmployeeController : ApiBaseController
+    public class EmployeeController : ApiBaseController<EmployeeController>
     {
         private readonly StoreOrderDbContext _context;
-        private readonly IAuthRepository _authRepository;
-        private readonly ILogger<EmployeeController> _logger;
         public EmployeeController(
             StoreOrderDbContext context,
             IAuthRepository authRepository,
-            ILogger<EmployeeController> logger)
+            ILoggerFactory loggerFactory) : base(loggerFactory, authRepository)
         {
-            _logger = logger;
             _context = context;
-            _authRepository = authRepository;
         }
 
         [HttpPost("login"), MapToApiVersion("1")]
@@ -505,16 +501,5 @@ namespace StoreOrder.WebApplication.Controllers
             return Ok(1);
         }
 
-        private async Task CheckIsSignoutedAsync()
-        {
-            if (HttpContext.User.Identity.IsAuthenticated)
-            {
-                bool isLogouted = await this._authRepository.CheckUserLogoutedAsync(this.userId, this.currentUserLogin);
-                if (isLogouted)
-                {
-                    throw new ApiException("User đã logout", (int)HttpStatusCode.Unauthorized);
-                }
-            }
-        }
     }
 }

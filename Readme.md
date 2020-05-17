@@ -19,6 +19,8 @@
 * [Modeling product variants](https://help.akeneo.com/pim/serenity/articles/what-about-products-variants.html)
 * http://demo.akeneo.com/
 * [Logging SQL and Change-Tracking Events in EF Core](https://docs.microsoft.com/en-us/archive/msdn-magazine/2018/october/data-points-logging-sql-and-change-tracking-events-in-ef-core)
+* Add serilog: https://andrewlock.net/adding-serilog-to-the-asp-net-core-generic-host/
+* `Update-Database -c AdminLogDbContext`
 
 ## Environment
 

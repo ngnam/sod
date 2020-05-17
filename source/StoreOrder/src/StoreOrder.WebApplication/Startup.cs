@@ -55,7 +55,11 @@ namespace StoreOrder.WebApplication
 #endif
                 options.UseNpgsql(
                     Configuration.GetConnectionString("StoreOrderDbContext")
-                    );
+                );
+            });
+
+            services.AddDbContext<AdminLogDbContext>(options => {
+                options.UseNpgsql(Configuration.GetConnectionString("AdminLogDbConnection"));
             });
 
             // Add JWT

@@ -24,23 +24,19 @@ namespace StoreOrder.WebApplication.Controllers
 {
     [Authorize]
     [ApiVersion("1")]
-    public class UploadMediaController : ApiBaseController
+    public class UploadMediaController : ApiBaseController<UploadMediaController>
     {
         private readonly IWebHostEnvironment _env;
         protected readonly IConfiguration _configuration;
-        private readonly ILogger<UploadMediaController> _logger;
-        private readonly IAuthRepository _authRepository;
 
         public UploadMediaController(
            IWebHostEnvironment env,
            IConfiguration configuration,
            IAuthRepository authRepository,
-           ILogger<UploadMediaController> logger)
+           ILoggerFactory loggerFactory): base(loggerFactory, authRepository)
         {
             _env = env;
-            _logger = logger;
             _configuration = configuration;
-            _authRepository = authRepository;
         }
 
         [HttpPost("upload-file/{type}"), MapToApiVersion("1")]
@@ -130,18 +126,6 @@ namespace StoreOrder.WebApplication.Controllers
             {
                 if (_imgUrUploadSettings == null) this._imgUrUploadSettings = _configuration.GetSection("ImgUrUpload").Get<ImgUrUpload>();
                 return this._imgUrUploadSettings;
-            }
-        }
-
-        private async Task CheckIsSignoutedAsync()
-        {
-            if (HttpContext.User.Identity.IsAuthenticated)
-            {
-                bool isLogouted = await this._authRepository.CheckUserLogoutedAsync(this.userId, this.currentUserLogin);
-                if (isLogouted)
-                {
-                    throw new ApiException("User đã logout", (int)HttpStatusCode.Unauthorized);
-                }
             }
         }
     }
