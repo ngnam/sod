@@ -262,6 +262,7 @@ namespace StoreOrder.WebApplication.Data
                 TokenType = JwtBearerDefaults.AuthenticationScheme
             };
 
+            _logger.LogInformation("generate token");
             return userLogined;
         }
 
@@ -282,6 +283,7 @@ namespace StoreOrder.WebApplication.Data
             };
             try
             {
+                _logger.LogInformation("Save user logined");
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException ex)
