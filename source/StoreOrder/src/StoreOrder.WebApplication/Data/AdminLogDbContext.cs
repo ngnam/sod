@@ -3,7 +3,7 @@ using StoreOrder.WebApplication.Data.Models.Loging;
 
 namespace StoreOrder.WebApplication.Data
 {
-    public class AdminLogDbContext : DbContext
+    public class AdminLogDbContext : DbContext, IAdminLogDbContext
     {
         public AdminLogDbContext(DbContextOptions<AdminLogDbContext> options) : base(options)
         {

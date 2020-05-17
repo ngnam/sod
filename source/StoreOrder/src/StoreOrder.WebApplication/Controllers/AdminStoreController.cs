@@ -7,6 +7,7 @@ using StoreOrder.WebApplication.Data.DTO;
 using StoreOrder.WebApplication.Data.Enums;
 using StoreOrder.WebApplication.Data.Models.Account;
 using StoreOrder.WebApplication.Data.Models.Stores;
+using StoreOrder.WebApplication.Data.Repositories.Interfaces;
 using StoreOrder.WebApplication.Data.Wrappers;
 using System.Linq;
 using System.Net;

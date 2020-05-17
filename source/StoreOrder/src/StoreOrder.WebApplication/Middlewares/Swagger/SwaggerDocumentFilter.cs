@@ -3,7 +3,6 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace StoreOrder.WebApplication.Middlewares.Swagger
 {
@@ -20,6 +19,7 @@ namespace StoreOrder.WebApplication.Middlewares.Swagger
             new OpenApiTag { Name = "UploadMedia", Description = "Upload Media API" },
             new OpenApiTag { Name = "Config", Description = "Config settings API" },
             new OpenApiTag { Name = "User", Description = "User Profile API" },
+            new OpenApiTag { Name = "Log", Description = "Log API" },
         };
         public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
         {

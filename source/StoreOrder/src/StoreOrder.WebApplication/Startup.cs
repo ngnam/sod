@@ -11,10 +11,14 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using StoreOrder.WebApplication.Data;
+using StoreOrder.WebApplication.Data.Repositories;
+using StoreOrder.WebApplication.Data.Repositories.Interfaces;
 using StoreOrder.WebApplication.Data.Wrappers;
 using StoreOrder.WebApplication.Extensions;
 using StoreOrder.WebApplication.Middlewares;
 using StoreOrder.WebApplication.Middlewares.Swagger;
+using StoreOrder.WebApplication.Services;
+using StoreOrder.WebApplication.Services.Interfaces;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
@@ -96,6 +100,10 @@ namespace StoreOrder.WebApplication
 
             // Add REPOSITORY
             services.AddScoped(typeof(IAuthRepository), typeof(AuthRepository));
+            services.AddTransient<ILogRepository, LogRepository<AdminLogDbContext>>();
+
+            //Services
+            services.AddTransient<ILogService, LogService>();
 
             ConfigureSwagger(services); // contains the services.AddSwaggerGen(options => {...} ) code see method definition below
 

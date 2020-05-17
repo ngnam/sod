@@ -2,7 +2,7 @@
 using StoreOrder.WebApplication.Data.Models.Account;
 using System.Threading.Tasks;
 
-namespace StoreOrder.WebApplication.Data
+namespace StoreOrder.WebApplication.Data.Repositories.Interfaces
 {
     public interface IAuthRepository
     {

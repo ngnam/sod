@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using StoreOrder.WebApplication.Controllers.ApiBase;
-using StoreOrder.WebApplication.Data;
+using StoreOrder.WebApplication.Data.Repositories.Interfaces;
 using System.Threading.Tasks;
 
 namespace StoreOrder.WebApplication.Controllers

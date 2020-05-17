@@ -51,9 +51,5 @@
     <ProjectReference Include="..\Imgur-NetCore\Imgur.API.NetCore.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Data\Repositories\Interfaces\" />
-  </ItemGroup>
-
 
 </Project>

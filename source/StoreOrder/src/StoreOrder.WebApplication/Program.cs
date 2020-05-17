@@ -35,6 +35,7 @@ namespace StoreOrder.WebApplication
                                 .Enrich.FromLogContext()
                                 .WriteTo.PostgreSQL(connectionstring, tableName, columnWriters, schemaName: "logging")
                                 .CreateLogger();
+
             try
             {
                 // CreateHostBuilder(args).Build().Run();

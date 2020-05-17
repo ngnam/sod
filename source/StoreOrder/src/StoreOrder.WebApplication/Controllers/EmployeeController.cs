@@ -7,6 +7,7 @@ using StoreOrder.WebApplication.Data;
 using StoreOrder.WebApplication.Data.DTO;
 using StoreOrder.WebApplication.Data.Models.Products;
 using StoreOrder.WebApplication.Data.Models.Stores;
+using StoreOrder.WebApplication.Data.Repositories.Interfaces;
 using StoreOrder.WebApplication.Data.Wrappers;
 using System;
 using System.Linq;

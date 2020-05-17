@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -7,7 +6,7 @@ using StoreOrder.WebApplication.Controllers.ApiBase;
 using StoreOrder.WebApplication.Data;
 using StoreOrder.WebApplication.Data.DTO;
 using StoreOrder.WebApplication.Data.Enums;
-using StoreOrder.WebApplication.Data.Models.Account;
+using StoreOrder.WebApplication.Data.Repositories.Interfaces;
 using StoreOrder.WebApplication.Data.Wrappers;
 using System;
 using System.Linq;
@@ -99,7 +98,7 @@ namespace StoreOrder.WebApplication.Controllers
                 user.Gender = model.Gender;
                 user.PhoneNumber = model.PhoneNumber;
                 user.UpdatedAt = DateTime.UtcNow;
-                
+
                 if (!string.IsNullOrEmpty(model.NewPassword))
                 {
                     var hashPass = Helpers.SercurityHelper.GenerateSaltedHash(model.NewPassword);

@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using StoreOrder.WebApplication.Data.DTO;
 using StoreOrder.WebApplication.Data.Enums;
 using StoreOrder.WebApplication.Data.Models.Account;
+using StoreOrder.WebApplication.Data.Repositories.Interfaces;
 using StoreOrder.WebApplication.Data.Wrappers;
 using StoreOrder.WebApplication.Extensions;
 using System;
@@ -17,7 +18,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StoreOrder.WebApplication.Data
+namespace StoreOrder.WebApplication.Data.Repositories
 {
     public class AuthRepository : IAuthRepository
     {
@@ -84,7 +85,7 @@ namespace StoreOrder.WebApplication.Data
             // GET roleCustomerUser 
             var roleCustomerUser = await _context.Roles.FirstOrDefaultAsync(role => role.RoleName.Equals(RoleTypeHelper.RoleCustomerUser));
             User userCreate = new User();
-            
+
             // CheckUserExist
             var userExist = await _context.Users
                 .Include(u => u.UserToRoles)
@@ -117,7 +118,8 @@ namespace StoreOrder.WebApplication.Data
                         TimeCode = 20
                     };
                     userCreate.UserDevices.Add(userDevice);
-                } else
+                }
+                else
                 {
                     // Update to UserDevices
                     var userDevice = _context.UserDevices.FirstOrDefault(uc => uc.CurrentUserId == userExist.Id && uc.CodeDevice == model.AppId);
@@ -143,7 +145,7 @@ namespace StoreOrder.WebApplication.Data
                         UserId = userExist.Id
                     };
                     userCreate.UseExternalSignIns.Add(newUSERExternalSignIn);
-                } 
+                }
                 else
                 {
                     // update To UserExternalSignIns
@@ -171,7 +173,8 @@ namespace StoreOrder.WebApplication.Data
                 userCreate.UserName = model.Email;
                 userCreate.PhoneNumber = model.PhoneNumber;
 
-                var userDevice = new UserDevice {
+                var userDevice = new UserDevice
+                {
                     Id = Guid.NewGuid().ToString(),
                     CodeDevice = model.AppId,
                     CurrentUserId = userCreate.Id,

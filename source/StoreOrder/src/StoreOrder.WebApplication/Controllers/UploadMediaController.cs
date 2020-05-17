@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StoreOrder.WebApplication.Controllers.ApiBase;
-using StoreOrder.WebApplication.Data;
 using StoreOrder.WebApplication.Data.MimeTypes;
 using StoreOrder.WebApplication.Data.Models.FileUpload;
+using StoreOrder.WebApplication.Data.Repositories.Interfaces;
 using StoreOrder.WebApplication.Data.Wrappers;
 using StoreOrder.WebApplication.Extensions;
 using StoreOrder.WebApplication.Settings;
@@ -33,7 +33,7 @@ namespace StoreOrder.WebApplication.Controllers
            IWebHostEnvironment env,
            IConfiguration configuration,
            IAuthRepository authRepository,
-           ILoggerFactory loggerFactory): base(loggerFactory, authRepository)
+           ILoggerFactory loggerFactory) : base(loggerFactory, authRepository)
         {
             _env = env;
             _configuration = configuration;
