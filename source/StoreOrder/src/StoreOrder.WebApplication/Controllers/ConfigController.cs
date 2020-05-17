@@ -36,8 +36,10 @@ namespace StoreOrder.WebApplication.Controllers
         [HttpGet("environment/{settingType}")]
         public async Task<IActionResult> GetSettings([FromHeader] string AuthenticationId, [FromHeader] string UserAgent, string settingType = "employee")
         {
+            _logger.LogInformation("GET environment/{@settingType}", settingType);
             if (string.IsNullOrEmpty(AuthenticationId) || string.IsNullOrEmpty(UserAgent))
             {
+                _logger.LogInformation("Bạn không có quyền truy cập.");
                 throw new ApiException("Bạn không có quyền truy cập.", (int)HttpStatusCode.Unauthorized);
             }
             int typeSetting = settingType == "employee" ? (int)TypeSetting.EMPLPLOYEE : (int)TypeSetting.CUSTOMER;
@@ -62,6 +64,7 @@ namespace StoreOrder.WebApplication.Controllers
         [HttpPost("environment/{settingType}"), MapToApiVersion("1")]
         public async Task<IActionResult> UpdateSettings([FromBody] SettingDTO model, [FromHeader] string AuthenticationId, [FromHeader] string UserAgent, string settingType = "employee")
         {
+            _logger.LogInformation("POST environment/{@settingType}", settingType);
             if (string.IsNullOrEmpty(AuthenticationId) || string.IsNullOrEmpty(UserAgent))
             {
                 throw new ApiException("Bạn không có quyền truy cập.", (int)HttpStatusCode.Unauthorized);

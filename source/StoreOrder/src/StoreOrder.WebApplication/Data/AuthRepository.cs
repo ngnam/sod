@@ -315,6 +315,7 @@ namespace StoreOrder.WebApplication.Data
             try
             {
                 await _context.SaveChangesAsync();
+                _logger.LogInformation("User đã logout success");
             }
             catch (Exception ex)
             {

@@ -71,10 +71,12 @@ namespace StoreOrder.WebApplication.Controllers
             var user = await _authRepository.GetUserByUserNameOrEmail(model.UserNameOrEmail);
             if (user == null)
             {
+                _logger.LogInformation("Wrong username or email.");
                 throw new ApiException("Wrong username or email.", (int)HttpStatusCode.BadRequest);
             }
             else if (!_authRepository.VerifyPasswordHash(model.Password, user.HashPassword, user.SaltPassword))
             {
+                _logger.LogInformation("Wrong password.");
                 throw new ApiException("Wrong password.", (int)HttpStatusCode.BadRequest);
             }
             else
@@ -104,6 +106,7 @@ namespace StoreOrder.WebApplication.Controllers
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == this.userId);
             if (user == null)
             {
+                _logger.LogInformation("User not found");
                 throw new ApiException("User not found");
             }
 

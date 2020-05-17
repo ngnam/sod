@@ -38,6 +38,7 @@ namespace StoreOrder.WebApplication.Controllers
         [HttpGet("logout"), MapToApiVersion("1")]
         public async Task<IActionResult> Logout()
         {
+            _logger.LogInformation("Logout");
             var isLogout = await _authRepository.LogoutAsync(this.userId, this.currentUserLogin);
             return Ok(new { isLogout = isLogout });
         }
@@ -121,6 +122,7 @@ namespace StoreOrder.WebApplication.Controllers
         [HttpPost("registration/{storeId}"), MapToApiVersion("2")]
         public async Task<IActionResult> RegistrationUserV2([FromForm] RegistrationUserDTO model, string storeId)
         {
+            _logger.Log(LogLevel.Information, "call registration/{@storeId}", storeId);
             await CheckIsSignoutedAsync();
             string messager = string.Empty;
             if (ModelState.IsValid)

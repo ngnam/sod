@@ -38,6 +38,7 @@ namespace StoreOrder.WebApplication.Controllers
                string filterColumn = null,
                string filterQuery = null)
         {
+            _logger.Log(LogLevel.Information, "GetListStores");
             // check user logout
             await CheckIsSignoutedAsync();
 
@@ -75,6 +76,8 @@ namespace StoreOrder.WebApplication.Controllers
             string filterColumn = null,
             string filterQuery = null)
         {
+            _logger.Log(LogLevel.Information, "get product");
+
             string messager = string.Empty;
             // get stores of user admin
             User user = await _context.Users.FindAsync(this.userId);
@@ -131,6 +134,7 @@ namespace StoreOrder.WebApplication.Controllers
             string filterColumn = null,
             string filterQuery = null)
         {
+            _logger.Log(LogLevel.Information, "get attribute");
             await CheckIsSignoutedAsync();
 
             string messager = string.Empty;
@@ -176,6 +180,8 @@ namespace StoreOrder.WebApplication.Controllers
            string filterColumn = null,
            string filterQuery = null)
         {
+            _logger.LogInformation("get category");
+
             var result = await ApiResult<CategoryStoreDTO>.CreateAsync(
                 _context.CategoryStores.Select(c => new CategoryStoreDTO
                 {
