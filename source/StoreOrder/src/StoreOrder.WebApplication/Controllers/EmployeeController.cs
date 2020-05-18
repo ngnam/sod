@@ -5,11 +5,13 @@ using Microsoft.Extensions.Logging;
 using StoreOrder.WebApplication.Controllers.ApiBase;
 using StoreOrder.WebApplication.Data;
 using StoreOrder.WebApplication.Data.DTO;
+using StoreOrder.WebApplication.Data.Enums;
 using StoreOrder.WebApplication.Data.Models.Products;
 using StoreOrder.WebApplication.Data.Models.Stores;
 using StoreOrder.WebApplication.Data.Repositories.Interfaces;
 using StoreOrder.WebApplication.Data.Wrappers;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -486,7 +488,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpPost("order"), MapToApiVersion("1")]
-        public async Task<IActionResult> StoreOrder([FromBody] OrderProductDTO model)
+        public async Task<IActionResult> CreateOrder([FromBody] OrderProductDTO model)
         {
             await CheckIsSignoutedAsync();
             if (ModelState.IsValid)
@@ -497,7 +499,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpPost("order"), MapToApiVersion("2")]
-        public async Task<IActionResult> StoreOrderV2([FromForm] OrderProductDTO model)
+        public async Task<IActionResult> CreateOrderV2([FromForm] OrderProductDTO model)
         {
             await CheckIsSignoutedAsync();
             if (ModelState.IsValid)
@@ -507,5 +509,158 @@ namespace StoreOrder.WebApplication.Controllers
             return Ok(1);
         }
 
+        [HttpPut("order/{orderId}"), MapToApiVersion("1")]
+        public async Task<IActionResult> UpdateOrder([FromBody] OrderProductDTO model)
+        {
+            await CheckIsSignoutedAsync();
+            if (ModelState.IsValid)
+            {
+                return Ok();
+            }
+            return Ok(1);
+        }
+
+        [HttpPut("order/{orderId}"), MapToApiVersion("2")]
+        public async Task<IActionResult> UpdateOrderV2([FromForm] OrderProductDTO model)
+        {
+            await CheckIsSignoutedAsync();
+            if (ModelState.IsValid)
+            {
+                return Ok();
+            }
+            return Ok(1);
+        }
+
+        [HttpGet("order/table/{tableId}"), MapToApiVersion("1")]
+        public async Task<IActionResult> GetOrderProductsWithTable(string tableId = "1")
+        {
+            await CheckIsSignoutedAsync();
+
+            var result = new OrderProductDTO
+            {
+                OrderId = Guid.NewGuid().ToString(),
+                OrderStatus = (int)TypeOrderStatus.Pendding,
+                TableId = Guid.NewGuid().ToString(),
+                TableName = "Bàn 01",
+                Products = new System.Collections.Generic.List<ProductOptionOrderDTO>()
+                {
+                    new ProductOptionOrderDTO { ProductId = "1", ProductName = "Trà chanh nhiệt đới", OptionId_OptionValueIds = new string[] {"1_1", "2_1_2_3"}, OptionDescription = "Kích cỡ nhỏ, Toping: Dừa khô, trân châu, chuối khô", OrderNote = "Cốc nhựa", AmountFood = 1, ProductOrderStatus = (int)TypeProductOrderWithTable.NEW, Price = 50000  },
+                    new ProductOptionOrderDTO { ProductId = "1", ProductName = "Trà chanh nhiệt đới", OptionId_OptionValueIds = new string[] {"2_1_2"}, OptionDescription = "Toping 80 đá, 20 đường", OrderNote = "Cốc nhựa", AmountFood = 1, ProductOrderStatus = (int)TypeProductOrderWithTable.NEW, Price = 50000  },
+                    new ProductOptionOrderDTO { ProductId = "1", ProductName = "Trà chanh nhiệt đới", OptionId_OptionValueIds = new string[] {"2_4_5"}, OptionDescription = "Toping ít đá, nhiều đường", OrderNote = "Cốc thủy tinh, thêm đường", AmountFood = 1, ProductOrderStatus = (int)TypeProductOrderWithTable.RECEIVED, Price = 50000  },
+                    new ProductOptionOrderDTO { ProductId = "2", ProductName = "Bạc Sửu", OptionId_OptionValueIds = new string[] {"3_4"}, OptionDescription = "Bạc sửu", OrderNote = "Ít đá", AmountFood = 1, ProductOrderStatus = (int)TypeProductOrderWithTable.DONE, Price = 50000  },
+                    new ProductOptionOrderDTO { ProductId = "2", ProductName = "Caffe đen", OptionId_OptionValueIds = new string[] {"3_4"}, OptionDescription = "Caffe đen", OrderNote = "Không đường", AmountFood = 1, ProductOrderStatus = (int)TypeProductOrderWithTable.DONE, Price = 50000  },
+                }
+            };
+            return Ok(result);
+        }
+
+        [HttpGet("order/{type}"), MapToApiVersion("1")]
+        public async Task<IActionResult> GetListOrderWithTableOrProductName(int type = 1)
+        {
+            await CheckIsSignoutedAsync();
+            if (type == 1)
+            {
+                // xem theo món
+                var result = new List<OrderWithProductDTO>() {
+                    new OrderWithProductDTO { ProductId = "1", ProductName = "Trà chanh nhiệt đới", TotalCount = 5, 
+                        Products = new List<ViewProductOptionDTO>() {
+                            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"1_1"}, OptionDescription = "Bình thường", TableId = "tableId1", TableName = "A1", AmountFood = 1, OrderNote = "Không toping", ProductOrderStatus = (int)TypeProductOrderWithTable.RECEIVED },
+                            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"2_1"}, OptionDescription = "Toping: Ít đá, nhiều đường", TableId = "tableId1", TableName = "A1", AmountFood = 1, OrderNote = "Cốc nhựa", ProductOrderStatus = (int)TypeProductOrderWithTable.RECEIVED },
+                            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"2_2"}, OptionDescription = "Toping nhiều đá, ít đường", TableId = "tableId1", TableName = "A1", AmountFood = 1, OrderNote = "Cốc nhựa", ProductOrderStatus = (int)TypeProductOrderWithTable.RECEIVED },
+                        }  
+                    },
+                    new OrderWithProductDTO { ProductId = "2", ProductName = "Trà chanh nhiệt độ", TotalCount = 5,
+                        Products = new List<ViewProductOptionDTO>() {
+                            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"1_1"}, OptionDescription = "Bình thường", TableId = "tableId1", TableName = "A1", AmountFood = 1, OrderNote = "Không toping", ProductOrderStatus = (int)TypeProductOrderWithTable.RECEIVED },
+                            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"2_1"}, OptionDescription = "Toping: Ít đá, nhiều đường", TableId = "tableId1", TableName = "A1", AmountFood = 1, OrderNote = "Cốc nhựa", ProductOrderStatus = (int)TypeProductOrderWithTable.RECEIVED },
+                            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"2_2"}, OptionDescription = "Toping nhiều đá, ít đường", TableId = "tableId1", TableName = "A1", AmountFood = 1, OrderNote = "Cốc nhựa", ProductOrderStatus = (int)TypeProductOrderWithTable.RECEIVED },
+                        }
+                    },
+                    new OrderWithProductDTO { ProductId = "3", ProductName = "Cà phê", TotalCount = 5,
+                        Products = new List<ViewProductOptionDTO>() {
+                            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"1_1"}, OptionDescription = "Cà phê đen", TableId = "tableId1", TableName = "A1", AmountFood = 1, OrderNote = "Mang về", ProductOrderStatus = (int)TypeProductOrderWithTable.RECEIVED },
+                            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"2_1"}, OptionDescription = "Bạc sửu", TableId = "tableId1", TableName = "A1", AmountFood = 1, OrderNote = "Cốc trắng", ProductOrderStatus = (int)TypeProductOrderWithTable.RECEIVED },
+                            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"2_2"}, OptionDescription = "Cà phê sữa", TableId = "tableId1", TableName = "A1", AmountFood = 1, OrderNote = "Cốc đá", ProductOrderStatus = (int)TypeProductOrderWithTable.RECEIVED },
+                        }
+                    }
+                };
+                return Ok(result);
+                
+            } else if(type == 2) {
+                // xem theo bàn
+                var result = new List<OrderWithTableDTO>() { 
+                    new OrderWithTableDTO { TableId = "1", TableName = "A1", TableStatus = (int)TypeTableStatus.TableStatus1, TotalFoods = 10, TimeOrder = 1 },
+                    new OrderWithTableDTO { TableId = "2", TableName = "A2", TableStatus = (int)TypeTableStatus.TableStatus1, TotalFoods = 10, TimeOrder = 1 },
+                    new OrderWithTableDTO { TableId = "3", TableName = "A3", TableStatus = (int)TypeTableStatus.TableStatus2, TotalFoods = 10, TimeOrder = 1 },
+                    new OrderWithTableDTO { TableId = "4", TableName = "A4", TableStatus = (int)TypeTableStatus.TableStatus2, TotalFoods = 10, TimeOrder = 1 },
+                    new OrderWithTableDTO { TableId = "5", TableName = "A5", TableStatus = (int)TypeTableStatus.TableStatus3, TotalFoods = 10, TimeOrder = 1 },
+                    new OrderWithTableDTO { TableId = "6", TableName = "A6", TableStatus = (int)TypeTableStatus.TableStatus3, TotalFoods = 10, TimeOrder = 1 },
+                    new OrderWithTableDTO { TableId = "7", TableName = "A7", TableStatus = (int)TypeTableStatus.TableStatus3, TotalFoods = 10, TimeOrder = 1 },
+                    new OrderWithTableDTO { TableId = "8", TableName = "A8", TableStatus = (int)TypeTableStatus.TableStatus3, TotalFoods = 10, TimeOrder = 1 },
+                    new OrderWithTableDTO { TableId = "9", TableName = "A9", TableStatus = (int)TypeTableStatus.TableStatus3, TotalFoods = 10, TimeOrder = 1 },
+                    new OrderWithTableDTO { TableId = "10", TableName = "A10", TableStatus = (int)TypeTableStatus.TableStatus3, TotalFoods = 10, TimeOrder = 1 },
+                    new OrderWithTableDTO { TableId = "11", TableName = "A11", TableStatus = (int)TypeTableStatus.TableStatus3, TotalFoods = 10, TimeOrder = 1 },
+                };
+                return Ok(result);
+            }
+            return Ok(null);
+        }
+
+        [HttpGet("order/2/table/{tableId}"), MapToApiVersion("1")]
+        public async Task<IActionResult> GetOrderWithTableViewProductsWithTableId(string tableId = "1")
+        {
+            await CheckIsSignoutedAsync();
+
+            var result = new OrderWithTableViewProductsDTO()
+            {
+                TableId = tableId,
+                TableName = "A1",
+                Products = new List<ViewProductDTO>()
+                {
+                     new ViewProductDTO { ProductId = "1", ProductName = "Trà chanh nhiệt đới", OptionId_OptionValueIds = new string[] {"1_1", "2_1_2_3"}, OptionDescription = "Kích cỡ nhỏ, Toping: Dừa khô, trân châu, chuối khô", OrderNote = "Cốc nhựa", AmountFood = 1, ProductOrderStatus = (int)TypeProductOrderWithTable.NEW  },
+                     new ViewProductDTO { ProductId = "1", ProductName = "Trà chanh nhiệt đới", OptionId_OptionValueIds = new string[] {"1_1", "2_1_2_3"}, OptionDescription = "Kích cỡ tỏ, Toping: Dừa khô, trân châu, chuối khô", OrderNote = "Cốc nhựa", AmountFood = 1, ProductOrderStatus = (int)TypeProductOrderWithTable.RECEIVED  },
+                     new ViewProductDTO { ProductId = "2", ProductName = "Trà đào", OptionId_OptionValueIds = new string[] {"1_1", "2_1_2_3"}, OptionDescription = "Kích cỡ nhỏ, Toping: Dừa khô, trân châu, chuối khô", OrderNote = "Cốc nhựa", AmountFood = 1, ProductOrderStatus = (int)TypeProductOrderWithTable.RECEIVED  },
+                     new ViewProductDTO { ProductId = "2", ProductName = "Trà đào", OptionId_OptionValueIds = new string[] {"1_1", "2_1_2_3"}, OptionDescription = "Kích cỡ to, Toping: Dừa khô, trân châu, chuối khô", OrderNote = "Cốc nhựa", AmountFood = 1, ProductOrderStatus = (int)TypeProductOrderWithTable.RECEIVED  },
+                     new ViewProductDTO { ProductId = "3", ProductName = "Caffe", OptionId_OptionValueIds = new string[] {"1_1", "2_1_2_3"}, OptionDescription = "Cafe đen", OrderNote = "Cốc thủy tinh", AmountFood = 1, ProductOrderStatus = (int)TypeProductOrderWithTable.RECEIVED  },
+                     new ViewProductDTO { ProductId = "3", ProductName = "Caffe", OptionId_OptionValueIds = new string[] {"1_1", "2_1_2_3"}, OptionDescription = "Bạc sửu", OrderNote = "Cốc thủy tinh", AmountFood = 1, ProductOrderStatus = (int)TypeProductOrderWithTable.RECEIVED  },
+                     new ViewProductDTO { ProductId = "3", ProductName = "Caffe", OptionId_OptionValueIds = new string[] {"1_1", "2_1_2_3"}, OptionDescription = "Sữa nâu", OrderNote = "Cốc thủy tinh", AmountFood = 1, ProductOrderStatus = (int)TypeProductOrderWithTable.RECEIVED  },
+                }
+            };
+
+            return Ok(result);
+        }
+
+        [HttpGet("order/{orderId}/confirm"), MapToApiVersion("1")]
+        public async Task<IActionResult> ConfirmOrder(string orderId = "1")
+        {
+            await CheckIsSignoutedAsync();
+            var result = new OrderProductDTO
+            {
+                OrderId = Guid.NewGuid().ToString(),
+                OrderStatus = (int)TypeOrderStatus.Pendding,
+                TableId = Guid.NewGuid().ToString(),
+                TableName = "Bàn 01",
+                Products = new System.Collections.Generic.List<ProductOptionOrderDTO>()
+                {
+                    new ProductOptionOrderDTO { ProductId = "1", ProductName = "Trà chanh nhiệt đới", OptionId_OptionValueIds = new string[] {"1_1", "2_1_2_3"}, OptionDescription = "Kích cỡ nhỏ, Toping: Dừa khô, trân châu, chuối khô", OrderNote = "Cốc nhựa", AmountFood = 1, ProductOrderStatus = (int)TypeProductOrderWithTable.NEW, Price = 50000  },
+                    new ProductOptionOrderDTO { ProductId = "1", ProductName = "Trà chanh nhiệt đới", OptionId_OptionValueIds = new string[] {"2_1_2"}, OptionDescription = "Toping 80 đá, 20 đường", OrderNote = "Cốc nhựa", AmountFood = 1, ProductOrderStatus = (int)TypeProductOrderWithTable.NEW, Price = 50000  },
+                    new ProductOptionOrderDTO { ProductId = "1", ProductName = "Trà chanh nhiệt đới", OptionId_OptionValueIds = new string[] {"2_4_5"}, OptionDescription = "Toping ít đá, nhiều đường", OrderNote = "Cốc thủy tinh, thêm đường", AmountFood = 1, ProductOrderStatus = (int)TypeProductOrderWithTable.RECEIVED, Price = 50000  },
+                    new ProductOptionOrderDTO { ProductId = "2", ProductName = "Bạc Sửu", OptionId_OptionValueIds = new string[] {"3_4"}, OptionDescription = "Bạc sửu", OrderNote = "Ít đá", AmountFood = 1, ProductOrderStatus = (int)TypeProductOrderWithTable.DONE, Price = 50000  },
+                    new ProductOptionOrderDTO { ProductId = "2", ProductName = "Caffe đen", OptionId_OptionValueIds = new string[] {"3_4"}, OptionDescription = "Caffe đen", OrderNote = "Không đường", AmountFood = 1, ProductOrderStatus = (int)TypeProductOrderWithTable.DONE, Price = 50000  },
+                }
+            };
+            return Ok(result);
+        }
+
+        [HttpPost("order/{orderId}/confirm-pay"), MapToApiVersion("1")]
+        public async Task<IActionResult> ConfirmPayOrder([FromBody] OrderProductDTO model, string orderId = "1")
+        {
+            await CheckIsSignoutedAsync();
+            if (ModelState.IsValid)
+            {
+                return Ok(1);
+            }
+            return Ok(0);
+        }
     }
 }

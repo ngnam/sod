@@ -1,36 +1,50 @@
-﻿using System.Collections.Generic;
+﻿using StoreOrder.WebApplication.Data.Enums;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace StoreOrder.WebApplication.Data.DTO
 {
     public class OrderProductDTO
     {
-        //- id = id bàn
-        //- productId = id món
-        //- listOptionDetail = danh sách id các option
-        //- note = ghi chú của món ăn
-        //- amount = số lượng
+        public OrderProductDTO()
+        {
+            this.Products = new List<ProductOptionOrderDTO>();
+            this.OrderId = "0";
+            this.CreatedOn = DateTime.UtcNow;
+            if (!this.OrderId.Equals("0"))
+            {
+                this.UpdatedOn = DateTime.UtcNow;
+            }
+        }
+        [Required]
+        public string OrderId { get; set; }
         [Required]
         public string TableId { get; set; }
-        [Required]
-        public string ProductId { get; set; }
-        public List<ProductOptionDetailDTO> ProductOptionDetailDTOs { get; set; }
-        [Required]
-        public string OrderNote { get; set; }
-        [Required]
-        public int? Amount { get; set; }
+        public string TableName{ get; set; }
+        public int OrderStatus { get; set; }
+        public DateTimeOffset? CreatedOn { get; set; }
+        public DateTimeOffset? UpdatedOn { get; set; }
+        public List<ProductOptionOrderDTO> Products { get; set; }
     }
 
-    public class ProductOptionDetailDTO
+    public class ProductOptionOrderDTO
     {
+        public ProductOptionOrderDTO()
+        {
+            this.AmountFood = 1;
+            this.ProductOrderStatus = (int)TypeProductOrderWithTable.NEW;
+            this.Price = 0;
+            this.OptionId_OptionValueIds = new string[] {};
+        }
+        [Required]
         public string ProductId { get; set; }
-        [Required]
-        public string OptionId { get; set; }
-        [Required]
-        public string OptionValueId { get; set; }
-        [Required]
-        public string SkuId { get; set; }
-        [Required]
+        public string ProductName { get; set; }
+        public string[] OptionId_OptionValueIds { get; set; }
+        public string OptionDescription { get; set; }
         public decimal Price { get; set; }
+        public string OrderNote { get; set; }
+        public int AmountFood { get; set; }
+        public int ProductOrderStatus { get; set; }
     }
 }
