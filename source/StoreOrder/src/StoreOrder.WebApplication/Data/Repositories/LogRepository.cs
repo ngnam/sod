@@ -35,6 +35,7 @@ namespace StoreOrder.WebApplication.Data.Repositories
             var pagedList = new PagedList<Log>();
             Expression<Func<Log, bool>> searchCondition = x => x.LogEvent.Contains(search) || x.Message.Contains(search) || x.Exception.Contains(search);
             var logs = await DbContext.Logs
+                .AsNoTracking()
                 .WhereIf(!string.IsNullOrEmpty(search), searchCondition)
                 .PageBy(x => x.Id, page, pageSize)
                 .ToListAsync();

@@ -32,6 +32,7 @@ namespace StoreOrder.WebApplication
             };
             Log.Logger = new LoggerConfiguration()
                                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                                .Enrich.WithThreadId()
                                 .Enrich.FromLogContext()
                                 .WriteTo.PostgreSQL(connectionstring, tableName, columnWriters, schemaName: "logging")
                                 .CreateLogger();
@@ -39,8 +40,6 @@ namespace StoreOrder.WebApplication
             try
             {
                 // CreateHostBuilder(args).Build().Run();
-                Log.Information("Getting the motors running...");
-
                 var host = CreateHostBuilder(args).Build();
                 using (var scope = host.Services.CreateScope())
                 {
