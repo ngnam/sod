@@ -584,7 +584,7 @@ namespace StoreOrder.WebApplication.Controllers
                         }
                     }
                 };
-                return Ok(result);
+                return Ok(new { data = result });
                 
             } else if(type == 2) {
                 // xem theo bàn
@@ -601,9 +601,9 @@ namespace StoreOrder.WebApplication.Controllers
                     new OrderWithTableDTO { TableId = "10", TableName = "A10", TableStatus = (int)TypeTableStatus.TableStatus3, TotalFoods = 10, TimeOrder = 1 },
                     new OrderWithTableDTO { TableId = "11", TableName = "A11", TableStatus = (int)TypeTableStatus.TableStatus3, TotalFoods = 10, TimeOrder = 1 },
                 };
-                return Ok(result);
+                return Ok(new { data = result });
             }
-            return Ok(null);
+            return Ok(new { data = new List<OrderWithTableDTO>() { } });
         }
 
         [HttpGet("order/2/table/{tableId}"), MapToApiVersion("1")]
