@@ -22,7 +22,7 @@
 * Add serilog: https://andrewlock.net/adding-serilog-to-the-asp-net-core-generic-host/
 * `Update-Database -c AdminLogDbContext`
 * https://forums.asp.net/t/2158689.aspx?How+make+a+dynamic+Authorize+
-
+* https://imgurapi.readthedocs.io/en/latest/oauth2/
 
 
 ## Environment

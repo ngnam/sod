@@ -2,6 +2,7 @@
 using Imgur.API.Authentication.Impl;
 using Imgur.API.Endpoints.Impl;
 using Imgur.API.Models;
+using Imgur.API.Models.Impl;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -96,11 +97,22 @@ namespace StoreOrder.WebApplication.Controllers
             try
             {
                 var client = new ImgurClient(this.imgUrUploadSettings.ClientID, this.imgUrUploadSettings.ClientSecret);
+                // state=#access_token=d9cb9143c19c67696e26f4ac59b2f7424af7650c&expires_in=315360000&token_type=bearer&refresh_token=ddd479acc0fa1b91b099599f864ac0a9afa82801&account_username=ngnamB&account_id=96736173
+                var token = new OAuth2Token(
+                    accessToken: "d9cb9143c19c67696e26f4ac59b2f7424af7650c", 
+                    refreshToken: "ddd479acc0fa1b91b099599f864ac0a9afa82801", 
+                    tokenType: "bearer",
+                    accountId: "96736173", 
+                    accountUsername: "ngnamB", 
+                    expiresIn: 315360000);
+                //var endpoint = new OAuth2Endpoint(client);
+                //var token = endpoint.GetTokenByRefreshTokenAsync("REFRESH_TOKEN");
+                client.SetOAuth2Token(token);
                 var albumEndpoint = new AlbumEndpoint(client);
-                // "a/Y1Bkgxv"><a href="//imgur.com/a/Y1Bkgxv">
-                IAlbum album = await albumEndpoint.GetAlbumAsync("Y1Bkgxv");
+                // https://imgur.com/a/Dsoqayj
+                IAlbum album = await albumEndpoint.GetAlbumAsync("Dsoqayj");
                 var imageEndpoint = new ImageEndpoint(client);
-                IImage imageOrVideo = await imageEndpoint.UploadImageBinaryAsync(postedFile.Bytes, album.DeleteHash);
+                IImage imageOrVideo = await imageEndpoint.UploadImageBinaryAsync(image: postedFile.Bytes, albumId: album.Id);
                 //Debug.Write("Image retrieved. Image Url: " + image.Link);
                 return Ok(imageOrVideo);
             }
