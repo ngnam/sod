@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using StoreOrder.WebApplication.Authorization;
 using StoreOrder.WebApplication.Controllers.ApiBase;
 using StoreOrder.WebApplication.Data;
 using StoreOrder.WebApplication.Data.DTO;
@@ -10,6 +11,9 @@ using StoreOrder.WebApplication.Data.Models.Stores;
 using StoreOrder.WebApplication.Data.Repositories.Interfaces;
 using StoreOrder.WebApplication.Data.Wrappers;
 using System;
+using System.Linq;
+using System.Net;
+using System.Security.Permissions;
 using System.Threading.Tasks;
 
 namespace StoreOrder.WebApplication.Controllers
@@ -40,10 +44,11 @@ namespace StoreOrder.WebApplication.Controllers
         public async Task<IActionResult> Logout()
         {
             _logger.LogInformation("Logout");
-            var isLogout = await _authRepository.LogoutAsync(this.userId, this.currentUserLogin);
+            var isLogout = await _authRepository.LogoutAsync(this.CurrentUserId, this.UserIdentifierId);
             return Ok(new { isLogout = isLogout });
         }
 
+        [Authorize(Policy = Permissions.Account.Create)]
         [HttpPost("registration/{storeId}"), MapToApiVersion("1")]
         public async Task<IActionResult> RegistrationUser([FromBody] RegistrationUserDTO model, string storeId)
         {
@@ -58,7 +63,7 @@ namespace StoreOrder.WebApplication.Controllers
                 {
                     messager = "Không tìm thấy cửa hàng hoặc cửa hàng đã đóng.";
                     _logger.Log(LogLevel.Information, messager);
-                    throw new ApiException(messager);
+                    throw new ApiException(messager, (int)HttpStatusCode.BadRequest);
                 }
 
                 // get role
@@ -67,7 +72,7 @@ namespace StoreOrder.WebApplication.Controllers
                 {
                     messager = "Không tìm thấy role.";
                     _logger.Log(LogLevel.Information, messager);
-                    throw new ApiException(messager);
+                    throw new ApiException(messager, (int)HttpStatusCode.BadRequest);
                 }
 
                 // init user
@@ -108,9 +113,9 @@ namespace StoreOrder.WebApplication.Controllers
                 {
                     _logger.Log(LogLevel.Warning, $"Log when RegistrationUser {ex.Message}");
 #if !DEBUG
-                    throw new ApiException($"Có lỗi xảy ra khi Đăng ký {user.FirstName}");
+                    throw new ApiException($"Có lỗi xảy ra khi đăng ký {user.FirstName}", (int)HttpStatusCode.BadRequest);
 #else
-                    throw new ApiException(ex);
+                    throw new ApiException(ex, (int)HttpStatusCode.BadRequest);
 #endif
                 }
 
@@ -120,6 +125,7 @@ namespace StoreOrder.WebApplication.Controllers
             return Ok(new { data = messager });
         }
 
+        [Authorize(Policy = Permissions.Account.Create)]
         [HttpPost("registration/{storeId}"), MapToApiVersion("2")]
         public async Task<IActionResult> RegistrationUserV2([FromForm] RegistrationUserDTO model, string storeId)
         {

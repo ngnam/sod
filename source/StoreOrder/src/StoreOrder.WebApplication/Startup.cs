@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -10,11 +11,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using StoreOrder.WebApplication.Authorization;
 using StoreOrder.WebApplication.Data;
 using StoreOrder.WebApplication.Data.Repositories;
 using StoreOrder.WebApplication.Data.Repositories.Interfaces;
 using StoreOrder.WebApplication.Data.Wrappers;
 using StoreOrder.WebApplication.Extensions;
+using StoreOrder.WebApplication.Helpers;
 using StoreOrder.WebApplication.Middlewares;
 using StoreOrder.WebApplication.Middlewares.Swagger;
 using StoreOrder.WebApplication.Services;
@@ -99,11 +102,14 @@ namespace StoreOrder.WebApplication
             });
 
             // Add REPOSITORY
-            services.AddScoped(typeof(IAuthRepository), typeof(AuthRepository));
+            services.AddTransient<IAuthRepository, AuthRepository>();
             services.AddTransient<ILogRepository, LogRepository<AdminLogDbContext>>();
 
             //Services
             services.AddTransient<ILogService, LogService>();
+            services.AddTransient<IUserManager, UserManager>();
+
+            services.AddAuthorizationPolicies();
 
             ConfigureSwagger(services); // contains the services.AddSwaggerGen(options => {...} ) code see method definition below
 

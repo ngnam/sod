@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using StoreOrder.WebApplication.Authorization;
 using StoreOrder.WebApplication.Data.DTO;
 using StoreOrder.WebApplication.Data.Enums;
 using StoreOrder.WebApplication.Data.Models.Account;
@@ -53,7 +54,7 @@ namespace StoreOrder.WebApplication.Data.Repositories
             return CreateToken(user, currentUserId);
         }
 
-        public async Task<User> GetUserByUserNameOrEmail(string userNameOrEmail)
+        public async Task<User> GetUserByUserNameOrEmailAsync(string userNameOrEmail)
         {
             return await _context.Users.Include(x => x.UserToRoles).ThenInclude(x => x.Role).FirstOrDefaultAsync(user =>
              user.UserName.ToLower().Equals(userNameOrEmail.ToLower()) ||
@@ -70,14 +71,14 @@ namespace StoreOrder.WebApplication.Data.Repositories
             await SaveUserLoginedAsync(user, userlogined, currentUserId);
         }
 
-        public async Task<bool> LogoutAsync(string userId, string currentUserId)
+        public async Task<bool> LogoutAsync(string currentUserId, string userIdentifierId)
         {
-            return await LogoutUserAsync(userId, currentUserId);
+            return await LogoutUserAsync(currentUserId, userIdentifierId);
         }
 
-        public async Task<bool> CheckUserLogoutedAsync(string userId, string currentUserId)
+        public async Task<bool> CheckUserLogoutedAsync(string currentUserId, string userIdentifierId)
         {
-            return await _context.UserLogins.AnyAsync(u => u.UserId == userId && u.NameIdentifier == currentUserId && u.IsLoggedIn == false && u.ExpiresIn == DateTime.MinValue);
+            return await _context.UserLogins.AnyAsync(u => u.UserId == currentUserId && u.NameIdentifier == userIdentifierId && u.IsLoggedIn == false && u.ExpiresIn == DateTime.MinValue);
         }
 
         public async Task<UserLogined> SignInAndSignUpCustomerAsync(CustomerLoginDTO model)
@@ -219,27 +220,66 @@ namespace StoreOrder.WebApplication.Data.Repositories
             return userLogined;
         }
 
+        public async Task<User> GetUserAsync(ClaimsPrincipal user)
+        {
+            string curentUserId = user.Claims.FirstOrDefault(x => x.Type.Equals(UserSignedClaimTypes.CurrentUserId, StringComparison.OrdinalIgnoreCase))?.Value;
+            if (string.IsNullOrEmpty(curentUserId))
+            {
+                return null;
+            }
+            var result = await _context.Users.FindAsync(curentUserId);
+            if (result == null)
+            {
+                return null;
+            }
+            return result;
+        }
+        public async Task<Role[]> GetRolesAsync(User user)
+        {
+            if (user == null) { return null; }
+            var result = await _context.UserToRoles.Where(x => x.UserId == user.Id).Select(x => x.Role).ToArrayAsync();
+            return result;
+
+        }
+        public async Task<List<Permission>> GetPermissionAsync(Role role)
+        {
+            return await _context.RoleToPermissions.Where(x => x.RoleId == role.Id).Select(x => x.Permission).ToListAsync();
+        }
+
+        public string GetStoreOfCurrentUser(ClaimsPrincipal user)
+        {
+            return user.Claims.FirstOrDefault(x => x.Type.Equals(UserSignedClaimTypes.StoreIdentifierId, StringComparison.OrdinalIgnoreCase))?.Value;
+        }
+
         #region PRIVATE METHOD
-        private UserLogined CreateToken(User user, string curentUserId)
+        private UserLogined CreateToken(User user, string userIdentifierId)
         {
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, curentUserId),
-                new Claim(ClaimTypes.PrimarySid, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(UserSignedClaimTypes.UserIdentifierId, userIdentifierId),
+                new Claim(UserSignedClaimTypes.CurrentUserId, user.Id.ToString()),
+                new Claim(UserSignedClaimTypes.UserName, user.UserName),
+                new Claim(ClaimTypes.Email, user.Email)
             };
 
-            var userRole = user.UserToRoles.Select(x => x.Role);
-            if (userRole.Count() > 0)
+            if (!string.IsNullOrEmpty(user.StoreId))
             {
-                var roleName = string.Join(";", userRole.Select(r => r.RoleName));
-                var roleCode = string.Join(";", userRole.Select(r => r.Code));
-                var roleIds = string.Join(";", userRole.Select(r => r.Id));
-                claims.Add(new Claim(ClaimTypes.Role, roleName));
-                claims.Add(new Claim(ClaimTypes.UserData, roleCode));
-                claims.Add(new Claim(ClaimTypes.GroupSid, roleIds));
+                claims.Add(new Claim(UserSignedClaimTypes.StoreIdentifierId, user.StoreId));
             }
+
+            var userRole = user.UserToRoles.Select(x => x.Role).ToList();
+            
+            foreach (var role in userRole)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role.RoleName));
+                var lstPermission = GetPermissionAsync(role).Result;
+                foreach (var item in lstPermission)
+                {
+                    claims.Add(new Claim(PermissionClaimTypes.Permission, item.PermissionName));
+                }
+            }
+
+            var subjects = new ClaimsIdentity(claims);
 
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8
                 .GetBytes(_configuration.GetSection("AppSettings:Token").Value));
@@ -248,7 +288,7 @@ namespace StoreOrder.WebApplication.Data.Repositories
             var timeExpires = Convert.ToDouble(_configuration.GetSection("AppSettings:Expires").Value);
             SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(claims),
+                Subject = subjects,
                 Expires = DateTime.Now.AddHours(timeExpires),
                 SigningCredentials = creds,
                 Audience = _configuration.GetSection("AppSettings:Audience").Value,
@@ -277,7 +317,7 @@ namespace StoreOrder.WebApplication.Data.Repositories
             {
                 new UserLogin {
                     AccessToken = userlogined.AccessToken,
-                    ExpiresIn = userlogined.ExpiresIn,
+                    ExpiresIn = userlogined.ExpiresIn.Value.DateTime,
                     IsLoggedIn = userlogined.IsLoggedIn,
                     TokenType = userlogined.TokenType,
                     UserId = user.Id,
@@ -296,15 +336,15 @@ namespace StoreOrder.WebApplication.Data.Repositories
             }
         }
 
-        private async Task<bool> LogoutUserAsync(string userId, string currentUserId)
+        private async Task<bool> LogoutUserAsync(string currentUserId, string userIdentifierId)
         {
-            if ((await CheckUserLogoutedAsync(userId, currentUserId)))
+            if ((await CheckUserLogoutedAsync(currentUserId, userIdentifierId)))
             {
                 _logger.LogInformation("User đã logout");
                 throw new ApiException("User đã logout", (int)HttpStatusCode.Unauthorized);
             }
             var userLogin = await _context.UserLogins
-                .FirstOrDefaultAsync(p => p.UserId == userId && p.NameIdentifier == currentUserId && p.IsLoggedIn == true);
+                .FirstOrDefaultAsync(p => p.UserId == currentUserId && p.NameIdentifier == userIdentifierId && p.IsLoggedIn == true);
             if (userLogin == null)
             {
                 _logger.LogInformation("User không tồn tại!");
@@ -327,7 +367,6 @@ namespace StoreOrder.WebApplication.Data.Repositories
             }
             return true;
         }
-
         #endregion
     }
 }

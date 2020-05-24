@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using StoreOrder.WebApplication.Authorization;
 using StoreOrder.WebApplication.Controllers.ApiBase;
 using StoreOrder.WebApplication.Data.MimeTypes;
 using StoreOrder.WebApplication.Data.Models.FileUpload;
@@ -41,6 +42,7 @@ namespace StoreOrder.WebApplication.Controllers
 
         [HttpPost("upload-file/{type}"), MapToApiVersion("1")]
         [DisableRequestSizeLimit]
+        [Authorize(Policy = Permissions.Upload.UploadFile)]
         public async Task<IActionResult> UploadFile(string type = "image")
         {
             await CheckIsSignoutedAsync();

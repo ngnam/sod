@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using StoreOrder.WebApplication.Authorization;
 using StoreOrder.WebApplication.Controllers.ApiBase;
 using StoreOrder.WebApplication.Data;
 using StoreOrder.WebApplication.Data.DTO;
@@ -41,7 +42,7 @@ namespace StoreOrder.WebApplication.Controllers
                 return Ok(new { isAuthenicated = HttpContext.User.Identity.IsAuthenticated });
             }
 
-            var user = await _authRepository.GetUserByUserNameOrEmail(model.UserNameOrEmail);
+            var user = await _authRepository.GetUserByUserNameOrEmailAsync(model.UserNameOrEmail);
             if (user == null)
             {
                 _logger.LogInformation("Wrong username or email.");
@@ -71,7 +72,7 @@ namespace StoreOrder.WebApplication.Controllers
                 return Ok(new { isAuthenicated = HttpContext.User.Identity.IsAuthenticated });
             }
 
-            var user = await _authRepository.GetUserByUserNameOrEmail(model.UserNameOrEmail);
+            var user = await _authRepository.GetUserByUserNameOrEmailAsync(model.UserNameOrEmail);
             if (user == null)
             {
                 _logger.LogInformation("Wrong username or email.");
@@ -93,6 +94,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpGet("tables"), MapToApiVersion("1")]
+        [Authorize(Policy = Permissions.Employee.GetListTables)]
         public async Task<IActionResult> GetListTables(
             int pageIndex = 0,
             int pageSize = 10,
@@ -106,7 +108,7 @@ namespace StoreOrder.WebApplication.Controllers
             await CheckIsSignoutedAsync();
 
             // get Store for user
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == this.userId);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == this.CurrentUserId);
             if (user == null)
             {
                 _logger.LogInformation("User not found");
@@ -159,6 +161,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpGet("product/category"), MapToApiVersion("1")]
+        [Authorize(Policy = Permissions.Employee.GetCategoryProductsForEmployee)]
         public async Task<IActionResult> GetCategoryProductsForEmployee(
             int pageIndex = 0,
             int pageSize = 10,
@@ -169,7 +172,7 @@ namespace StoreOrder.WebApplication.Controllers
         {
             await CheckIsSignoutedAsync();
             // get Store for user
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == this.userId);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == this.CurrentUserId);
             if (user == null)
             {
                 throw new ApiException("User not found");
@@ -195,6 +198,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpGet("product"), MapToApiVersion("1")]
+        [Authorize(Policy = Permissions.Employee.GetListProductsOfStoreForEmployee)]
         public async Task<IActionResult> GetListProductsOfStoreForEmployee(
            int pageIndex = 0,
            int pageSize = 10,
@@ -206,7 +210,7 @@ namespace StoreOrder.WebApplication.Controllers
             await CheckIsSignoutedAsync();
 
             // get Store for user
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == this.userId);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == this.CurrentUserId);
             if (user == null)
             {
                 throw new ApiException("User not found");
@@ -258,6 +262,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpGet("{categoryIdOrCode}/product"), MapToApiVersion("1")]
+        [Authorize(Policy = Permissions.Employee.GetListProductsOfStoreWithCategoryForEmployee)]
         public async Task<IActionResult> GetListProductsOfStoreWithCategoryForEmployee(
             string categoryIdOrCode = "ea76e2a8-873f-48bf-8ace-1415ee3758e8",
             int pageIndex = 0,
@@ -270,7 +275,7 @@ namespace StoreOrder.WebApplication.Controllers
             await CheckIsSignoutedAsync();
 
             // get Store for user
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == this.userId);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == this.CurrentUserId);
             if (user == null)
             {
                 throw new ApiException("User not found");
@@ -327,6 +332,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpGet("product/type2"), MapToApiVersion("1")]
+        [Authorize(Policy = Permissions.Employee.GetListProductsOfStoreForEmployeeV2)]
         public async Task<IActionResult> GetListProductsOfStoreForEmployeeV2(
            int pageIndex = 0,
            int pageSize = 10,
@@ -337,7 +343,7 @@ namespace StoreOrder.WebApplication.Controllers
         {
             await CheckIsSignoutedAsync();
             // get Store for user
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == this.userId);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == this.CurrentUserId);
             if (user == null)
             {
                 throw new ApiException("User not found");
@@ -405,6 +411,7 @@ namespace StoreOrder.WebApplication.Controllers
 
 
         [HttpGet("{categoryIdOrCode}/product/type2"), MapToApiVersion("1")]
+        [Authorize(Policy = Permissions.Employee.GetListProductsOfStoreWithCategoryForEmployeeV2)]
         public async Task<IActionResult> GetListProductsOfStoreWithCategoryForEmployeeV2(
             string categoryIdOrCode = "ea76e2a8-873f-48bf-8ace-1415ee3758e8",
             int pageIndex = 0,
@@ -416,7 +423,7 @@ namespace StoreOrder.WebApplication.Controllers
         {
             await CheckIsSignoutedAsync();
             // get Store for user
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == this.userId);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == this.CurrentUserId);
             if (user == null)
             {
                 throw new ApiException("User not found", (int)HttpStatusCode.BadRequest);
@@ -488,6 +495,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpPost("order"), MapToApiVersion("1")]
+        [Authorize(Policy = Permissions.Employee.CreateOrder)]
         public async Task<IActionResult> CreateOrder([FromBody] OrderProductDTO model)
         {
             await CheckIsSignoutedAsync();
@@ -499,6 +507,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpPost("order"), MapToApiVersion("2")]
+        [Authorize(Policy = Permissions.Employee.CreateOrder)]
         public async Task<IActionResult> CreateOrderV2([FromForm] OrderProductDTO model)
         {
             await CheckIsSignoutedAsync();
@@ -510,6 +519,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpPut("order/{orderId}"), MapToApiVersion("1")]
+        [Authorize(Policy = Permissions.Employee.UpdateOrder)]
         public async Task<IActionResult> UpdateOrder([FromBody] OrderProductDTO model)
         {
             await CheckIsSignoutedAsync();
@@ -521,6 +531,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpPut("order/{orderId}"), MapToApiVersion("2")]
+        [Authorize(Policy = Permissions.Employee.UpdateOrder)]
         public async Task<IActionResult> UpdateOrderV2([FromForm] OrderProductDTO model)
         {
             await CheckIsSignoutedAsync();
@@ -532,6 +543,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpGet("order/table/{tableId}"), MapToApiVersion("1")]
+        [Authorize(Policy = Permissions.Employee.GetOrderProductsWithTable)]
         public async Task<IActionResult> GetOrderProductsWithTable(string tableId = "1")
         {
             await CheckIsSignoutedAsync();
@@ -555,6 +567,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpGet("order/{type}"), MapToApiVersion("1")]
+        [Authorize(Policy = Permissions.Employee.GetListOrderWithTableOrProductName)]
         public async Task<IActionResult> GetListOrderWithTableOrProductName(int type = 1)
         {
             await CheckIsSignoutedAsync();
@@ -607,6 +620,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpGet("order/2/table/{tableId}"), MapToApiVersion("1")]
+        [Authorize(Policy = Permissions.Employee.GetOrderWithTableViewProductsWithTableId)]
         public async Task<IActionResult> GetOrderWithTableViewProductsWithTableId(string tableId = "1")
         {
             await CheckIsSignoutedAsync();
@@ -631,6 +645,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpGet("order/{orderId}/confirm"), MapToApiVersion("1")]
+        [Authorize(Policy = Permissions.Employee.ConfirmOrder)]
         public async Task<IActionResult> ConfirmOrder(string orderId = "1")
         {
             await CheckIsSignoutedAsync();
@@ -653,6 +668,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpPost("order/{orderId}/confirm-pay"), MapToApiVersion("1")]
+        [Authorize(Policy = Permissions.Employee.ConfirmPayOrder)]
         public async Task<IActionResult> ConfirmPayOrder([FromBody] OrderProductDTO model, string orderId = "1")
         {
             await CheckIsSignoutedAsync();

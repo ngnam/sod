@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using StoreOrder.WebApplication.Authorization;
 using StoreOrder.WebApplication.Controllers.ApiBase;
 using StoreOrder.WebApplication.Data;
 using StoreOrder.WebApplication.Data.DTO;
@@ -30,6 +31,7 @@ namespace StoreOrder.WebApplication.Controllers
             _context = context;
         }
 
+        [Authorize(Policy = Permissions.AdminStore.GetListStores)]
         [HttpGet(""), MapToApiVersion("1")]
         public async Task<IActionResult> GetListStores(
                int pageIndex = 0,
@@ -39,7 +41,6 @@ namespace StoreOrder.WebApplication.Controllers
                string filterColumn = null,
                string filterQuery = null)
         {
-            _logger.Log(LogLevel.Information, "GetListStores");
             // check user logout
             await CheckIsSignoutedAsync();
 
@@ -68,7 +69,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpGet("product"), MapToApiVersion("1")]
-        [Authorize]
+        [Authorize(Policy = Permissions.AdminStore.GetMenuProduct)]
         public async Task<IActionResult> GetMenuProduct(
             int pageIndex = 0,
             int pageSize = 10,
@@ -81,7 +82,7 @@ namespace StoreOrder.WebApplication.Controllers
 
             string messager = string.Empty;
             // get stores of user admin
-            User user = await _context.Users.FindAsync(this.userId);
+            User user = await _context.Users.FindAsync(this.CurrentUserId);
             if (user == null)
             {
                 messager = "Không tìm thấy user.";
@@ -127,6 +128,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpGet("attribute"), MapToApiVersion("1")]
+        [Authorize(Policy = Permissions.AdminStore.GetListStoreOption)]
         public async Task<IActionResult> GetListStoreOption(
             int pageIndex = 0,
             int pageSize = 10,
@@ -140,7 +142,7 @@ namespace StoreOrder.WebApplication.Controllers
 
             string messager = string.Empty;
             // get stores of user admin
-            User user = await _context.Users.FindAsync(this.userId);
+            User user = await _context.Users.FindAsync(this.CurrentUserId);
             if (user == null)
             {
                 messager = "Không tìm thấy user.";
@@ -173,6 +175,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpGet("category"), MapToApiVersion("1")]
+        [Authorize(Policy = Permissions.AdminStore.GetListCategoryStore)]
         public async Task<IActionResult> GetListCategoryStore(
            int pageIndex = 0,
            int pageSize = 10,

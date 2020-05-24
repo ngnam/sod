@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using StoreOrder.WebApplication.Authorization;
 using StoreOrder.WebApplication.Data;
 using StoreOrder.WebApplication.Data.Models.Account;
 using StoreOrder.WebApplication.Data.Models.Products;
@@ -111,6 +113,13 @@ namespace StoreOrder.WebApplication
             {
                 var roleCustomerUser = new Role { Id = Guid.NewGuid().ToString(), Code = Guid.NewGuid().ToString(), RoleName = RoleTypeHelper.RoleCustomerUser, Desc = "Role Account of Customer" };
                 await databaseDbContext.Roles.AddAsync(roleCustomerUser);
+                await databaseDbContext.SaveChangesAsync();
+            }
+
+            if (databaseDbContext.Roles.Count() == 5)
+            {
+                var roleSysAdmin = new Role { Id = Guid.NewGuid().ToString(), Code = Guid.NewGuid().ToString(), RoleName = RoleTypeHelper.RoleSysAdmin, Desc = "Role SysAdmin" };
+                await databaseDbContext.Roles.AddAsync(roleSysAdmin);
                 await databaseDbContext.SaveChangesAsync();
             }
 
@@ -244,6 +253,188 @@ namespace StoreOrder.WebApplication
                         await databaseDbContext.SaveChangesAsync();
                     }
                 }
+            }
+
+            if (!databaseDbContext.Permissions.Any())
+            {
+                await databaseDbContext.Permissions.AddRangeAsync(new List<Permission>() {
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.SysAdmin.ImportLocation },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.SysAdmin.ViewLogs },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.SysAdmin.DeleteLogs },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Account.Create },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Account.Delete },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Account.Edit },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Account.View },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Users.View },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Users.Create },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Users.Edit },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Users.Delete },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.AdminStore.GetListCategoryStore },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.AdminStore.GetListStoreOption },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.AdminStore.GetListStores },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.AdminStore.GetMenuProduct },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.AdminStore.CreateProduct },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.AdminStore.DeleteProduct },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.AdminStore.UpdateProduct },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.AdminStore.GetListProduct },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Employee.ConfirmOrder },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Employee.ConfirmPayOrder },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Employee.CreateOrder },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Employee.GetCategoryProductsForEmployee },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Employee.GetListOrderWithTableOrProductName },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Employee.GetListProductsOfStoreForEmployee },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Employee.GetListProductsOfStoreForEmployeeV2 },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Employee.GetListProductsOfStoreWithCategoryForEmployee },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Employee.GetListProductsOfStoreWithCategoryForEmployeeV2 },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Employee.GetListTables },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Employee.GetOrderProductsWithTable },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Employee.GetOrderWithTableViewProductsWithTableId },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Employee.UpdateOrder },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Upload.UploadFile },
+                });
+                await databaseDbContext.SaveChangesAsync();
+            }
+
+            if (!databaseDbContext.RoleToPermissions.Any())
+            {
+                // get role
+                var roleSysadmin = await databaseDbContext.Roles.FirstOrDefaultAsync(x => x.RoleName == RoleTypeHelper.RoleSysAdmin);
+                var roleAdminStore = await databaseDbContext.Roles.FirstOrDefaultAsync(x => x.RoleName == RoleTypeHelper.RoleAdmin);
+                var roleOrderUser = await databaseDbContext.Roles.FirstOrDefaultAsync(x => x.RoleName == RoleTypeHelper.RoleOrderUser);
+                var roleCookieUser = await databaseDbContext.Roles.FirstOrDefaultAsync(x => x.RoleName == RoleTypeHelper.RoleCookieUser);
+                var rolePayUser = await databaseDbContext.Roles.FirstOrDefaultAsync(x => x.RoleName == RoleTypeHelper.RolePayUser);
+
+                #region update roleSysAdmin
+                var permissionsSysAdmin = databaseDbContext.Permissions
+                    .Where(x => x.PermissionName == Permissions.SysAdmin.ImportLocation ||
+                                x.PermissionName == Permissions.SysAdmin.ViewLogs ||
+                                x.PermissionName == Permissions.SysAdmin.DeleteLogs ||
+                                x.PermissionName == Permissions.Account.Create ||
+                                x.PermissionName == Permissions.Account.Delete ||
+                                x.PermissionName == Permissions.Account.Edit ||
+                                x.PermissionName == Permissions.Account.View ||
+                                x.PermissionName == Permissions.AdminStore.GetListStores
+                    ).Select(x => x).ToList();
+
+                foreach (var permission in permissionsSysAdmin)
+                {
+                    // add Permissions To Role
+                    roleSysadmin.RoleToPermissions.Add(new RoleToPermission {
+                        Permission = permission,
+                        Role = roleSysadmin,
+                    });
+                }
+                // save to db
+                await databaseDbContext.SaveChangesAsync();
+                #endregion
+
+                #region Update RoleAdminStore
+                var permissionsAdminStore = databaseDbContext.Permissions
+                   .Where(x => x.PermissionName == Permissions.AdminStore.GetMenuProduct ||
+                               x.PermissionName == Permissions.AdminStore.GetListStoreOption ||
+                               x.PermissionName == Permissions.AdminStore.GetListCategoryStore ||
+                               x.PermissionName == Permissions.AdminStore.GetListProduct ||
+                               x.PermissionName == Permissions.AdminStore.CreateProduct ||
+                               x.PermissionName == Permissions.AdminStore.UpdateProduct ||
+                               x.PermissionName == Permissions.AdminStore.DeleteProduct ||
+                               x.PermissionName == Permissions.Upload.UploadFile
+
+                   ).Select(x => x).ToList();
+
+                foreach (var permission in permissionsAdminStore)
+                {
+                    // add Permissions To Role
+                    roleAdminStore.RoleToPermissions.Add(new RoleToPermission
+                    {
+                        Permission = permission,
+                        Role = roleAdminStore,
+                    });
+                }
+                // save to db
+                await databaseDbContext.SaveChangesAsync();
+                #endregion
+
+                #region Update RoleOrderUser
+                var permissionsOrderUsers = databaseDbContext.Permissions
+                   .Where(x => x.PermissionName == Permissions.Employee.GetListTables ||
+                               x.PermissionName == Permissions.Employee.GetCategoryProductsForEmployee ||
+                               x.PermissionName == Permissions.Employee.GetListProductsOfStoreForEmployee ||
+                               x.PermissionName == Permissions.Employee.GetListProductsOfStoreWithCategoryForEmployee ||
+                               x.PermissionName == Permissions.Employee.GetListProductsOfStoreForEmployeeV2 ||
+                               x.PermissionName == Permissions.Employee.GetListProductsOfStoreWithCategoryForEmployeeV2 ||
+                               x.PermissionName == Permissions.Employee.CreateOrder ||
+                               x.PermissionName == Permissions.Employee.UpdateOrder
+
+                   ).Select(x => x).ToList();
+
+                foreach (var permission in permissionsOrderUsers)
+                {
+                    // add Permissions To Role
+                    roleOrderUser.RoleToPermissions.Add(new RoleToPermission
+                    {
+                        Permission = permission,
+                        Role = roleOrderUser,
+                    });
+                }
+                // save to db
+                await databaseDbContext.SaveChangesAsync();
+                #endregion
+
+                #region Update RoleOrderUser
+                var permissionsOrderCookies = databaseDbContext.Permissions
+                   .Where(x => x.PermissionName == Permissions.Employee.GetOrderProductsWithTable ||
+                               x.PermissionName == Permissions.Employee.GetListOrderWithTableOrProductName ||
+                               x.PermissionName == Permissions.Employee.GetOrderWithTableViewProductsWithTableId ||
+                               x.PermissionName == Permissions.Employee.ConfirmOrder
+                   ).Select(x => x).ToList();
+
+                foreach (var permission in permissionsOrderCookies)
+                {
+                    // add Permissions To Role
+                    roleCookieUser.RoleToPermissions.Add(new RoleToPermission
+                    {
+                        Permission = permission,
+                        Role = roleCookieUser,
+                    });
+                }
+                // save to db
+                await databaseDbContext.SaveChangesAsync();
+                #endregion
+
+                #region Update rolePayUser
+                var permissionsPayUsers = databaseDbContext.Permissions
+                   .Where(x => x.PermissionName == Permissions.Employee.ConfirmOrder ||
+                               x.PermissionName == Permissions.Employee.ConfirmPayOrder
+                   ).Select(x => x).ToList();
+
+                foreach (var permission in permissionsPayUsers)
+                {
+                    // add Permissions To Role
+                    rolePayUser.RoleToPermissions.Add(new RoleToPermission
+                    {
+                        Permission = permission,
+                        Role = rolePayUser,
+                    });
+                }
+                // save to db
+                await databaseDbContext.SaveChangesAsync();
+                #endregion
+
+            }
+
+            if (!databaseDbContext.Users.Include(x => x.UserToRoles).ThenInclude(x => x.Role).Any(x => x.UserToRoles.Any(r => r.Role.RoleName == RoleTypeHelper.RoleSysAdmin))) {
+                var roleSysAdmin = await databaseDbContext.Roles.FirstOrDefaultAsync(x => x.RoleName == RoleTypeHelper.RoleSysAdmin);
+                string password = "string@12345";
+                var hashPass = Helpers.SercurityHelper.GenerateSaltedHash(password);
+                var userSysAdmin = new User { Id = Guid.NewGuid().ToString(), Age = 29, BirthDay = new DateTime(1991, 1, 1).ToUniversalTime(), CountLoginFailed = 0, FirstName = "sysadmin", LastName = "sysadmin", IsActived = 1, Email = "nguyenvannam0411@gmail.com", UserName = "ngvannam", HashPassword = hashPass.Hash, SaltPassword = hashPass.Salt, Gender = 1, OldPassword = hashPass.Hash + ";" + hashPass.Salt, PhoneNumber = "0349801673" };
+
+                roleSysAdmin.UserToRoles.Add(new UserToRole {
+                    Role = roleSysAdmin,
+                    User = userSysAdmin,
+                });
+
+                // save to db
+                await databaseDbContext.SaveChangesAsync();
             }
         }
     }

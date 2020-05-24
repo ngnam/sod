@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using StoreOrder.WebApplication.Authorization;
 using StoreOrder.WebApplication.Data;
 using StoreOrder.WebApplication.Data.DTO;
 using StoreOrder.WebApplication.Data.Models.Location;
@@ -35,7 +36,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpGet("import/{fileJSON}"), MapToApiVersion("1")]
-        [Authorize(Roles = RoleTypeHelper.RoleAdmin)]
+        [Authorize(Policy = Permissions.SysAdmin.ImportLocation)]
         public async Task<IActionResult> ImportData(string fileJSON)
         {
             // read jSON file
@@ -85,6 +86,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpGet(""), MapToApiVersion("1")]
+        [AllowAnonymous]
         public IActionResult GetProvinder(string code = null)
         {
             Dictionary<string, IEnumerable<ProviderDTO>> providersDictionary = new Dictionary<string, IEnumerable<ProviderDTO>>();

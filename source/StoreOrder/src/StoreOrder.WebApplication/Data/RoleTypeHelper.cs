@@ -2,6 +2,7 @@
 {
     public static class RoleTypeHelper
     {
+        public const string RoleSysAdmin = "SysAdministrator";
         public const string RoleAdmin = "Administrator";
         public const string RoleOrderUser = "OrderUser";
         public const string RoleCookieUser = "CookieUser";

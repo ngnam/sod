@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using StoreOrder.WebApplication.Authorization;
 using StoreOrder.WebApplication.Controllers.ApiBase;
 using StoreOrder.WebApplication.Data.DTO.Log;
 using StoreOrder.WebApplication.Data.Repositories.Interfaces;
@@ -23,6 +24,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpGet("ErrorsLog"), MapToApiVersion("1")]
+        [Authorize(Policy = Permissions.SysAdmin.ViewLogs)]
         public async Task<IActionResult> ErrorsLog(int? page, string search)
         {
             await CheckIsSignoutedAsync();
@@ -33,7 +35,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpPost("DeleteLogs"), MapToApiVersion("1")]
-        [ValidateAntiForgeryToken]
+        [Authorize(Policy = Permissions.SysAdmin.DeleteLogs)]
         public async Task<IActionResult> DeleteLogs([FromBody]LogsDto log)
         {
             await CheckIsSignoutedAsync();
@@ -47,7 +49,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpPost("DeleteLogs"), MapToApiVersion("2")]
-        [ValidateAntiForgeryToken]
+        [Authorize(Policy = Permissions.SysAdmin.DeleteLogs)]
         public async Task<IActionResult> DeleteLogsV2([FromForm]LogsDto log)
         {
             await CheckIsSignoutedAsync();

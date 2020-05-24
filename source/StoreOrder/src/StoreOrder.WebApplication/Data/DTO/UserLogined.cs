@@ -8,7 +8,7 @@ namespace StoreOrder.WebApplication.Data.DTO
         [JsonProperty("access_token")]
         public string AccessToken { get; set; }
         [JsonProperty("expires_in")]
-        public DateTime? ExpiresIn { get; set; }
+        public DateTimeOffset? ExpiresIn { get; set; }
         [JsonProperty("isLoggedIn")]
         public bool? IsLoggedIn { get; set; }
         [JsonProperty("token_type")]

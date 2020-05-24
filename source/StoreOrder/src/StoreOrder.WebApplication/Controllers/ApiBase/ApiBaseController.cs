@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using StoreOrder.WebApplication.Authorization;
 using StoreOrder.WebApplication.Data.Repositories.Interfaces;
 using StoreOrder.WebApplication.Data.Wrappers;
 using System;
@@ -24,33 +25,31 @@ namespace StoreOrder.WebApplication.Controllers.ApiBase
             _logger = loggerFactory.CreateLogger<T>();
             _authRepository = authRepository;
         }
-        private string _userId;
-        protected string userId
+        private string _curentUserId;
+        protected string CurrentUserId
         {
             get
             {
-                if (string.IsNullOrEmpty(this._userId) && HttpContext.User.Identity.IsAuthenticated)
+                if (string.IsNullOrEmpty(this._curentUserId) && HttpContext.User.Identity.IsAuthenticated)
                 {
                     //First get user claims    
-                    var claims = HttpContext.User.Claims;
-                    this._userId = claims?.FirstOrDefault(x => x.Type.Equals(ClaimTypes.PrimarySid, StringComparison.OrdinalIgnoreCase))?.Value;
+                    this._curentUserId = HttpContext.User.Claims.FirstOrDefault(x => x.Type.Equals(UserSignedClaimTypes.CurrentUserId, StringComparison.OrdinalIgnoreCase))?.Value;
                 }
-                return this._userId;
+                return this._curentUserId;
             }
         }
 
-        private string _currentUserLogin;
-        protected string currentUserLogin
+        private string _userIdentifierId;
+        protected string UserIdentifierId
         {
             get
             {
-                if (string.IsNullOrEmpty(this._currentUserLogin) && HttpContext.User.Identity.IsAuthenticated)
+                if (string.IsNullOrEmpty(this._userIdentifierId) && HttpContext.User.Identity.IsAuthenticated)
                 {
                     //First get user claims    
-                    var claims = HttpContext.User.Claims;
-                    this._currentUserLogin = claims?.FirstOrDefault(x => x.Type.Equals(ClaimTypes.NameIdentifier, StringComparison.OrdinalIgnoreCase))?.Value;
+                    this._userIdentifierId = HttpContext.User.Claims.FirstOrDefault(x => x.Type.Equals(UserSignedClaimTypes.UserIdentifierId, StringComparison.OrdinalIgnoreCase))?.Value;
                 }
-                return this._currentUserLogin;
+                return this._userIdentifierId;
             }
         }
 
@@ -58,10 +57,10 @@ namespace StoreOrder.WebApplication.Controllers.ApiBase
         {
             if (HttpContext.User.Identity.IsAuthenticated)
             {
-                bool isLogouted = await this._authRepository.CheckUserLogoutedAsync(this.userId, this.currentUserLogin);
+                bool isLogouted = await this._authRepository.CheckUserLogoutedAsync(this.CurrentUserId, this.UserIdentifierId);
                 if (isLogouted)
                 {
-                    throw new ApiException("User đã logout", (int)HttpStatusCode.Unauthorized);
+                    throw new ApiException("User has signout", (int)HttpStatusCode.Unauthorized);
                 }
             }
         }

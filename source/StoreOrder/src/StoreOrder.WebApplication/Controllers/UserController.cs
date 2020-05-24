@@ -34,7 +34,7 @@ namespace StoreOrder.WebApplication.Controllers
         {
             await CheckIsSignoutedAsync();
 
-            var user = await _context.Users.Include(u => u.UserToRoles).ThenInclude(u => u.Role).FirstOrDefaultAsync(u => u.Id == this.userId);
+            var user = await _context.Users.Include(u => u.UserToRoles).ThenInclude(u => u.Role).FirstOrDefaultAsync(u => u.Id == this.CurrentUserId);
 
             if (user == null)
             {
@@ -80,7 +80,7 @@ namespace StoreOrder.WebApplication.Controllers
             if (ModelState.IsValid)
             {
                 // check user exist
-                var user = await _context.Users.FindAsync(this.userId);
+                var user = await _context.Users.FindAsync(this.CurrentUserId);
                 if (user == null)
                 {
                     throw new ApiException("User not found", (int)HttpStatusCode.BadRequest);
@@ -134,7 +134,7 @@ namespace StoreOrder.WebApplication.Controllers
             if (ModelState.IsValid)
             {
                 // check user exist
-                var user = await _context.Users.FindAsync(this.userId);
+                var user = await _context.Users.FindAsync(this.CurrentUserId);
                 if (user == null)
                 {
                     throw new ApiException("User not found", (int)HttpStatusCode.BadRequest);

@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace StoreOrder.WebApplication.Controllers
 {
-    [Authorize]
+    [AllowAnonymous]
     [ApiVersion("1")]
     [ApiVersion("2")]
     public class CustomerController : ApiBaseController<CustomerController>
