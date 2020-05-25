@@ -41,8 +41,10 @@ namespace StoreOrder.WebApplication.Data.DTO
         public string ProductId { get; set; }
         public string ProductName { get; set; }
         public string[] OptionId_OptionValueIds { get; set; }
+        [MaxLength(500)]
         public string OptionDescription { get; set; }
         public decimal Price { get; set; }
+        [MaxLength(500)]
         public string OrderNote { get; set; }
         public int AmountFood { get; set; }
         public int ProductOrderStatus { get; set; }

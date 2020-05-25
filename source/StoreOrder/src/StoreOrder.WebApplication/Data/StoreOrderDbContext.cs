@@ -317,7 +317,10 @@ namespace StoreOrder.WebApplication.Data
                 c.HasKey(m => m.Id);
                 c.Property(m => m.Id).HasMaxLength(50);
                 c.Property(m => m.ProductId).HasMaxLength(50);
-                c.Property(m => m.Note).HasMaxLength(250);
+                c.Property(m => m.ProductName).HasMaxLength(250).IsRequired(false);
+                c.Property(m => m.Note).HasMaxLength(500).IsRequired(false);
+                c.Property(m => m.OptionDescription).HasMaxLength(500).IsRequired(false);
+                c.Property(m => m.OptionId_OptionValueIds).HasColumnType("text[]").HasColumnName("OptionId_OptionValueIds");
             });
 
             modelBuilder.Entity<UserCookingOrder>(c =>
