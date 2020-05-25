@@ -10,5 +10,9 @@ namespace StoreOrder.WebApplication.Data.Repositories.Interfaces
         Task<PagedList<Log>> GetLogsAsync(string search, int page = 1, int pageSize = 10);
 
         Task DeleteLogsOlderThanAsync(DateTime deleteOlderThan);
+
+        Task<int> ClearAllLogs();
+
+        Task<int> CountLogs();
     }
 }

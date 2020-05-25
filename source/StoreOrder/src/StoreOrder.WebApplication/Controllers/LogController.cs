@@ -61,5 +61,21 @@ namespace StoreOrder.WebApplication.Controllers
 
             return Ok(1);
         }
+
+        [HttpGet("ClearAll"), MapToApiVersion("1")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ClearAll()
+        {
+            var result = await _logService.ClearAllLogs();
+            return Ok(result);
+        }
+
+        [HttpGet("Count"), MapToApiVersion("1")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CountLogs()
+        {
+            var result = await _logService.CountLogs();
+            return Ok(result);
+        }
     }
 }

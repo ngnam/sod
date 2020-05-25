@@ -46,5 +46,16 @@ namespace StoreOrder.WebApplication.Data.Repositories
 
             return pagedList;
         }
+
+        public virtual async Task<int> ClearAllLogs()
+        {
+            string sqlCommand = "TRUNCATE TABLE logging.logs RESTART IDENTITY;";
+            return await DbContext.Database.ExecuteSqlRawAsync(sqlCommand);
+        }
+
+        public virtual async Task<int> CountLogs()
+        {
+            return await DbContext.Logs.CountAsync();
+        }
     }
 }

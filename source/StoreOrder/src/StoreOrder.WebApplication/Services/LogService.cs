@@ -43,5 +43,15 @@ namespace StoreOrder.WebApplication.Services
         {
             await Repository.DeleteLogsOlderThanAsync(deleteOlderThan);
         }
+
+        public virtual async Task<int> ClearAllLogs()
+        {
+            return await Repository.ClearAllLogs();
+        }
+
+        public virtual async Task<int> CountLogs()
+        {
+            return await Repository.CountLogs();
+        }
     }
 }
