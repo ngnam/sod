@@ -833,7 +833,6 @@ namespace StoreOrder.WebApplication.Controllers
             }
             var result = await _context.Orders
                 .Include(o => o.OrderDetails)
-                .ThenInclude(o => o.Order)
                 .Where(x => x.UserId == this.CurrentUserId && x.TableId == tableId && x.OrderStatus != (int)TypeOrderStatus.Done)
                 .Select(o => new OrderProductDTO {
                     OrderId = o.Id,
