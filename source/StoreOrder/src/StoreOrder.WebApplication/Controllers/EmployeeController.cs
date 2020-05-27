@@ -505,6 +505,12 @@ namespace StoreOrder.WebApplication.Controllers
             string message = string.Empty;
             if (ModelState.IsValid)
             {
+                // check if table busy
+                var hasTableBusying = await _context.StoreTables.FirstOrDefaultAsync(t => t.Id == model.TableId && t.StoreId == this.UserStoreId && t.TableStatus == (int)TypeTableStatus.TableStatus2);
+                if (hasTableBusying != null)
+                {
+                    throw new ApiException("Bàn này đang bận không thể tạo mới order!", (int)HttpStatusCode.BadRequest);
+                }
                 // check order is create or update order
                 if (string.Equals(model.OrderId, "0"))
                 {
@@ -572,6 +578,13 @@ namespace StoreOrder.WebApplication.Controllers
             string message = string.Empty;
             if (ModelState.IsValid)
             {
+                // check if table busy
+                var hasTableBusying = await _context.StoreTables.FirstOrDefaultAsync(t => t.Id == model.TableId && t.StoreId == this.UserStoreId && t.TableStatus == (int)TypeTableStatus.TableStatus2);
+                if (hasTableBusying != null)
+                {
+                    throw new ApiException("Bàn này đang bận không thể tạo mới order!", (int)HttpStatusCode.BadRequest);
+                }
+
                 // check order is create or update order
                 if (string.Equals(model.OrderId, "0"))
                 {
