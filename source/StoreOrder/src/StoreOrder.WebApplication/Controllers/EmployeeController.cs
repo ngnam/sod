@@ -516,15 +516,8 @@ namespace StoreOrder.WebApplication.Controllers
                         TableId = model.TableId,
                         TableName = model.TableName,
                         UserId = this.CurrentUserId,
+                        CreatedOn = DateTime.UtcNow
                     };
-                    if (model.CreatedOn.HasValue)
-                    {
-                        newOrder.CreatedOn = model.CreatedOn.Value.FromDateTimeOffset();
-                    }
-                    if (model.UpdatedOn.HasValue)
-                    {
-                        newOrder.UpdateOn = model.UpdatedOn.Value.FromDateTimeOffset();
-                    }
 
                     // add Order Detail
                     foreach (var order in model.Products)
@@ -834,7 +827,9 @@ namespace StoreOrder.WebApplication.Controllers
             var result = await _context.Orders
                 .Include(o => o.OrderDetails)
                 .Where(x => x.UserId == this.CurrentUserId && x.TableId == tableId && x.OrderStatus != (int)TypeOrderStatus.Done)
-                .Select(o => new OrderProductDTO {
+                .OrderByDescending(x => x.CreatedOn)
+                .Select(o => new OrderProductDTO
+                {
                     OrderId = o.Id,
                     OrderStatus = o.OrderStatus.Value,
                     TableId = o.TableId,
