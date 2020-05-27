@@ -9,13 +9,10 @@ namespace StoreOrder.WebApplication.Data.DTO
     {
         public OrderProductDTO()
         {
-            this.Products = new List<ProductOptionOrderDTO>();
+            this.Products = new List<OrderDetailDTO>();
             this.OrderId = "0";
-            this.CreatedOn = DateTime.UtcNow;
-            if (!this.OrderId.Equals("0"))
-            {
-                this.UpdatedOn = DateTime.UtcNow;
-            }
+            this.CreatedOn = null;
+            this.UpdatedOn = null;
         }
         [Required]
         public string OrderId { get; set; }
@@ -25,15 +22,15 @@ namespace StoreOrder.WebApplication.Data.DTO
         public int OrderStatus { get; set; }
         public DateTimeOffset? CreatedOn { get; set; }
         public DateTimeOffset? UpdatedOn { get; set; }
-        public List<ProductOptionOrderDTO> Products { get; set; }
+        public List<OrderDetailDTO> Products { get; set; }
     }
 
-    public class ProductOptionOrderDTO
+    public class OrderDetailDTO
     {
-        public ProductOptionOrderDTO()
+        public OrderDetailDTO()
         {
-            this.AmountFood = 1;
-            this.ProductOrderStatus = (int)TypeProductOrderWithTable.NEW;
+            this.Amount = 1;
+            this.Status = (int)TypeOrderDetail.NewOrder;
             this.Price = 0;
             this.OptionId_OptionValueIds = new string[] {};
         }
@@ -45,8 +42,9 @@ namespace StoreOrder.WebApplication.Data.DTO
         public string OptionDescription { get; set; }
         public decimal Price { get; set; }
         [MaxLength(500)]
-        public string OrderNote { get; set; }
-        public int AmountFood { get; set; }
-        public int ProductOrderStatus { get; set; }
+        public string Note { get; set; }
+        public int? Amount { get; set; }
+        public int? Status { get; set; }
+        public string OrderDetailId { get; set; }
     }
 }

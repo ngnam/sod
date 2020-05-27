@@ -12,3 +12,8 @@
 - Add Middleware Block Ip spam from list IP safe list
 * Date 13/5/2020
 - Update API endpoints for employee, customer, login
+* Date 25/5/2020
+- New Module Permissions
+* Date 27/5/2020
+- Update Module Order
+- Update api create order, update order, get order with table id

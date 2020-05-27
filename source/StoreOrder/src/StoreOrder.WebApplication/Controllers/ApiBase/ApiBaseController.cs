@@ -64,5 +64,18 @@ namespace StoreOrder.WebApplication.Controllers.ApiBase
                 }
             }
         }
+
+        private string _StoreId; 
+        protected string UserStoreId
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(this._StoreId) && HttpContext.User.Identity.IsAuthenticated)
+                {
+                    this._StoreId = HttpContext.User.Claims.FirstOrDefault(x => x.Type.Equals(UserSignedClaimTypes.StoreIdentifierId, StringComparison.OrdinalIgnoreCase))?.Value;
+                }
+                return this._StoreId;
+            }
+        }
     }
 }

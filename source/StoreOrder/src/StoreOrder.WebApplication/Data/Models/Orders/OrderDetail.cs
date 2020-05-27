@@ -16,7 +16,7 @@ namespace StoreOrder.WebApplication.Data.Orders
         public decimal Price { get; set; }
         public int? Amount { get; set; }
         public int? Rate { get; set; }
-        public int? ProductOrderStatus { get; set; }
+        public int? Status { get; set; }
         [MaxLength(500)]
         public string Note { get; set; }
         public string OrderId { get; set; }

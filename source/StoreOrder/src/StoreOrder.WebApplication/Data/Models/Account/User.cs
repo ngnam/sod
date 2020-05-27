@@ -13,7 +13,6 @@ namespace StoreOrder.WebApplication.Data.Models.Account
             this.CreatedAt = DateTime.UtcNow;
             this.UserDevices = new HashSet<UserDevice>();
             this.UseExternalSignIns = new HashSet<ExternalSignIn>();
-            this.UserCookingOrders = new HashSet<UserCookingOrder>();
             this.UserToRoles = new HashSet<UserToRole>();
             this.Orders = new HashSet<Order>();
             this.Products = new HashSet<Product>();
@@ -40,7 +39,6 @@ namespace StoreOrder.WebApplication.Data.Models.Account
         public virtual ICollection<ExternalSignIn> UseExternalSignIns { get; set; }
         public virtual ICollection<UserToRole> UserToRoles { get; set; }
         public virtual ICollection<Order> Orders { get; set; }
-        public virtual ICollection<UserCookingOrder> UserCookingOrders { get; set; }
         public virtual ICollection<Product> Products { get; set; }
         public virtual ICollection<UserLogin> UserLogins { get; set; }
         public string StoreId { get; set; }

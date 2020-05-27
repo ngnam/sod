@@ -9,6 +9,10 @@ namespace StoreOrder.WebApplication.Data.Models.Orders
 {
     public class Order
     {
+        public Order()
+        {
+            this.OrderDetails = new HashSet<OrderDetail>();
+        }
         public string Id { get; set; }
         public int? OrderStatus { get; set; }
         public DateTime? CreatedOn { get; set; }
@@ -20,7 +24,6 @@ namespace StoreOrder.WebApplication.Data.Models.Orders
         public string TableName { get; set; }
         public virtual StoreTable StoreTable { get; set; }
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
-        public virtual ICollection<UserCookingOrder> UserCookingOrders { get; set; }
-
+        public virtual string UserCookingId { get; set; }
     }
 }

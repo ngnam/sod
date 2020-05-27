@@ -52,7 +52,7 @@ namespace StoreOrder.WebApplication.Data
                 c.Property(m => m.Id).HasMaxLength(255);
                 c.Property(m => m.CodeDevice).HasMaxLength(250);
             });
-            #endregion
+            #endregion`
 
             #region UseExternalSignIn
             // UseExternalSignIn
@@ -306,9 +306,9 @@ namespace StoreOrder.WebApplication.Data
                 c.ToTable("Orders", "Order");
                 c.HasKey(m => m.Id);
                 c.Property(m => m.Id).HasMaxLength(50);
+                c.Property(m => m.UserCookingId).HasMaxLength(50);
                 c.HasOne(m => m.User).WithMany(m => m.Orders).HasForeignKey(m => m.UserId);
                 c.HasMany(m => m.OrderDetails).WithOne(m => m.Order).HasForeignKey(m => m.OrderId);
-                c.HasMany(m => m.UserCookingOrders).WithOne(m => m.Order).HasForeignKey(m => m.OrderId);
             });
 
             modelBuilder.Entity<OrderDetail>(c =>
@@ -321,14 +321,6 @@ namespace StoreOrder.WebApplication.Data
                 c.Property(m => m.Note).HasMaxLength(500).IsRequired(false);
                 c.Property(m => m.OptionDescription).HasMaxLength(500).IsRequired(false);
                 c.Property(m => m.OptionId_OptionValueIds).HasColumnType("text[]").HasColumnName("OptionId_OptionValueIds");
-            });
-
-            modelBuilder.Entity<UserCookingOrder>(c =>
-            {
-                c.ToTable("UserCookingOrders", "Order");
-                c.HasKey(m => m.Id);
-                c.Property(m => m.Id).HasMaxLength(50);
-                c.HasOne(m => m.User).WithMany(m => m.UserCookingOrders).HasForeignKey(m => m.UserId);
             });
 
             modelBuilder.Entity<Setting>(c => {
@@ -360,7 +352,6 @@ namespace StoreOrder.WebApplication.Data
         // Order
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
-        public DbSet<UserCookingOrder> UserCookingOrders { get; set; }
         // Product
         public DbSet<CategoryProduct> CategoryProducts { get; set; }
         public DbSet<Product> Products { get; set; }

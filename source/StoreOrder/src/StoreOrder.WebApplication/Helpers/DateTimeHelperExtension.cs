@@ -2,14 +2,14 @@
 
 namespace StoreOrder.WebApplication.Helpers
 {
-    public partial class DateTimeHelper
+    public static class DateTimeHelperExtension
     {
-        public static DateTime FromDateTimeOffset(DateTimeOffset utcTimeOffset)
+        public static DateTime FromDateTimeOffset(this DateTimeOffset utcTimeOffset)
         {
             return utcTimeOffset.DateTime;
         }
 
-        public static DateTimeOffset ToDateTimeOffset(DateTime utcTime)
+        public static DateTimeOffset ToDateTimeOffset(this DateTime utcTime)
         {
             return DateTime.SpecifyKind(utcTime, DateTimeKind.Utc);
         }
