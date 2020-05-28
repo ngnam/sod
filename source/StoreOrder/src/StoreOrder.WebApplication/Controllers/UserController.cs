@@ -34,7 +34,7 @@ namespace StoreOrder.WebApplication.Controllers
         {
             await CheckIsSignoutedAsync();
 
-            var user = await _context.Users.Include(u => u.UserToRoles).ThenInclude(u => u.Role).FirstOrDefaultAsync(u => u.Id == this.CurrentUserId);
+            var user = await _context.Users.Include(u => u.UserToRoles).ThenInclude(u => u.Role).FirstOrDefaultAsync(u => u.Id == this.CurrentUserId && u.IsActived == (int)TypeVerified.Verified);
 
             if (user == null)
             {

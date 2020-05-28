@@ -15,9 +15,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\..\.env = ..\..\.env
 		..\..\.npmrc = ..\..\.npmrc
 		..\..\appveyor.yml = ..\..\appveyor.yml
-		..\..\client-admin-web-app-readme.md = ..\..\client-admin-web-app-readme.md
-		..\..\client-android-app-readme.md = ..\..\client-android-app-readme.md
-		..\..\client-ios-app-readme.md = ..\..\client-ios-app-readme.md
 		..\..\Dockerfile = ..\..\Dockerfile
 		..\..\heroku.yml = ..\..\heroku.yml
 		..\..\Readme.md = ..\..\Readme.md
@@ -26,6 +23,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Imgur.API.NetCore", "src\Imgur-NetCore\Imgur.API.NetCore.csproj", "{855A620C-4062-4285-AB81-F5A7BA4A4B8E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{40B7A92D-7FE9-4AFA-AD70-F1BABE1B58B7}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\docs\client-admin-web-app-readme.md = ..\..\docs\client-admin-web-app-readme.md
+		..\..\docs\client-android-app-readme.md = ..\..\docs\client-android-app-readme.md
+		..\..\docs\client-ios-app-readme.md = ..\..\docs\client-ios-app-readme.md
+		..\..\docs\sercurity.md = ..\..\docs\sercurity.md
+		..\..\docs\translator.md = ..\..\docs\translator.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,6 +54,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{F83C235D-D36D-4F3D-B790-8B43567F0926} = {F7F4CA9F-6272-47DC-8262-D40E57AABD54}
 		{855A620C-4062-4285-AB81-F5A7BA4A4B8E} = {F7F4CA9F-6272-47DC-8262-D40E57AABD54}
+		{40B7A92D-7FE9-4AFA-AD70-F1BABE1B58B7} = {264F8FCF-7DEB-4E81-A42A-A33BE98EC95A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {66A838EA-9096-4BB0-B0CE-7BB3E90B8C1C}

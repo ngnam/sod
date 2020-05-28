@@ -1,6 +1,6 @@
 # StoreOrder Web API
 
-* A project case-study for restaurent
+* A project case-study for restaurent - nguyenvannam
 
 # Contributors
 
@@ -13,17 +13,13 @@
 * [Why choose postgreSQL](https://dzone.com/articles/customizing-automatic-http-400-error-response-in-a)
 * [Implement Swagger & migration from open 2.0 -> open 3.0](https://github.com/ngnam/WebApiExamples)
 * Install Swashbuckle `Install-Package Swashbuckle.AspNetCore -Version 5.0.0`
-* [JSON WEB TOKENS (JWT) Implementation](https://dev.to/_patrickgod/authentication-with-json-web-tokens-in-net-core-3-1-29bd)
-* [Generate & verify password ](https://stackoverflow.com/questions/52146528/how-to-validate-salted-and-hashed-password-in-c-sharp)
 * [Convert `DateTime.Now.Tick` to int ](https://stackoverflow.com/questions/2695093/how-to-maintain-precision-using-datetime-now-ticks-in-c-sharp/2695525)
 * [Modeling product variants](https://help.akeneo.com/pim/serenity/articles/what-about-products-variants.html)
 * http://demo.akeneo.com/
 * [Logging SQL and Change-Tracking Events in EF Core](https://docs.microsoft.com/en-us/archive/msdn-magazine/2018/october/data-points-logging-sql-and-change-tracking-events-in-ef-core)
-* Add serilog: https://andrewlock.net/adding-serilog-to-the-asp-net-core-generic-host/
-* `Update-Database -c AdminLogDbContext`
-* https://forums.asp.net/t/2158689.aspx?How+make+a+dynamic+Authorize+
-* https://imgurapi.readthedocs.io/en/latest/oauth2/
-
+* [Add serilog](https://andrewlock.net/adding-serilog-to-the-asp-net-core-generic-host/) - `Update-Database -c AdminLogDbContext`
+* [Multiple translate database](docs/translator.md)
+* [Sercurity](docs/sercurity.md)
 
 ## Environment
 
@@ -51,7 +47,7 @@ COMMANDS
 
 ## License
 
-* choose license: https://choosealicense.com/
+* choose license: Opensource
 
 # Release History
 
@@ -63,18 +59,19 @@ If you find this project useful — or just feeling generous, consider buying me a
 | ------------- |:-------------:|
 |   <a href="https://www.paypal.me/ngnam39"><img src="https://github.com/ngnam/Resources/blob/master/donate_paypal.svg" height="40"></a>   | [![BMC](https://github.com/ngnam/Resources/blob/master/donate_coffee.png)](https://www.buymeacoffee.com/ngnam) |
   
-
 Thank you!
 
 
-# StoreOrder Client Admin WebApp
+# Get more
 
-* See: [Release log](/client-admin-web-app-readme.md)
+## StoreOrder Client Admin WebApp
 
-# StoreOrder Client Android App
+* See: [Release log](docs/client-admin-web-app-readme.md)
 
-* See: [Release log](/client-android-app-readme.md)
+## StoreOrder Client Android App
 
-# StoreOrder Client IOS App
+* See: [Release log](docs/client-android-app-readme.md)
 
-* See: [Release log](/client-ios-app-readme.md)
+## StoreOrder Client IOS App
+
+* See: [Release log](docs/client-ios-app-readme.md)
