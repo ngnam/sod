@@ -7,10 +7,11 @@ namespace StoreOrder.WebApplication.Data.DTO
         public OrderWithProductDTO()
         {
             this.Products = new List<ViewProductOptionDTO>();
+            this.TotalCount = this.Products.Count;
         }
         public string ProductId { get; set; }
         public string ProductName { get; set; }
-        public int TotalCount { get; set; }
+        public int? TotalCount { get; private set; }
         public List<ViewProductOptionDTO> Products { get; set; }
     }
 
@@ -24,8 +25,8 @@ namespace StoreOrder.WebApplication.Data.DTO
         public string TableName { get; set; }
         public string[] OptionId_OptionValueIds { get; set; }
         public string OptionDescription { get; set; }
-        public string OrderNote { get; set; }
-        public int AmountFood { get; set; }
-        public int ProductOrderStatus { get; set; }
+        public string Note { get; set; }
+        public int Amount { get; set; }
+        public int Status { get; set; }
     }
 }

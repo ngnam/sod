@@ -363,7 +363,8 @@ namespace StoreOrder.WebApplication
                                x.PermissionName == Permissions.Employee.GetListProductsOfStoreForEmployeeV2 ||
                                x.PermissionName == Permissions.Employee.GetListProductsOfStoreWithCategoryForEmployeeV2 ||
                                x.PermissionName == Permissions.Employee.CreateOrder ||
-                               x.PermissionName == Permissions.Employee.UpdateOrder
+                               x.PermissionName == Permissions.Employee.UpdateOrder ||
+                               x.PermissionName == Permissions.Employee.GetOrderProductsWithTable
 
                    ).Select(x => x).ToList();
 

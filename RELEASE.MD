@@ -17,3 +17,7 @@
 * Date 27/5/2020
 - Update Module Order
 - Update api create order, update order, get order with table id
+* Date 28/5/2020
+- Update api order/type1, order/type2, 
+- Update 2 api:  order/{orderId}/confirm (GET, POST), 
+- Update api order/{orderId}/confirm-pay

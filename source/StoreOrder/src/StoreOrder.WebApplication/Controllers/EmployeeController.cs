@@ -13,9 +13,7 @@ using StoreOrder.WebApplication.Data.Models.Stores;
 using StoreOrder.WebApplication.Data.Orders;
 using StoreOrder.WebApplication.Data.Repositories.Interfaces;
 using StoreOrder.WebApplication.Data.Wrappers;
-using StoreOrder.WebApplication.Helpers;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -502,15 +500,16 @@ namespace StoreOrder.WebApplication.Controllers
         public async Task<IActionResult> CreateOrder([FromBody] OrderProductDTO model)
         {
             await CheckIsSignoutedAsync();
-            string message = string.Empty;
+            int message = 0;
             if (ModelState.IsValid)
             {
                 // check if table busy
-                var hasTableBusying = await _context.StoreTables.FirstOrDefaultAsync(t => t.Id == model.TableId && t.StoreId == this.UserStoreId && t.TableStatus == (int)TypeTableStatus.TableStatus2);
+                var hasTableBusying = await _context.StoreTables.Where(t => t.Id == model.TableId && t.StoreId == this.UserStoreId && t.TableStatus != (int)TypeTableStatus.Busying).FirstOrDefaultAsync();
                 if (hasTableBusying != null)
                 {
                     throw new ApiException("Bàn này đang bận không thể tạo mới order!", (int)HttpStatusCode.BadRequest);
                 }
+
                 // check order is create or update order
                 if (string.Equals(model.OrderId, "0"))
                 {
@@ -548,7 +547,11 @@ namespace StoreOrder.WebApplication.Controllers
                     try
                     {
                         await _context.SaveChangesAsync();
-                        message = "Tạo mới order thành công!";
+                        message = 1;
+
+                        // update table to state busying
+                        await UpdateTableStatus(model.TableId, (int)TypeTableStatus.Busying);
+
                     }
                     catch (DbUpdateException ex)
                     {
@@ -575,12 +578,12 @@ namespace StoreOrder.WebApplication.Controllers
         public async Task<IActionResult> CreateOrderV2([FromForm] OrderProductDTO model)
         {
             await CheckIsSignoutedAsync();
-            string message = string.Empty;
+            int message = 0;
             if (ModelState.IsValid)
             {
                 // check if table busy
-                var hasTableBusying = await _context.StoreTables.FirstOrDefaultAsync(t => t.Id == model.TableId && t.StoreId == this.UserStoreId && t.TableStatus == (int)TypeTableStatus.TableStatus2);
-                if (hasTableBusying != null)
+                var hasTableBusying = _context.StoreTables.Where(t => t.Id == model.TableId && t.StoreId == this.UserStoreId);
+                if (hasTableBusying.Where(x => x.TableStatus != (int)TypeTableStatus.Busying) != null)
                 {
                     throw new ApiException("Bàn này đang bận không thể tạo mới order!", (int)HttpStatusCode.BadRequest);
                 }
@@ -622,7 +625,10 @@ namespace StoreOrder.WebApplication.Controllers
                     try
                     {
                         await _context.SaveChangesAsync();
-                        message = "Tạo mới order thành công!";
+                        message = 1;
+
+                        // update table to state busying
+                        await UpdateTableStatus(model.TableId, (int)TypeTableStatus.Busying);
                     }
                     catch (DbUpdateException ex)
                     {
@@ -646,10 +652,10 @@ namespace StoreOrder.WebApplication.Controllers
 
         [HttpPut("order/{orderId}"), MapToApiVersion("1")]
         [Authorize(Policy = Permissions.Employee.UpdateOrder)]
-        public async Task<IActionResult> UpdateOrder([FromBody] OrderProductDTO model, string orderId, bool isOrder=true)
+        public async Task<IActionResult> UpdateOrder([FromBody] OrderProductDTO model, string orderId, bool isOrder = true)
         {
             await CheckIsSignoutedAsync();
-            string message = string.Empty;
+            int message = 0;
             model.OrderId = orderId;
 
             if (ModelState.IsValid)
@@ -696,7 +702,8 @@ namespace StoreOrder.WebApplication.Controllers
                                 Status = order.Status,
                                 Price = order.Price
                             });
-                        } else
+                        }
+                        else
                         {
                             _context.Entry(orderDetail).State = EntityState.Modified;
 
@@ -706,7 +713,8 @@ namespace StoreOrder.WebApplication.Controllers
                                 orderDetail.Amount = order.Amount;
                                 orderDetail.Status = order.Status;
                                 orderDetail.Price = order.Price;
-                            } else
+                            }
+                            else
                             {
                                 orderDetail.Status = order.Status;
                             }
@@ -717,7 +725,7 @@ namespace StoreOrder.WebApplication.Controllers
                     try
                     {
                         await _context.SaveChangesAsync();
-                        message = "Cập nhật order thành công!";
+                        message = 1;
                     }
                     catch (DbUpdateException ex)
                     {
@@ -741,10 +749,10 @@ namespace StoreOrder.WebApplication.Controllers
 
         [HttpPut("order/{orderId}"), MapToApiVersion("2")]
         [Authorize(Policy = Permissions.Employee.UpdateOrder)]
-        public async Task<IActionResult> UpdateOrderV2([FromForm] OrderProductDTO model, string orderId)
+        public async Task<IActionResult> UpdateOrderV2([FromForm] OrderProductDTO model, string orderId, bool isOrder = true)
         {
             await CheckIsSignoutedAsync();
-            string message = string.Empty;
+            int message = 0;
             model.OrderId = orderId;
 
             if (ModelState.IsValid)
@@ -765,12 +773,18 @@ namespace StoreOrder.WebApplication.Controllers
                     orderExist.OrderStatus = model.OrderStatus;
                     orderExist.UpdateOn = DateTime.UtcNow;
 
+                    if (!isOrder)
+                    {
+                        orderExist.UserCookingId = this.CurrentUserId;
+                    }
+
                     // add Order Detail
                     foreach (var order in model.Products)
                     {
                         // find orderDetail
                         // if not exist then create, other update order detail
                         OrderDetail orderDetail = await _context.OrderDetails.FindAsync(order.OrderDetailId);
+
                         if (orderDetail == null)
                         {
                             orderExist.OrderDetails.Add(new Data.Orders.OrderDetail
@@ -789,10 +803,18 @@ namespace StoreOrder.WebApplication.Controllers
                         else
                         {
                             _context.Entry(orderDetail).State = EntityState.Modified;
-                            orderDetail.Note = order.Note;
-                            orderDetail.Amount = order.Amount;
-                            orderDetail.Status = order.Status;
-                            orderDetail.Price = order.Price;
+
+                            if (isOrder)
+                            {
+                                orderDetail.Note = order.Note;
+                                orderDetail.Amount = order.Amount;
+                                orderDetail.Status = order.Status;
+                                orderDetail.Price = order.Price;
+                            }
+                            else
+                            {
+                                orderDetail.Status = order.Status;
+                            }
                         }
                     }
 
@@ -800,14 +822,14 @@ namespace StoreOrder.WebApplication.Controllers
                     try
                     {
                         await _context.SaveChangesAsync();
-                        message = "Cập nhật order thành công!";
+                        message = 1;
                     }
                     catch (DbUpdateException ex)
                     {
 #if !DEBUG
                         throw new ApiException("An error occurred creating a order.");
 #else
-                        _logger.LogError("Update db Exception---", ex);
+                        _logger.LogError("Update db---", ex);
                         throw new ApiException("Error Update Exceptions!", (int)HttpStatusCode.BadRequest);
 #endif
                     }
@@ -821,7 +843,6 @@ namespace StoreOrder.WebApplication.Controllers
 
             return Ok(message);
         }
-
 
         [HttpGet("order/table/{tableId}"), MapToApiVersion("1")]
         [Authorize(Policy = Permissions.Employee.GetOrderProductsWithTable)]
@@ -882,119 +903,318 @@ namespace StoreOrder.WebApplication.Controllers
             return Ok(result);
         }
 
-        [HttpGet("order/{type}"), MapToApiVersion("1")]
+        [HttpGet("order/type1"), MapToApiVersion("1")]
         [Authorize(Policy = Permissions.Employee.GetListOrderWithTableOrProductName)]
-        public async Task<IActionResult> GetListOrderWithTableOrProductName(int type = 1)
+        public async Task<IActionResult> GetListOrderWithProductName(
+            int pageIndex = 0,
+            int pageSize = 10,
+            string sortColumn = null,
+            string sortOrder = null,
+            string filterColumn = null,
+            string filterQuery = null
+            )
         {
             await CheckIsSignoutedAsync();
-            if (type == 1)
-            {
-                // xem theo món
-                var result = new List<OrderWithProductDTO>() {
-                    new OrderWithProductDTO { ProductId = "1", ProductName = "Trà chanh nhiệt đới", TotalCount = 5,
-                        Products = new List<ViewProductOptionDTO>() {
-                            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"1_1"}, OptionDescription = "Bình thường", TableId = "tableId1", TableName = "A1", AmountFood = 1, OrderNote = "Không toping", ProductOrderStatus = (int)TypeOrderDetail.NewOrder },
-                            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"2_1"}, OptionDescription = "Toping: Ít đá, nhiều đường", TableId = "tableId1", TableName = "A1", AmountFood = 1, OrderNote = "Cốc nhựa", ProductOrderStatus = (int)TypeOrderDetail.NewOrder },
-                            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"2_2"}, OptionDescription = "Toping nhiều đá, ít đường", TableId = "tableId1", TableName = "A1", AmountFood = 1, OrderNote = "Cốc nhựa", ProductOrderStatus = (int)TypeOrderDetail.NewOrder },
-                        }
-                    },
-                    new OrderWithProductDTO { ProductId = "2", ProductName = "Trà chanh nhiệt độ", TotalCount = 5,
-                        Products = new List<ViewProductOptionDTO>() {
-                            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"1_1"}, OptionDescription = "Bình thường", TableId = "tableId1", TableName = "A1", AmountFood = 1, OrderNote = "Không toping", ProductOrderStatus = (int)TypeOrderDetail.NewOrder },
-                            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"2_1"}, OptionDescription = "Toping: Ít đá, nhiều đường", TableId = "tableId1", TableName = "A1", AmountFood = 1, OrderNote = "Cốc nhựa", ProductOrderStatus = (int)TypeOrderDetail.NewOrder },
-                            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"2_2"}, OptionDescription = "Toping nhiều đá, ít đường", TableId = "tableId1", TableName = "A1", AmountFood = 1, OrderNote = "Cốc nhựa", ProductOrderStatus = (int)TypeOrderDetail.NewOrder },
-                        }
-                    },
-                    new OrderWithProductDTO { ProductId = "3", ProductName = "Cà phê", TotalCount = 5,
-                        Products = new List<ViewProductOptionDTO>() {
-                            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"1_1"}, OptionDescription = "Cà phê đen", TableId = "tableId1", TableName = "A1", AmountFood = 1, OrderNote = "Mang về", ProductOrderStatus = (int)TypeOrderDetail.NewOrder },
-                            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"2_1"}, OptionDescription = "Bạc sửu", TableId = "tableId1", TableName = "A1", AmountFood = 1, OrderNote = "Cốc trắng", ProductOrderStatus = (int)TypeOrderDetail.NewOrder },
-                            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"2_2"}, OptionDescription = "Cà phê sữa", TableId = "tableId1", TableName = "A1", AmountFood = 1, OrderNote = "Cốc đá", ProductOrderStatus = (int)TypeOrderDetail.NewOrder },
-                        }
-                    }
-                };
-                return Ok(new { data = result });
+            // xem theo món
+            //var result = new List<OrderWithProductDTO>() {
+            //    new OrderWithProductDTO { ProductId = "1", ProductName = "Trà chanh nhiệt đới", TotalCount = 5,
+            //        Products = new List<ViewProductOptionDTO>() {
+            //            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"1_1"}, OptionDescription = "Bình thường", TableId = "tableId1", TableName = "A1", Amount = 1, Note = "Không toping", Status = (int)TypeOrderDetail.NewOrder },
+            //            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"2_1"}, OptionDescription = "Toping: Ít đá, nhiều đường", TableId = "tableId1", TableName = "A1", Amount = 1, Note = "Cốc nhựa", Status = (int)TypeOrderDetail.NewOrder },
+            //            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"2_2"}, OptionDescription = "Toping nhiều đá, ít đường", TableId = "tableId1", TableName = "A1", Amount = 1, Note = "Cốc nhựa", Status = (int)TypeOrderDetail.NewOrder },
+            //        }
+            //    },
+            //    new OrderWithProductDTO { ProductId = "2", ProductName = "Trà chanh nhiệt độ", TotalCount = 5,
+            //        Products = new List<ViewProductOptionDTO>() {
+            //            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"1_1"}, OptionDescription = "Bình thường", TableId = "tableId1", TableName = "A1", Amount = 1, Note = "Không toping", Status = (int)TypeOrderDetail.NewOrder },
+            //            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"2_1"}, OptionDescription = "Toping: Ít đá, nhiều đường", TableId = "tableId1", TableName = "A1", Amount = 1, Note = "Cốc nhựa", Status = (int)TypeOrderDetail.NewOrder },
+            //            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"2_2"}, OptionDescription = "Toping nhiều đá, ít đường", TableId = "tableId1", TableName = "A1", Amount = 1, Note = "Cốc nhựa", Status = (int)TypeOrderDetail.NewOrder },
+            //        }
+            //    },
+            //    new OrderWithProductDTO { ProductId = "3", ProductName = "Cà phê", TotalCount = 5,
+            //        Products = new List<ViewProductOptionDTO>() {
+            //            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"1_1"}, OptionDescription = "Cà phê đen", TableId = "tableId1", TableName = "A1", Amount = 1, Note = "Mang về", Status = (int)TypeOrderDetail.NewOrder },
+            //            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"2_1"}, OptionDescription = "Bạc sửu", TableId = "tableId1", TableName = "A1", Amount = 1, Note = "Cốc trắng", Status = (int)TypeOrderDetail.NewOrder },
+            //            new ViewProductOptionDTO { OptionId_OptionValueIds = new string[] {"2_2"}, OptionDescription = "Cà phê sữa", TableId = "tableId1", TableName = "A1", Amount = 1, Note = "Cốc đá", Status = (int)TypeOrderDetail.NewOrder },
+            //        }
+            //    }
+            //};
 
-            }
-            else if (type == 2)
+            var tableOfStores = await _context.StoreTables.Where(x => x.StoreId == this.UserStoreId).Select(x => x.Id).ToListAsync();
+            if (tableOfStores.Count == 0)
             {
-                // xem theo bàn
-                var result = new List<OrderWithTableDTO>() {
-                    new OrderWithTableDTO { TableId = "1", TableName = "A1", TableStatus = (int)TypeTableStatus.TableStatus1, TotalFoods = 10, TimeOrder = 1 },
-                    new OrderWithTableDTO { TableId = "2", TableName = "A2", TableStatus = (int)TypeTableStatus.TableStatus1, TotalFoods = 10, TimeOrder = 1 },
-                    new OrderWithTableDTO { TableId = "3", TableName = "A3", TableStatus = (int)TypeTableStatus.TableStatus2, TotalFoods = 10, TimeOrder = 1 },
-                    new OrderWithTableDTO { TableId = "4", TableName = "A4", TableStatus = (int)TypeTableStatus.TableStatus2, TotalFoods = 10, TimeOrder = 1 },
-                    new OrderWithTableDTO { TableId = "5", TableName = "A5", TableStatus = (int)TypeTableStatus.TableStatus3, TotalFoods = 10, TimeOrder = 1 },
-                    new OrderWithTableDTO { TableId = "6", TableName = "A6", TableStatus = (int)TypeTableStatus.TableStatus3, TotalFoods = 10, TimeOrder = 1 },
-                    new OrderWithTableDTO { TableId = "7", TableName = "A7", TableStatus = (int)TypeTableStatus.TableStatus3, TotalFoods = 10, TimeOrder = 1 },
-                    new OrderWithTableDTO { TableId = "8", TableName = "A8", TableStatus = (int)TypeTableStatus.TableStatus3, TotalFoods = 10, TimeOrder = 1 },
-                    new OrderWithTableDTO { TableId = "9", TableName = "A9", TableStatus = (int)TypeTableStatus.TableStatus3, TotalFoods = 10, TimeOrder = 1 },
-                    new OrderWithTableDTO { TableId = "10", TableName = "A10", TableStatus = (int)TypeTableStatus.TableStatus3, TotalFoods = 10, TimeOrder = 1 },
-                    new OrderWithTableDTO { TableId = "11", TableName = "A11", TableStatus = (int)TypeTableStatus.TableStatus3, TotalFoods = 10, TimeOrder = 1 },
-                };
-                return Ok(new { data = result });
+                throw new ApiException("Cửa hàng chưa có bàn.", (int)HttpStatusCode.BadRequest);
             }
-            return Ok(new { data = new List<OrderWithTableDTO>() { } });
+
+            var result = await ApiResult<OrderDetail>.CreateAsync(
+                _context.OrderDetails
+                    .Include(o => o.Order)
+                    .Where(o => o.Order.UserId == this.CurrentUserId && tableOfStores.Contains(o.Order.TableId) && o.Order.OrderStatus != (int)TypeOrderStatus.Done && o.Order.Id == o.OrderId),
+                pageIndex,
+                pageSize,
+                sortColumn,
+                sortOrder,
+                filterColumn,
+                filterQuery
+                );
+
+            var orderDetails = result.Data.GroupBy(o => new { o.ProductId, o.ProductName })
+            .Select(o => new OrderWithProductDTO
+            {
+                ProductId = o.Key.ProductId,
+                ProductName = o.Key.ProductName,
+                Products = o.Select(o => new ViewProductOptionDTO
+                {
+                    TableId = o.Order.TableId,
+                    TableName = o.Order.TableName,
+                    Note = o.Note,
+                    OptionDescription = o.OptionDescription,
+                    Amount = o.Amount.Value,
+                    Status = o.Status.Value,
+                    OptionId_OptionValueIds = o.OptionId_OptionValueIds,
+                }).ToList()
+            }).ToList();
+
+            return Ok(new
+            {
+                Data = orderDetails,
+                FilterColumn = result.FilterColumn,
+                FilterQuery = result.FilterQuery,
+                PageIndex = result.PageIndex,
+                PageSize = result.PageSize,
+                TotalPages = result.TotalPages,
+                TotalCount = result.TotalCount,
+                SortColumn = result.SortColumn,
+                SortOrder = result.SortOrder,
+                HasNextPage = result.HasNextPage,
+                HasPreviousPage = result.HasPreviousPage
+            });
         }
 
-        [HttpGet("order/2/table/{tableId}"), MapToApiVersion("1")]
-        [Authorize(Policy = Permissions.Employee.GetOrderWithTableViewProductsWithTableId)]
-        public async Task<IActionResult> GetOrderWithTableViewProductsWithTableId(string tableId = "1")
+        [HttpGet("order/type2"), MapToApiVersion("1")]
+        [Authorize(Policy = Permissions.Employee.GetListOrderWithTableOrProductName)]
+        public async Task<IActionResult> GetListOrderWithTable(
+            int pageIndex = 0,
+            int pageSize = 10,
+            string sortColumn = null,
+            string sortOrder = null,
+            string filterColumn = null,
+            string filterQuery = null
+            )
         {
             await CheckIsSignoutedAsync();
 
-            var result = new OrderWithTableViewProductsDTO()
+            var tableOfStores = await _context.StoreTables.Where(x => x.StoreId == this.UserStoreId).Select(x => x.Id).ToListAsync();
+            if (tableOfStores.Count == 0)
             {
-                TableId = tableId,
-                TableName = "A1",
-                Products = new List<ViewProductDTO>()
-                {
-                     new ViewProductDTO { ProductId = "1", ProductName = "Trà chanh nhiệt đới", OptionId_OptionValueIds = new string[] {"1_1", "2_1_2_3"}, OptionDescription = "Kích cỡ nhỏ, Toping: Dừa khô, trân châu, chuối khô", OrderNote = "Cốc nhựa", AmountFood = 1, ProductOrderStatus = (int)TypeOrderDetail.NewOrder  },
-                     new ViewProductDTO { ProductId = "1", ProductName = "Trà chanh nhiệt đới", OptionId_OptionValueIds = new string[] {"1_1", "2_1_2_3"}, OptionDescription = "Kích cỡ tỏ, Toping: Dừa khô, trân châu, chuối khô", OrderNote = "Cốc nhựa", AmountFood = 1, ProductOrderStatus = (int)TypeOrderDetail.NewOrder  },
-                     new ViewProductDTO { ProductId = "2", ProductName = "Trà đào", OptionId_OptionValueIds = new string[] {"1_1", "2_1_2_3"}, OptionDescription = "Kích cỡ nhỏ, Toping: Dừa khô, trân châu, chuối khô", OrderNote = "Cốc nhựa", AmountFood = 1, ProductOrderStatus = (int)TypeOrderDetail.NewOrder  },
-                     new ViewProductDTO { ProductId = "2", ProductName = "Trà đào", OptionId_OptionValueIds = new string[] {"1_1", "2_1_2_3"}, OptionDescription = "Kích cỡ to, Toping: Dừa khô, trân châu, chuối khô", OrderNote = "Cốc nhựa", AmountFood = 1, ProductOrderStatus = (int)TypeOrderDetail.NewOrder  },
-                     new ViewProductDTO { ProductId = "3", ProductName = "Caffe", OptionId_OptionValueIds = new string[] {"1_1", "2_1_2_3"}, OptionDescription = "Cafe đen", OrderNote = "Cốc thủy tinh", AmountFood = 1, ProductOrderStatus = (int)TypeOrderDetail.NewOrder  },
-                     new ViewProductDTO { ProductId = "3", ProductName = "Caffe", OptionId_OptionValueIds = new string[] {"1_1", "2_1_2_3"}, OptionDescription = "Bạc sửu", OrderNote = "Cốc thủy tinh", AmountFood = 1, ProductOrderStatus = (int)TypeOrderDetail.NewOrder  },
-                     new ViewProductDTO { ProductId = "3", ProductName = "Caffe", OptionId_OptionValueIds = new string[] {"1_1", "2_1_2_3"}, OptionDescription = "Sữa nâu", OrderNote = "Cốc thủy tinh", AmountFood = 1, ProductOrderStatus = (int)TypeOrderDetail.NewOrder  },
-                }
-            };
+                throw new ApiException("Cửa hàng chưa có bàn.", (int)HttpStatusCode.BadRequest);
+            }
 
-            return Ok(result);
+            var result = await ApiResult<Order>.CreateAsync(
+                _context.Orders
+                    .Include(o => o.StoreTable)
+                    .Include(o => o.OrderDetails)
+                    .Where(o => o.UserId == this.CurrentUserId && tableOfStores.Contains(o.TableId) && o.OrderStatus != (int)TypeOrderStatus.Done),
+                pageIndex,
+                pageSize,
+                sortColumn,
+                sortOrder,
+                filterColumn,
+                filterQuery
+                );
+
+            var tables = result.Data
+            .Select(o => new OrderWithTableDTO
+            {
+                TableId = o.TableId,
+                TableName = o.TableName,
+                TableStatus = o.StoreTable.TableStatus,
+                TotalFoods = o.OrderDetails.Count
+            }).ToList();
+
+            return Ok(new
+            {
+                Data = tables,
+                FilterColumn = result.FilterColumn,
+                FilterQuery = result.FilterQuery,
+                PageIndex = result.PageIndex,
+                PageSize = result.PageSize,
+                TotalPages = result.TotalPages,
+                TotalCount = result.TotalCount,
+                SortColumn = result.SortColumn,
+                SortOrder = result.SortOrder,
+                HasNextPage = result.HasNextPage,
+                HasPreviousPage = result.HasPreviousPage
+            });
         }
 
         [HttpGet("order/{orderId}/confirm"), MapToApiVersion("1")]
         [Authorize(Policy = Permissions.Employee.ConfirmOrder)]
-        public async Task<IActionResult> ConfirmOrder(string orderId = "1")
+        public async Task<IActionResult> GetConfirmOrder(string orderId)
         {
             await CheckIsSignoutedAsync();
+
+            if (string.IsNullOrEmpty(orderId))
+            {
+                throw new ApiException("Order Id is Required", (int)HttpStatusCode.BadRequest);
+            }
+
+            // find Order by id
+            var order = await _context.Orders
+                .Include(o => o.OrderDetails).Where(x => x.UserId == this.
+                CurrentUserId && x.Id == orderId && x.OrderStatus != (int)TypeOrderStatus.Done)
+                .FirstOrDefaultAsync();
+
+            if (order == null)
+            {
+                throw new ApiException("Order không tìm thấy hoặc order đã kết thúc.", (int)HttpStatusCode.BadRequest);
+            }
+
             var result = new OrderProductDTO
             {
-                OrderId = Guid.NewGuid().ToString(),
-                OrderStatus = (int)TypeOrderStatus.NewOrder,
-                TableId = Guid.NewGuid().ToString(),
-                TableName = "Bàn 01",
-                Products = new System.Collections.Generic.List<OrderDetailDTO>()
+                OrderId = order.Id,
+                OrderStatus = order.OrderStatus.Value,
+                TableId = order.TableId,
+                TableName = order.TableName,
+                Products = order.OrderDetails.Select(odt => new OrderDetailDTO
                 {
-                    new OrderDetailDTO { ProductId = "1", ProductName = "Trà chanh nhiệt đới", OptionId_OptionValueIds = new string[] {"1_1", "2_1_2_3"}, OptionDescription = "Kích cỡ nhỏ, Toping: Dừa khô, trân châu, chuối khô", Note = "Cốc nhựa", Amount = 1, Status = (int)TypeOrderDetail.NewOrder, Price = 50000  },
-                    new OrderDetailDTO { ProductId = "1", ProductName = "Trà chanh nhiệt đới", OptionId_OptionValueIds = new string[] {"2_1_2"}, OptionDescription = "Toping 80 đá, 20 đường", Note = "Cốc nhựa", Amount = 1, Status = (int)TypeOrderDetail.NewOrder, Price = 50000  },
-                    new OrderDetailDTO { ProductId = "1", ProductName = "Trà chanh nhiệt đới", OptionId_OptionValueIds = new string[] {"2_4_5"}, OptionDescription = "Toping ít đá, nhiều đường", Note = "Cốc thủy tinh, thêm đường", Amount = 1, Status = (int)TypeOrderDetail.NewOrder, Price = 50000  },
-                    new OrderDetailDTO { ProductId = "2", ProductName = "Bạc Sửu", OptionId_OptionValueIds = new string[] {"3_4"}, OptionDescription = "Bạc sửu", Note = "Ít đá", Amount = 1, Status = (int)TypeOrderDetail.Done, Price = 50000  },
-                    new OrderDetailDTO { ProductId = "2", ProductName = "Caffe đen", OptionId_OptionValueIds = new string[] {"3_4"}, OptionDescription = "Caffe đen", Note = "Không đường", Amount = 1, Status = (int)TypeOrderDetail.Done, Price = 50000  },
-                }
+                    OrderDetailId = odt.Id,
+                    ProductId = odt.ProductId,
+                    ProductName = odt.ProductName,
+                    Amount = odt.Amount,
+                    Note = odt.Note,
+                    OptionDescription = odt.OptionDescription,
+                    OptionId_OptionValueIds = odt.OptionId_OptionValueIds,
+                    Price = odt.Price,
+                    Status = odt.Status,
+                }).ToList()
             };
             return Ok(result);
         }
 
-        [HttpPost("order/{orderId}/confirm-pay"), MapToApiVersion("1")]
-        [Authorize(Policy = Permissions.Employee.ConfirmPayOrder)]
-        public async Task<IActionResult> ConfirmPayOrder([FromBody] OrderProductDTO model, string orderId = "1")
+        [HttpPost("order/{orderId}/confirm"), MapToApiVersion("1")]
+        [Authorize(Policy = Permissions.Employee.ConfirmOrder)]
+        public async Task<IActionResult> PostConfirmOrder(string orderId)
         {
             await CheckIsSignoutedAsync();
+            int message = 0;
+            if (string.IsNullOrEmpty(orderId))
+            {
+                throw new ApiException("Order Id is Required", (int)HttpStatusCode.BadRequest);
+            }
+
+            // find Order by id
+            var order = await _context.Orders
+                .Include(o => o.OrderDetails).Where(x => x.UserId == this.
+                CurrentUserId && x.Id == orderId && x.OrderStatus != (int)TypeOrderStatus.Done)
+                .FirstOrDefaultAsync();
+
+            if (order == null)
+            {
+                throw new ApiException("Order không tìm thấy hoặc order đã kết thúc.", (int)HttpStatusCode.BadRequest);
+            }
+
+            _context.Entry(order).State = EntityState.Modified;
+            order.OrderStatus = (int)TypeOrderStatus.Confirmed;
+            order.UpdateOn = DateTime.UtcNow;
+
+            // save
+            try
+            {
+                await _context.SaveChangesAsync();
+                message = 1;
+            }
+            catch (DbUpdateException ex)
+            {
+#if !DEBUG
+                throw new ApiException("An error occurred confirm a order.");
+#else
+                _logger.LogError("Update db---", ex);
+                throw new ApiException("Error Update Exceptions!", (int)HttpStatusCode.BadRequest);
+#endif
+            }
+
+            return Ok(message);
+        }
+
+        [HttpPost("order/{orderId}/confirm-pay"), MapToApiVersion("1")]
+        [Authorize(Policy = Permissions.Employee.ConfirmPayOrder)]
+        public async Task<IActionResult> ConfirmPayOrder([FromBody] OrderProductDTO model, string orderId)
+        {
+            await CheckIsSignoutedAsync();
+            int message = 0;
             if (ModelState.IsValid)
             {
-                return Ok(1);
+                if (string.IsNullOrEmpty(orderId))
+                {
+                    throw new ApiException("Order Id is Required", (int)HttpStatusCode.BadRequest);
+                }
+
+                // find Order confirmed by OrderId
+                var order = await _context.Orders
+                    .Include(o => o.OrderDetails).Where(x => x.UserId == this.
+                    CurrentUserId && x.Id == orderId && x.OrderStatus == (int)TypeOrderStatus.Confirmed)
+                    .FirstOrDefaultAsync();
+
+                if (order == null)
+                {
+                    throw new ApiException("Order không tìm thấy hoặc order đã kết thúc.", (int)HttpStatusCode.BadRequest);
+                }
+
+                // update status order
+                _context.Entry(order).State = EntityState.Modified;
+                order.OrderStatus = (int)TypeOrderStatus.Done;
+                order.UpdateOn = DateTime.UtcNow;
+
+                // save
+                try
+                {
+                    await _context.SaveChangesAsync();
+                    message = 1;
+                }
+                catch (DbUpdateException ex)
+                {
+#if !DEBUG
+                throw new ApiException("An error occurred confirm a order.");
+#else
+                    _logger.LogError("Update db---", ex);
+                    throw new ApiException("Error Update Exceptions!", (int)HttpStatusCode.BadRequest);
+#endif
+                }
+
+                // update table to state can oder
+                await UpdateTableStatus(model.TableId, (int)TypeTableStatus.CanOrder);
+
             }
-            return Ok(0);
+            return Ok(message);
+        }
+
+        private async Task<int> UpdateTableStatus(string tableId, int status)
+        {
+            int message = 0;
+            var tableOrder = await _context.StoreTables.FirstOrDefaultAsync(t => t.Id == tableId && t.StoreId == this.UserStoreId && t.TableStatus != (int)TypeTableStatus.Busying);
+            if (tableOrder != null)
+            {
+                // update table to state can oder
+                _context.Entry(tableOrder).State = EntityState.Modified;
+                tableOrder.TableStatus = status;
+                // save
+                try
+                {
+                    await _context.SaveChangesAsync();
+                    message = 1;
+                }
+                catch (DbUpdateException ex)
+                {
+#if !DEBUG
+                throw new ApiException("An error occurred confirm a order.");
+#else
+                    _logger.LogError("Update db---", ex);
+                    throw new ApiException("Error Update Exceptions!", (int)HttpStatusCode.BadRequest);
+#endif
+                }
+            }
+            return message;
         }
     }
 }
