@@ -1,6 +1,6 @@
 # Sercurity Module
 
-* Contributes 
+## Contributes 
 
 * [JSON WEB TOKENS (JWT) Implementation](https://dev.to/_patrickgod/authentication-with-json-web-tokens-in-net-core-3-1-29bd)
 * [Generate & verify password ](https://stackoverflow.com/questions/52146528/how-to-validate-salted-and-hashed-password-in-c-sharp)

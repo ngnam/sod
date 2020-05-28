@@ -1,6 +1,6 @@
 # Translator Module
 
-* Contributes 
+## Contributes 
 
 * [Database Localization and Internationalization](https://www.soluling.com/Help/Database/Index.htm)
 * [Database Internationalization(I18N)/Localization(L10N) design patterns](https://medium.com/walkin/database-internationalization-i18n-localization-l10n-design-patterns-94ff372375c6)
