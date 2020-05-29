@@ -501,6 +501,7 @@ namespace StoreOrder.WebApplication.Controllers
         {
             await CheckIsSignoutedAsync();
             int message = 0;
+            Order orderCreate = null;
             if (ModelState.IsValid)
             {
                 // check if table busy
@@ -548,7 +549,7 @@ namespace StoreOrder.WebApplication.Controllers
                     {
                         await _context.SaveChangesAsync();
                         message = 1;
-
+                        orderCreate = newOrder;
                         // update table to state busying
                         await UpdateTableStatus(model.TableId, (int)TypeTableStatus.Busying);
 
@@ -570,7 +571,7 @@ namespace StoreOrder.WebApplication.Controllers
                 }
             }
 
-            return Ok(message);
+            return Ok(orderCreate);
         }
 
         [HttpPost("order"), MapToApiVersion("2")]
@@ -657,7 +658,6 @@ namespace StoreOrder.WebApplication.Controllers
             await CheckIsSignoutedAsync();
             int message = 0;
             model.OrderId = orderId;
-
             if (ModelState.IsValid)
             {
                 // check order is create or update order

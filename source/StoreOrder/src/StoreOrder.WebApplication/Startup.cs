@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,6 +36,8 @@ namespace StoreOrder.WebApplication
 {
     public class Startup
     {
+        private readonly string MyAllowSpecificOrigins = "_myStoreAppAllowSpecificOrigins";
+
         public static readonly ILoggerFactory DbCommandConsoleLoggerFactory = LoggerFactory.Create(builder =>
             {
                 builder
@@ -113,6 +116,17 @@ namespace StoreOrder.WebApplication
 
             ConfigureSwagger(services); // contains the services.AddSwaggerGen(options => {...} ) code see method definition below
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: MyAllowSpecificOrigins,
+                                  builder =>
+                                  {
+                                      builder.WithOrigins(Configuration.GetSection("MyAllowSpecificOrigins").Value.Split(";", StringSplitOptions.RemoveEmptyEntries))
+                                      // allow all header & all method
+                                      .AllowAnyHeader().AllowAnyMethod();
+                                  });
+            });
+
             services.AddApiVersioning(o =>
             {
                 o.AssumeDefaultVersionWhenUnspecified = true;
@@ -154,6 +168,8 @@ namespace StoreOrder.WebApplication
             }
             app.UseStaticFiles();
             app.UseCookiePolicy();
+
+            app.UseCors(MyAllowSpecificOrigins);
 
             app.UseRouting();
             app.UseAuthentication();
