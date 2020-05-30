@@ -126,7 +126,7 @@ namespace StoreOrder.WebApplication
                                   {
                                       builder.WithOrigins(Configuration.GetSection("MyAllowSpecificOrigins").Value.Split(";", StringSplitOptions.RemoveEmptyEntries))
                                       // allow all header & all method
-                                      .AllowAnyHeader().AllowAnyMethod();
+                                      .AllowAnyHeader().AllowAnyMethod().AllowCredentials();
                                   });
             });
 
