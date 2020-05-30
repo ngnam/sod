@@ -1087,10 +1087,15 @@ namespace StoreOrder.WebApplication.Controllers
                 throw new ApiException("Order Id is Required", (int)HttpStatusCode.BadRequest);
             }
 
+            var tableOfStores = await _context.StoreTables.Where(x => x.StoreId == this.UserStoreId).Select(x => x.Id).ToListAsync();
+            if (tableOfStores.Count == 0)
+            {
+                throw new ApiException("Cửa hàng chưa có bàn.", (int)HttpStatusCode.BadRequest);
+            }
+
             // find Order by id
             var order = await _context.Orders
-                .Include(o => o.OrderDetails).Where(x => x.UserId == this.
-                CurrentUserId && x.Id == orderId && x.OrderStatus != (int)TypeOrderStatus.Done)
+                .Include(o => o.OrderDetails).Where(x => x.Id == orderId && x.OrderStatus != (int)TypeOrderStatus.Done && tableOfStores.Contains(x.TableId))
                 .FirstOrDefaultAsync();
 
             if (order == null)
@@ -1131,10 +1136,15 @@ namespace StoreOrder.WebApplication.Controllers
                 throw new ApiException("Order Id is Required", (int)HttpStatusCode.BadRequest);
             }
 
+            var tableOfStores = await _context.StoreTables.Where(x => x.StoreId == this.UserStoreId).Select(x => x.Id).ToListAsync();
+            if (tableOfStores.Count == 0)
+            {
+                throw new ApiException("Cửa hàng chưa có bàn.", (int)HttpStatusCode.BadRequest);
+            }
+
             // find Order by id
             var order = await _context.Orders
-                .Include(o => o.OrderDetails).Where(x => x.UserId == this.
-                CurrentUserId && x.Id == orderId && x.OrderStatus != (int)TypeOrderStatus.Done)
+                .Include(o => o.OrderDetails).Where(x => x.Id == orderId && x.OrderStatus != (int)TypeOrderStatus.Done && tableOfStores.Contains(x.TableId))
                 .FirstOrDefaultAsync();
 
             if (order == null)
@@ -1178,9 +1188,15 @@ namespace StoreOrder.WebApplication.Controllers
                     throw new ApiException("Order Id is Required", (int)HttpStatusCode.BadRequest);
                 }
 
+                var tableOfStores = await _context.StoreTables.Where(x => x.StoreId == this.UserStoreId).Select(x => x.Id).ToListAsync();
+                if (tableOfStores.Count == 0)
+                {
+                    throw new ApiException("Cửa hàng chưa có bàn.", (int)HttpStatusCode.BadRequest);
+                }
+
                 // find Order confirmed by OrderId
                 var order = await _context.Orders
-                    .Include(o => o.OrderDetails).Where(x => x.Id == orderId && x.OrderStatus == (int)TypeOrderStatus.Confirmed)
+                    .Include(o => o.OrderDetails).Where(x => x.Id == orderId && x.OrderStatus == (int)TypeOrderStatus.Confirmed && tableOfStores.Contains(x.TableId))
                     .FirstOrDefaultAsync();
 
                 if (order == null)
