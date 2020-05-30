@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http;
@@ -12,8 +13,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Serialization;
 using StoreOrder.WebApplication.Authorization;
 using StoreOrder.WebApplication.Data;
+using StoreOrder.WebApplication.Data.Hub;
 using StoreOrder.WebApplication.Data.Repositories;
 using StoreOrder.WebApplication.Data.Repositories.Interfaces;
 using StoreOrder.WebApplication.Data.Wrappers;
@@ -157,6 +160,15 @@ namespace StoreOrder.WebApplication
                     throw new ApiException(context.ModelState.AllErrors());
                 };
             });
+
+            services
+                .AddSignalR(hubOptions => {
+                    hubOptions.EnableDetailedErrors = true;
+                    hubOptions.KeepAliveInterval = TimeSpan.FromMinutes(1);
+                })
+                .AddJsonProtocol(options => {
+                    options.PayloadSerializerOptions.WriteIndented = true;
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -203,8 +215,17 @@ namespace StoreOrder.WebApplication
 
             app.UseEndpoints(endpoints =>
             {
+                var desiredTransports =
+                   HttpTransportType.WebSockets |
+                   HttpTransportType.LongPolling;
+
                 endpoints.MapControllers();
+                endpoints.MapHub<MyOrderHub>("/orderHub", (options) =>
+                {
+                    options.Transports = desiredTransports;
+                });
             });
+
         }
 
         private void ConfigureSwagger(IServiceCollection services)
