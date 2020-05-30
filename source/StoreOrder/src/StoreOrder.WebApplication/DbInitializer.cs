@@ -390,7 +390,8 @@ namespace StoreOrder.WebApplication
                    .Where(x => x.PermissionName == Permissions.Employee.GetOrderProductsWithTable ||
                                x.PermissionName == Permissions.Employee.GetListOrderWithTableOrProductName ||
                                x.PermissionName == Permissions.Employee.GetOrderWithTableViewProductsWithTableId ||
-                               x.PermissionName == Permissions.Employee.ConfirmOrder
+                               x.PermissionName == Permissions.Employee.ConfirmOrder || 
+                               x.PermissionName == Permissions.Employee.UpdateOrderProductStatus
                    ).Select(x => x).ToList();
 
                 foreach (var permission in permissionsOrderCookies)

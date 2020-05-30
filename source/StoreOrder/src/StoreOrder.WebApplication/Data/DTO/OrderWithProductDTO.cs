@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace StoreOrder.WebApplication.Data.DTO
 {
@@ -21,12 +22,16 @@ namespace StoreOrder.WebApplication.Data.DTO
         {
             this.OptionId_OptionValueIds = new string[] { };
         }
+        [Required]
         public string TableId { get; set; }
         public string TableName { get; set; }
+        [Required]
         public string[] OptionId_OptionValueIds { get; set; }
         public string OptionDescription { get; set; }
         public string Note { get; set; }
         public int Amount { get; set; }
         public int Status { get; set; }
+        [Required]
+        public string OrderDetailId { get; set; }
     }
 }

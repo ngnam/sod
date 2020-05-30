@@ -14,6 +14,7 @@ using StoreOrder.WebApplication.Data.Orders;
 using StoreOrder.WebApplication.Data.Repositories.Interfaces;
 using StoreOrder.WebApplication.Data.Wrappers;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -858,7 +859,7 @@ namespace StoreOrder.WebApplication.Controllers
                     throw new ApiException("Api not supports", (int)HttpStatusCode.BadRequest);
                 }
             }
-              
+
             return Ok(await GetOrders(model.TableId, this.CurrentUserId, this.UserStoreId));
         }
 
@@ -926,7 +927,7 @@ namespace StoreOrder.WebApplication.Controllers
             var result = await ApiResult<OrderDetail>.CreateAsync(
                 _context.OrderDetails
                     .Include(o => o.Order)
-                    .Where(o => o.Order.UserId == this.CurrentUserId && tableOfStores.Contains(o.Order.TableId) && o.Order.OrderStatus != (int)TypeOrderStatus.Done && o.Order.Id == o.OrderId),
+                    .Where(o => tableOfStores.Contains(o.Order.TableId) && o.Order.OrderStatus != (int)TypeOrderStatus.Done && o.Order.Id == o.OrderId),
                 pageIndex,
                 pageSize,
                 sortColumn,
@@ -949,6 +950,7 @@ namespace StoreOrder.WebApplication.Controllers
                     Amount = o.Amount.Value,
                     Status = o.Status.Value,
                     OptionId_OptionValueIds = o.OptionId_OptionValueIds,
+                    OrderDetailId = o.Id
                 }).ToList()
             }).ToList();
 
@@ -991,7 +993,7 @@ namespace StoreOrder.WebApplication.Controllers
                 _context.Orders
                     .Include(o => o.StoreTable)
                     .Include(o => o.OrderDetails)
-                    .Where(o => o.UserId == this.CurrentUserId && tableOfStores.Contains(o.TableId) && o.OrderStatus != (int)TypeOrderStatus.Done),
+                    .Where(o => tableOfStores.Contains(o.TableId) && o.OrderStatus != (int)TypeOrderStatus.Done),
                 pageIndex,
                 pageSize,
                 sortColumn,
@@ -1023,6 +1025,55 @@ namespace StoreOrder.WebApplication.Controllers
                 HasNextPage = result.HasNextPage,
                 HasPreviousPage = result.HasPreviousPage
             });
+        }
+
+        [HttpPost("order/update/product-status"), MapToApiVersion("1")]
+        [Authorize(Policy = Permissions.Employee.UpdateOrderProductStatus)]
+        public async Task<IActionResult> UpdateProductStatus([FromBody] List<ViewProductOptionDTO> listProducts)
+        {
+            await CheckIsSignoutedAsync();
+            int message = 0;
+            if (ModelState.IsValid)
+            {
+                foreach (var model in listProducts)
+                {
+                    var orderDetail = await _context.OrderDetails.FindAsync(model.OrderDetailId);
+
+                    if (orderDetail == null)
+                    {
+                        throw new ApiException("Không tìm thấy chi tiết order", (int)HttpStatusCode.BadRequest);
+                    }
+
+                    _context.Entry(orderDetail).State = EntityState.Modified;
+
+                    orderDetail.OptionDescription = model.OptionDescription;
+                    orderDetail.Note = model.Note;
+                    orderDetail.Amount = model.Amount;
+                    orderDetail.Status = model.Status;
+
+                    // save to db
+                    try
+                    {
+                        await _context.SaveChangesAsync();
+                        message = 1;
+
+                        // update user received order
+                        await UpdateUserReceivedOrder(orderDetail.OrderId);
+
+                    }
+                    catch (DbUpdateException ex)
+                    {
+#if !DEBUG
+                        throw new ApiException("An error occurred creating a order.");
+#else
+                        _logger.LogError("Update db---", ex);
+                        throw new ApiException("Error Update Exceptions!", (int)HttpStatusCode.BadRequest);
+#endif
+                    }
+                }
+            }
+
+            return Ok(message);
         }
 
         [HttpGet("order/{orderId}/confirm"), MapToApiVersion("1")]
@@ -1227,6 +1278,37 @@ namespace StoreOrder.WebApplication.Controllers
                     }).ToList()
                 }).FirstOrDefaultAsync();
             return result;
+        }
+
+        private async Task<int> UpdateUserReceivedOrder(string orderId)
+        {
+            int message = 0;
+            var order = await _context.Orders.FindAsync(orderId);
+            if (order != null)
+            {
+                if (string.IsNullOrEmpty(order.UserCookingId))
+                {
+                    // update table to state can oder
+                    _context.Entry(order).State = EntityState.Modified;
+                    order.UserCookingId = this.CurrentUserId;
+                    // save
+                    try
+                    {
+                        await _context.SaveChangesAsync();
+                        message = 1;
+                    }
+                    catch (DbUpdateException ex)
+                    {
+#if !DEBUG
+                throw new ApiException("An error occurred confirm a order.");
+#else
+                        _logger.LogError("Update db---", ex);
+                        throw new ApiException("Error Update Exceptions!", (int)HttpStatusCode.BadRequest);
+#endif
+                    }
+                }
+            }
+            return message;
         }
     }
 }

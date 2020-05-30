@@ -58,6 +58,7 @@
             public const string GetOrderWithTableViewProductsWithTableId = "Permission.Employee.GetOrderWithTableViewProductsWithTableId";
             public const string ConfirmOrder = "Permission.Employee.ConfirmOrder";
             public const string ConfirmPayOrder = "Permission.Employee.ConfirmPayOrder";
+            public const string UpdateOrderProductStatus = "Permission.Employee.UpdateOrderProductStatus";
         }
 
         public static class Upload
