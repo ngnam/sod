@@ -376,10 +376,10 @@ namespace StoreOrder.WebApplication.Controllers
                 FixedPrice = p.FixedPrice,
                 UniversalProductCode = p.UniversalProductCode,
                 ImageHeightThumb = p.ProductDetail.ImageHeightThumb,
-                ImageThumb = p.ProductDetail.ImageThumb,
-                ImageWidthThumb = p.ProductDetail.ImageWidthThumb,
-                LongDescription = p.ProductDetail.LongDescription,
-                ShortDescription = p.ProductDetail.ShortDescription,
+                ImageThumb = p.ProductDetail?.ImageThumb,
+                ImageWidthThumb = p.ProductDetail?.ImageWidthThumb,
+                LongDescription = p.ProductDetail?.LongDescription,
+                ShortDescription = p.ProductDetail?.ShortDescription,
                 ProductOptionDTOs = p.ProductOptions.Select(po => new ProductOptionDTO
                 {
                     OptionId = po.OptionId,
@@ -460,11 +460,11 @@ namespace StoreOrder.WebApplication.Controllers
                 ProductName = p.ProductName,
                 FixedPrice = p.FixedPrice,
                 UniversalProductCode = p.UniversalProductCode,
-                ImageHeightThumb = p.ProductDetail.ImageHeightThumb,
-                ImageThumb = p.ProductDetail.ImageThumb,
-                ImageWidthThumb = p.ProductDetail.ImageWidthThumb,
-                LongDescription = p.ProductDetail.LongDescription,
-                ShortDescription = p.ProductDetail.ShortDescription,
+                ImageHeightThumb = p.ProductDetail?.ImageHeightThumb,
+                ImageThumb = p.ProductDetail?.ImageThumb,
+                ImageWidthThumb = p.ProductDetail?.ImageWidthThumb,
+                LongDescription = p.ProductDetail?.LongDescription,
+                ShortDescription = p.ProductDetail?.ShortDescription,
                 ProductOptionDTOs = p.ProductOptions.Select(po => new ProductOptionDTO
                 {
                     OptionId = po.OptionId,
