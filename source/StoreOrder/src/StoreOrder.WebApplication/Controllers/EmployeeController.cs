@@ -229,6 +229,7 @@ namespace StoreOrder.WebApplication.Controllers
                 {
                     ProductId = p.ProductId,
                     Price = p.Price,
+                    FixedPrice = p.Product.FixedPrice,
                     ProductName = p.Product.ProductName,
                     Weight = p.Product.Weight,
                     Depth = p.Product.Depth,
@@ -299,6 +300,7 @@ namespace StoreOrder.WebApplication.Controllers
                 {
                     ProductId = p.ProductId,
                     Price = p.Price,
+                    FixedPrice = p.Product.FixedPrice,
                     ProductName = p.Product.ProductName,
                     Weight = p.Product.Weight,
                     Depth = p.Product.Depth,
