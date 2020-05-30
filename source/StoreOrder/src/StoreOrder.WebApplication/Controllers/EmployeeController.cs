@@ -1180,13 +1180,12 @@ namespace StoreOrder.WebApplication.Controllers
 
                 // find Order confirmed by OrderId
                 var order = await _context.Orders
-                    .Include(o => o.OrderDetails).Where(x => x.UserId == this.
-                    CurrentUserId && x.Id == orderId && x.OrderStatus == (int)TypeOrderStatus.Confirmed)
+                    .Include(o => o.OrderDetails).Where(x => x.Id == orderId && x.OrderStatus == (int)TypeOrderStatus.Confirmed)
                     .FirstOrDefaultAsync();
 
                 if (order == null)
                 {
-                    throw new ApiException("Order không tìm thấy hoặc order đã kết thúc.", (int)HttpStatusCode.BadRequest);
+                    throw new ApiException("Order không tìm thấy hoặc order chưa confirm.", (int)HttpStatusCode.BadRequest);
                 }
 
                 // update status order

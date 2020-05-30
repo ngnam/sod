@@ -385,7 +385,7 @@ namespace StoreOrder.WebApplication
                 await databaseDbContext.SaveChangesAsync();
                 #endregion
 
-                #region Update RoleOrderUser
+                #region Update RoleCookieUser
                 var permissionsOrderCookies = databaseDbContext.Permissions
                    .Where(x => x.PermissionName == Permissions.Employee.GetOrderProductsWithTable ||
                                x.PermissionName == Permissions.Employee.GetListOrderWithTableOrProductName ||
