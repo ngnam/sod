@@ -7,6 +7,8 @@
             public const string ImportLocation = "Permissions.SysAdmin.ImportData";
             public const string ViewLogs = "Permissions.SysAdmin.ViewLogs";
             public const string DeleteLogs = "Permissions.SysAdmin.DeleteLogs";
+            public const string GetListStores = "Permission.SysAdmin.GetListStores";
+            public const string GetListCategoryStore = "Permission.SysAdmin.CategoryStore";
         }
         public static class Account
         {
@@ -26,14 +28,19 @@
 
         public static class AdminStore
         {
-            public const string GetListStores = "Permission.AdminStore.GetListStores";
             public const string GetMenuProduct = "Permission.AdminStore.GetMenuProduct";
             public const string GetListStoreOption = "Permission.AdminStore.Attribute";
-            public const string GetListCategoryStore = "Permission.AdminStore.Category";
+            public const string CreateCategoryStore = "Permission.AdminStore.CreateCategoryStore";
+            public const string UpdateCategoryStore = "Permission.AdminStore.UpdateCategoryStore";
+            public const string DeleteCategoryStore = "Permission.AdminStore.DeleteCategoryStore";
             public const string GetListProduct = "Permission.AdminStore.GetListProduct";
             public const string CreateProduct = "Permission.AdminStore.CreateProduct";
             public const string UpdateProduct = "Permission.AdminStore.UpdateProduct";
             public const string DeleteProduct = "Permission.AdminStore.DeleteProduct";
+            public const string GetListCatProduct = "Permission.AdminStore.GetListCatProduct";
+            public const string CreateCatProduct = "Permission.AdminStore.CreateCatProduct";
+            public const string UpdateCatProduct = "Permission.AdminStore.UpdateCatProduct";
+            public const string DeleteCatProduct = "Permission.AdminStore.DeleteCatProduct";
         }
 
         public static class Employee

@@ -504,8 +504,13 @@ namespace StoreOrder.WebApplication.Controllers
             Order orderCreate = null;
             if (ModelState.IsValid)
             {
+                if (model.Products.Count == 0)
+                {
+                    throw new ApiException("Cần có ít nhất 1 sản phẩm trong đơn hàng.", (int)HttpStatusCode.BadRequest);
+                }
+
                 // check if table busy
-                var hasTableBusying = await _context.StoreTables.Where(t => t.Id == model.TableId && t.StoreId == this.UserStoreId && t.TableStatus != (int)TypeTableStatus.Busying).FirstOrDefaultAsync();
+                var hasTableBusying = await _context.StoreTables.Where(t => t.Id == model.TableId && t.StoreId == this.UserStoreId && t.TableStatus == (int)TypeTableStatus.Busying).FirstOrDefaultAsync();
                 if (hasTableBusying != null)
                 {
                     throw new ApiException("Bàn này đang bận không thể tạo mới order!", (int)HttpStatusCode.BadRequest);
@@ -580,11 +585,17 @@ namespace StoreOrder.WebApplication.Controllers
         {
             await CheckIsSignoutedAsync();
             int message = 0;
+            Order orderCreate = null;
             if (ModelState.IsValid)
             {
+                if (model.Products.Count == 0)
+                {
+                    throw new ApiException("Cần có ít nhất 1 sản phẩm trong đơn hàng.", (int)HttpStatusCode.BadRequest);
+                }
+
                 // check if table busy
-                var hasTableBusying = _context.StoreTables.Where(t => t.Id == model.TableId && t.StoreId == this.UserStoreId);
-                if (hasTableBusying.Where(x => x.TableStatus != (int)TypeTableStatus.Busying) != null)
+                var hasTableBusying = await _context.StoreTables.Where(t => t.Id == model.TableId && t.StoreId == this.UserStoreId && t.TableStatus == (int)TypeTableStatus.Busying).FirstOrDefaultAsync();
+                if (hasTableBusying != null)
                 {
                     throw new ApiException("Bàn này đang bận không thể tạo mới order!", (int)HttpStatusCode.BadRequest);
                 }
@@ -627,9 +638,10 @@ namespace StoreOrder.WebApplication.Controllers
                     {
                         await _context.SaveChangesAsync();
                         message = 1;
-
+                        orderCreate = newOrder;
                         // update table to state busying
                         await UpdateTableStatus(model.TableId, (int)TypeTableStatus.Busying);
+
                     }
                     catch (DbUpdateException ex)
                     {
@@ -648,7 +660,7 @@ namespace StoreOrder.WebApplication.Controllers
                 }
             }
 
-            return Ok(message);
+            return Ok(orderCreate);
         }
 
         [HttpPut("order/{orderId}"), MapToApiVersion("1")]
@@ -660,6 +672,12 @@ namespace StoreOrder.WebApplication.Controllers
             model.OrderId = orderId;
             if (ModelState.IsValid)
             {
+                // check products null
+                if (model.Products.Count == 0)
+                {
+                    throw new ApiException("Cần có ít nhất 1 sản phẩm trong đơn hàng.", (int)HttpStatusCode.BadRequest);
+                }
+
                 // check order is create or update order
                 if (!string.Equals(model.OrderId, "0"))
                 {
@@ -743,8 +761,8 @@ namespace StoreOrder.WebApplication.Controllers
                     throw new ApiException("Api not supports", (int)HttpStatusCode.BadRequest);
                 }
             }
-
-            return Ok(message);
+            // get order
+            return Ok(await GetOrders(model.TableId, this.CurrentUserId, this.UserStoreId));
         }
 
         [HttpPut("order/{orderId}"), MapToApiVersion("2")]
@@ -840,8 +858,8 @@ namespace StoreOrder.WebApplication.Controllers
                     throw new ApiException("Api not supports", (int)HttpStatusCode.BadRequest);
                 }
             }
-
-            return Ok(message);
+              
+            return Ok(await GetOrders(model.TableId, this.CurrentUserId, this.UserStoreId));
         }
 
         [HttpGet("order/table/{tableId}"), MapToApiVersion("1")]
@@ -858,49 +876,8 @@ namespace StoreOrder.WebApplication.Controllers
             {
                 throw new ApiException("table not found.", (int)HttpStatusCode.BadRequest);
             }
-            var result = await _context.Orders
-                .Include(o => o.OrderDetails)
-                .Where(x => x.UserId == this.CurrentUserId && x.TableId == tableId && x.OrderStatus != (int)TypeOrderStatus.Done)
-                .OrderByDescending(x => x.CreatedOn)
-                .Select(o => new OrderProductDTO
-                {
-                    OrderId = o.Id,
-                    OrderStatus = o.OrderStatus.Value,
-                    TableId = o.TableId,
-                    TableName = o.TableName,
-                    CreatedOn = o.CreatedOn,
-                    UpdatedOn = o.UpdateOn,
-                    Products = o.OrderDetails.Select(odt => new OrderDetailDTO
-                    {
-                        OrderDetailId = odt.Id,
-                        ProductId = odt.ProductId,
-                        ProductName = odt.ProductName,
-                        Amount = odt.Amount,
-                        Note = odt.Note,
-                        OptionDescription = odt.OptionDescription,
-                        OptionId_OptionValueIds = odt.OptionId_OptionValueIds,
-                        Price = odt.Price,
-                        Status = odt.Status,
-                    }).ToList()
-                }).FirstOrDefaultAsync();
 
-            //var result = new OrderProductDTO
-            //{
-            //    OrderId = Guid.NewGuid().ToString(),
-            //    OrderStatus = (int)TypeOrderStatus.NewOrder,
-            //    TableId = Guid.NewGuid().ToString(),
-            //    TableName = "Bàn 01",
-            //    Products = new System.Collections.Generic.List<OrderDetailDTO>()
-            //    {
-            //        new OrderDetailDTO { ProductId = "1", ProductName = "Trà chanh nhiệt đới", OptionId_OptionValueIds = new string[] {"1_1", "2_1_2_3"}, OptionDescription = "Kích cỡ nhỏ, Toping: Dừa khô, trân châu, chuối khô", Note = "Cốc nhựa", Amount = 1, Status = (int)TypeOrderDetail.NewOrder, Price = 50000  },
-            //        new OrderDetailDTO { ProductId = "1", ProductName = "Trà chanh nhiệt đới", OptionId_OptionValueIds = new string[] {"2_1_2"}, OptionDescription = "Toping 80 đá, 20 đường", Note = "Cốc nhựa", Amount = 1, Status = (int)TypeOrderDetail.NewOrder, Price = 50000  },
-            //        new OrderDetailDTO { ProductId = "1", ProductName = "Trà chanh nhiệt đới", OptionId_OptionValueIds = new string[] {"2_4_5"}, OptionDescription = "Toping ít đá, nhiều đường", Note = "Cốc thủy tinh, thêm đường", Amount = 1, Status = (int)TypeOrderDetail.NewOrder, Price = 50000  },
-            //        new OrderDetailDTO { ProductId = "2", ProductName = "Bạc Sửu", OptionId_OptionValueIds = new string[] {"3_4"}, OptionDescription = "Bạc sửu", Note = "Ít đá", Amount = 1, Status = (int)TypeOrderDetail.NewOrder, Price = 50000  },
-            //        new OrderDetailDTO { ProductId = "2", ProductName = "Caffe đen", OptionId_OptionValueIds = new string[] {"3_4"}, OptionDescription = "Caffe đen", Note = "Không đường", Amount = 1, Status = (int)TypeOrderDetail.NewOrder, Price = 50000  },
-            //    }
-            //};
-
-            return Ok(result);
+            return Ok(await GetOrders(tableId, this.CurrentUserId, this.UserStoreId));
         }
 
         [HttpGet("order/type1"), MapToApiVersion("1")]
@@ -1215,6 +1192,41 @@ namespace StoreOrder.WebApplication.Controllers
                 }
             }
             return message;
+        }
+
+        private async Task<OrderProductDTO> GetOrders(string tableId, string currentUserId, string storeId)
+        {
+            var tableOfStore = await _context.StoreTables.FirstOrDefaultAsync(t => t.Id == tableId && t.StoreId == storeId);
+            if (tableOfStore == null)
+            {
+                throw new ApiException("table not found.", (int)HttpStatusCode.BadRequest);
+            }
+            var result = await _context.Orders
+                .Include(o => o.OrderDetails)
+                .Where(x => x.UserId == currentUserId && x.TableId == tableId && x.OrderStatus != (int)TypeOrderStatus.Done)
+                .OrderByDescending(x => x.CreatedOn)
+                .Select(o => new OrderProductDTO
+                {
+                    OrderId = o.Id,
+                    OrderStatus = o.OrderStatus.Value,
+                    TableId = o.TableId,
+                    TableName = o.TableName,
+                    CreatedOn = o.CreatedOn,
+                    UpdatedOn = o.UpdateOn,
+                    Products = o.OrderDetails.Select(odt => new OrderDetailDTO
+                    {
+                        OrderDetailId = odt.Id,
+                        ProductId = odt.ProductId,
+                        ProductName = odt.ProductName,
+                        Amount = odt.Amount,
+                        Note = odt.Note,
+                        OptionDescription = odt.OptionDescription,
+                        OptionId_OptionValueIds = odt.OptionId_OptionValueIds,
+                        Price = odt.Price,
+                        Status = odt.Status,
+                    }).ToList()
+                }).FirstOrDefaultAsync();
+            return result;
         }
     }
 }

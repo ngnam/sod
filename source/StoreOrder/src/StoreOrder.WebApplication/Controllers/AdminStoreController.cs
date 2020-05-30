@@ -31,7 +31,7 @@ namespace StoreOrder.WebApplication.Controllers
             _context = context;
         }
 
-        [Authorize(Policy = Permissions.AdminStore.GetListStores)]
+        [Authorize(Policy = Permissions.SysAdmin.GetListStores)]
         [HttpGet(""), MapToApiVersion("1")]
         public async Task<IActionResult> GetListStores(
                int pageIndex = 0,
@@ -70,7 +70,7 @@ namespace StoreOrder.WebApplication.Controllers
 
         [HttpGet("product"), MapToApiVersion("1")]
         [Authorize(Policy = Permissions.AdminStore.GetMenuProduct)]
-        public async Task<IActionResult> GetMenuProduct(
+        public async Task<IActionResult> GetProducts(
             int pageIndex = 0,
             int pageSize = 10,
             string sortColumn = null,
@@ -78,8 +78,6 @@ namespace StoreOrder.WebApplication.Controllers
             string filterColumn = null,
             string filterQuery = null)
         {
-            _logger.Log(LogLevel.Information, "get product");
-
             string messager = string.Empty;
             // get stores of user admin
             User user = await _context.Users.FindAsync(this.CurrentUserId);
@@ -175,7 +173,7 @@ namespace StoreOrder.WebApplication.Controllers
         }
 
         [HttpGet("category"), MapToApiVersion("1")]
-        [Authorize(Policy = Permissions.AdminStore.GetListCategoryStore)]
+        [Authorize(Policy = Permissions.SysAdmin.GetListCategoryStore)]
         public async Task<IActionResult> GetListCategoryStore(
            int pageIndex = 0,
            int pageSize = 10,
@@ -201,6 +199,8 @@ namespace StoreOrder.WebApplication.Controllers
             );
             return Ok(result);
         }
+
+
 
     }
 }

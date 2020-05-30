@@ -269,9 +269,8 @@ namespace StoreOrder.WebApplication
                     new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Users.Create },
                     new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Users.Edit },
                     new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.Users.Delete },
-                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.AdminStore.GetListCategoryStore },
+                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.SysAdmin.GetListCategoryStore },
                     new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.AdminStore.GetListStoreOption },
-                    new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.AdminStore.GetListStores },
                     new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.AdminStore.GetMenuProduct },
                     new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.AdminStore.CreateProduct },
                     new Permission { Id = Guid.NewGuid().ToString(), PermissionName = Permissions.AdminStore.DeleteProduct },
@@ -313,13 +312,15 @@ namespace StoreOrder.WebApplication
                                 x.PermissionName == Permissions.Account.Delete ||
                                 x.PermissionName == Permissions.Account.Edit ||
                                 x.PermissionName == Permissions.Account.View ||
-                                x.PermissionName == Permissions.AdminStore.GetListStores
+                                x.PermissionName == Permissions.SysAdmin.GetListStores ||
+                                x.PermissionName == Permissions.SysAdmin.GetListCategoryStore
                     ).Select(x => x).ToList();
 
                 foreach (var permission in permissionsSysAdmin)
                 {
                     // add Permissions To Role
-                    roleSysadmin.RoleToPermissions.Add(new RoleToPermission {
+                    roleSysadmin.RoleToPermissions.Add(new RoleToPermission
+                    {
                         Permission = permission,
                         Role = roleSysadmin,
                     });
@@ -332,12 +333,15 @@ namespace StoreOrder.WebApplication
                 var permissionsAdminStore = databaseDbContext.Permissions
                    .Where(x => x.PermissionName == Permissions.AdminStore.GetMenuProduct ||
                                x.PermissionName == Permissions.AdminStore.GetListStoreOption ||
-                               x.PermissionName == Permissions.AdminStore.GetListCategoryStore ||
                                x.PermissionName == Permissions.AdminStore.GetListProduct ||
                                x.PermissionName == Permissions.AdminStore.CreateProduct ||
                                x.PermissionName == Permissions.AdminStore.UpdateProduct ||
                                x.PermissionName == Permissions.AdminStore.DeleteProduct ||
-                               x.PermissionName == Permissions.Upload.UploadFile
+                               x.PermissionName == Permissions.Upload.UploadFile ||
+                               x.PermissionName == Permissions.AdminStore.CreateCatProduct ||
+                               x.PermissionName == Permissions.AdminStore.UpdateCatProduct ||
+                               x.PermissionName == Permissions.AdminStore.DeleteCatProduct ||
+                               x.PermissionName == Permissions.AdminStore.GetListCatProduct
 
                    ).Select(x => x).ToList();
 
@@ -423,13 +427,15 @@ namespace StoreOrder.WebApplication
 
             }
 
-            if (!databaseDbContext.Users.Include(x => x.UserToRoles).ThenInclude(x => x.Role).Any(x => x.UserToRoles.Any(r => r.Role.RoleName == RoleTypeHelper.RoleSysAdmin))) {
+            if (!databaseDbContext.Users.Include(x => x.UserToRoles).ThenInclude(x => x.Role).Any(x => x.UserToRoles.Any(r => r.Role.RoleName == RoleTypeHelper.RoleSysAdmin)))
+            {
                 var roleSysAdmin = await databaseDbContext.Roles.FirstOrDefaultAsync(x => x.RoleName == RoleTypeHelper.RoleSysAdmin);
                 string password = "string@12345";
                 var hashPass = Helpers.SercurityHelper.GenerateSaltedHash(password);
                 var userSysAdmin = new User { Id = Guid.NewGuid().ToString(), Age = 29, BirthDay = new DateTime(1991, 1, 1).ToUniversalTime(), CountLoginFailed = 0, FirstName = "sysadmin", LastName = "sysadmin", IsActived = 1, Email = "nguyenvannam0411@gmail.com", UserName = "ngvannam", HashPassword = hashPass.Hash, SaltPassword = hashPass.Salt, Gender = 1, OldPassword = hashPass.Hash + ";" + hashPass.Salt, PhoneNumber = "0349801673" };
 
-                roleSysAdmin.UserToRoles.Add(new UserToRole {
+                roleSysAdmin.UserToRoles.Add(new UserToRole
+                {
                     Role = roleSysAdmin,
                     User = userSysAdmin,
                 });
