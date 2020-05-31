@@ -4,11 +4,14 @@ namespace StoreOrder.WebApplication.Data.DTO
 {
     public class UserProfileDTO
     {
+        public UserProfileDTO()
+        {
+            this.ScreenId = new int[] { };
+        }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string GAvartar { get; set; }
-        public int ScreenId { get; set; }
-        public string GroupName { get; set; }
+        public int[] ScreenId { get; set; }
     }
 
     public class UserProfileUpdateDTO
