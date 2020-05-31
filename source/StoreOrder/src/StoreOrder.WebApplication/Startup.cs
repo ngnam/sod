@@ -1,11 +1,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,10 +10,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Newtonsoft.Json.Serialization;
 using StoreOrder.WebApplication.Authorization;
 using StoreOrder.WebApplication.Data;
-using StoreOrder.WebApplication.Data.Hub;
 using StoreOrder.WebApplication.Data.Repositories;
 using StoreOrder.WebApplication.Data.Repositories.Interfaces;
 using StoreOrder.WebApplication.Data.Wrappers;
@@ -71,7 +66,8 @@ namespace StoreOrder.WebApplication
                 );
             });
 
-            services.AddDbContext<AdminLogDbContext>(options => {
+            services.AddDbContext<AdminLogDbContext>(options =>
+            {
                 options.UseNpgsql(Configuration.GetConnectionString("AdminLogDbConnection"));
             });
 
@@ -103,7 +99,21 @@ namespace StoreOrder.WebApplication
                             context.Response.Headers.Add("Token-Expired", "true");
                         }
                         return Task.CompletedTask;
-                    }
+                    },
+                    //OnMessageReceived = context =>
+                    //{
+                    //    var accessToken = context.Request.Query["access_token"];
+
+                    //    // If the request is for our hub...
+                    //    var path = context.HttpContext.Request.Path;
+                    //    if (!string.IsNullOrEmpty(accessToken) &&
+                    //        (path.StartsWithSegments("/hubs/order")))
+                    //    {
+                    //        // Read the token out of the query string
+                    //        context.Token = accessToken;
+                    //    }
+                    //    return Task.CompletedTask;
+                    //}
                 };
             });
 
@@ -161,14 +171,14 @@ namespace StoreOrder.WebApplication
                 };
             });
 
-            services
-                .AddSignalR(hubOptions => {
-                    hubOptions.EnableDetailedErrors = true;
-                    hubOptions.KeepAliveInterval = TimeSpan.FromMinutes(1);
-                })
-                .AddJsonProtocol(options => {
-                    options.PayloadSerializerOptions.WriteIndented = true;
-                });
+            //services
+            //    .AddSignalR(hubOptions => {
+            //        hubOptions.EnableDetailedErrors = true;
+            //        hubOptions.KeepAliveInterval = TimeSpan.FromMinutes(5);
+            //    })
+            //    .AddJsonProtocol(options => {
+            //        options.PayloadSerializerOptions.WriteIndented = true;
+            //    });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -215,15 +225,15 @@ namespace StoreOrder.WebApplication
 
             app.UseEndpoints(endpoints =>
             {
-                var desiredTransports =
-                   HttpTransportType.WebSockets |
-                   HttpTransportType.LongPolling;
+                //var desiredTransports =
+                //   HttpTransportType.WebSockets |
+                //   HttpTransportType.LongPolling;
 
                 endpoints.MapControllers();
-                endpoints.MapHub<MyOrderHub>("/orderHub", (options) =>
-                {
-                    options.Transports = desiredTransports;
-                });
+                //endpoints.MapHub<PornHub>("/hubs/order", (options) =>
+                //{
+                //    options.Transports = desiredTransports;
+                //});
             });
 
         }
