@@ -41,33 +41,30 @@ namespace StoreOrder.WebApplication.Controllers
                 throw new ApiException("User not found", (int)HttpStatusCode.BadRequest);
             }
 
-            int ScreenId = 0;
-            var roleName = user.UserToRoles.FirstOrDefault().Role;
-
-            switch (roleName.RoleName)
-            {
-                case RoleTypeHelper.RoleOrderUser:
-                    ScreenId = (int)TypeScreen.USER_ORDER;
-                    break;
-                case RoleTypeHelper.RoleCookieUser:
-                    ScreenId = (int)TypeScreen.USER_COOKIE;
-                    break;
-                case RoleTypeHelper.RolePayUser:
-                    ScreenId = (int)TypeScreen.USER_PAY;
-                    break;
-                case RoleTypeHelper.RoleCustomerUser:
-                    ScreenId = (int)TypeScreen.USER_CUSTOMER;
-                    break;
-            }
-
+            var roleUser = user.UserToRoles.Select(x => x.Role).ToList();
             var result = new UserProfileDTO
             {
                 FirstName = user.FirstName,
                 GAvartar = "https://ragus.vn/wp-content/uploads/2019/10/Yua-Mikami-vlog-1.jpg",
                 LastName = user.LastName,
-                GroupName = roleName.Desc,
-                ScreenId = ScreenId,
             };
+
+            if (roleUser.Any(x => x.RoleName == RoleTypeHelper.RoleOrderUser))
+            {
+                result.ScreenId.Append((int)TypeScreen.USER_ORDER);
+            }
+            if (roleUser.Any(x => x.RoleName == RoleTypeHelper.RoleCookieUser))
+            {
+                result.ScreenId.Append((int)TypeScreen.USER_COOKIE);
+            }
+            if (roleUser.Any(x => x.RoleName == RoleTypeHelper.RolePayUser))
+            {
+                result.ScreenId.Append((int)TypeScreen.USER_PAY);
+            }
+            if (roleUser.Any(x => x.RoleName == RoleTypeHelper.RoleCustomerUser))
+            {
+                result.ScreenId.Append((int)TypeScreen.USER_CUSTOMER);
+            }
 
             return Ok(result);
         }
