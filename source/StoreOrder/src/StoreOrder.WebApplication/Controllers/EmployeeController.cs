@@ -874,13 +874,7 @@ namespace StoreOrder.WebApplication.Controllers
             {
                 throw new ApiException("table id not found.", (int)HttpStatusCode.BadRequest);
             }
-            var tableOfStore = await _context.StoreTables.FirstOrDefaultAsync(t => t.Id == tableId && t.StoreId == this.UserStoreId);
-            if (tableOfStore == null)
-            {
-                throw new ApiException("table not found.", (int)HttpStatusCode.BadRequest);
-            }
-
-            return Ok(await GetOrders(tableId, this.CurrentUserId, this.UserStoreId));
+            return Ok(await GetOrders(tableId, this.UserStoreId));
         }
 
         [HttpGet("order/type1"), MapToApiVersion("1")]
@@ -1262,7 +1256,7 @@ namespace StoreOrder.WebApplication.Controllers
             return message;
         }
 
-        private async Task<OrderProductDTO> GetOrders(string tableId, string currentUserId, string storeId)
+        private async Task<OrderProductDTO> GetOrders(string tableId, string storeId)
         {
             var tableOfStore = await _context.StoreTables.FirstOrDefaultAsync(t => t.Id == tableId && t.StoreId == storeId);
             if (tableOfStore == null)
@@ -1271,7 +1265,7 @@ namespace StoreOrder.WebApplication.Controllers
             }
             var result = await _context.Orders
                 .Include(o => o.OrderDetails)
-                .Where(x => x.UserId == currentUserId && x.TableId == tableId && x.OrderStatus != (int)TypeOrderStatus.Done)
+                .Where(x => x.TableId == tableOfStore.Id && x.OrderStatus != (int)TypeOrderStatus.Done)
                 .OrderByDescending(x => x.CreatedOn)
                 .Select(o => new OrderProductDTO
                 {
