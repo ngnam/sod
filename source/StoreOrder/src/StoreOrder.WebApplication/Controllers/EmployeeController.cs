@@ -1231,7 +1231,7 @@ namespace StoreOrder.WebApplication.Controllers
         private async Task<int> UpdateTableStatus(string tableId, int status)
         {
             int message = 0;
-            var tableOrder = await _context.StoreTables.FirstOrDefaultAsync(t => t.Id == tableId && t.StoreId == this.UserStoreId && t.TableStatus != (int)TypeTableStatus.Busying);
+            var tableOrder = await _context.StoreTables.FirstOrDefaultAsync(t => t.Id == tableId && t.StoreId == this.UserStoreId);
             if (tableOrder != null)
             {
                 // update table to state can oder
