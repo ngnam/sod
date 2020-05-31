@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace StoreOrder.WebApplication.Data.DTO
 {
@@ -6,12 +8,13 @@ namespace StoreOrder.WebApplication.Data.DTO
     {
         public UserProfileDTO()
         {
-            this.ScreenId = new int[] { };
+            this.ScreenId = new HashSet<int>();
         }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string GAvartar { get; set; }
-        public int[] ScreenId { get; set; }
+        public ICollection<int> ScreenId { get; set; }
+        public string GroupName { get; set; }
     }
 
     public class UserProfileUpdateDTO

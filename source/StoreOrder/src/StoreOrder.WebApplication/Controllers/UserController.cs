@@ -47,24 +47,17 @@ namespace StoreOrder.WebApplication.Controllers
                 FirstName = user.FirstName,
                 GAvartar = "https://ragus.vn/wp-content/uploads/2019/10/Yua-Mikami-vlog-1.jpg",
                 LastName = user.LastName,
+                GroupName = ""
             };
 
             if (roleUser.Any(x => x.RoleName == RoleTypeHelper.RoleOrderUser))
-            {
-                result.ScreenId.Append((int)TypeScreen.USER_ORDER);
-            }
+                result.ScreenId.Add(1);
             if (roleUser.Any(x => x.RoleName == RoleTypeHelper.RoleCookieUser))
-            {
-                result.ScreenId.Append((int)TypeScreen.USER_COOKIE);
-            }
+                result.ScreenId.Add(2);
             if (roleUser.Any(x => x.RoleName == RoleTypeHelper.RolePayUser))
-            {
-                result.ScreenId.Append((int)TypeScreen.USER_PAY);
-            }
+                result.ScreenId.Add(3);
             if (roleUser.Any(x => x.RoleName == RoleTypeHelper.RoleCustomerUser))
-            {
-                result.ScreenId.Append((int)TypeScreen.USER_CUSTOMER);
-            }
+                result.ScreenId.Add(4);
 
             return Ok(result);
         }
