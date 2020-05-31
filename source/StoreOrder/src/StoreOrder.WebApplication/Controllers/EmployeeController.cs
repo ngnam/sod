@@ -765,7 +765,7 @@ namespace StoreOrder.WebApplication.Controllers
                 }
             }
             // get order
-            return Ok(await GetOrders(model.TableId, this.CurrentUserId, this.UserStoreId));
+            return Ok(await GetOrders(model.TableId, this.UserStoreId));
         }
 
         [HttpPut("order/{orderId}"), MapToApiVersion("2")]
@@ -862,7 +862,7 @@ namespace StoreOrder.WebApplication.Controllers
                 }
             }
 
-            return Ok(await GetOrders(model.TableId, this.CurrentUserId, this.UserStoreId));
+            return Ok(await GetOrders(model.TableId, this.UserStoreId));
         }
 
         [HttpGet("order/table/{tableId}"), MapToApiVersion("1")]
