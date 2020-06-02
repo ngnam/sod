@@ -8,16 +8,19 @@ namespace StoreOrder.WebApplication.Data.DTO
     {
         public UserProfileDTO()
         {
-            this.ScreenId = new HashSet<int>();
-            this.GroupName = new HashSet<string>();
+            this.GroupScreens = new HashSet<GroupScreen>();
         }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string GAvartar { get; set; }
-        public ICollection<int> ScreenId { get; set; }
         public int? Gender { get; set; }
-        public string StoreName { get; set; }
-        public ICollection<string> GroupName { get; set; }
+        public ICollection<GroupScreen> GroupScreens { get; set; }
+    }
+
+    public class GroupScreen
+    {
+        public string GroupName { get; set; }
+        public int ScreenId { get; set; }
     }
 
     public class UserProfileUpdateDTO

@@ -9,6 +9,7 @@ using StoreOrder.WebApplication.Data.Enums;
 using StoreOrder.WebApplication.Data.Repositories.Interfaces;
 using StoreOrder.WebApplication.Data.Wrappers;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -46,26 +47,42 @@ namespace StoreOrder.WebApplication.Controllers
             }
 
             var roleUser = user.UserToRoles.Select(x => x.Role).ToList();
+
             var result = new UserProfileDTO
             {
                 FirstName = user.FirstName,
                 GAvartar = "https://ragus.vn/wp-content/uploads/2019/10/Yua-Mikami-vlog-1.jpg",
                 LastName = user.LastName,
-                GroupName = roleUser.Select(r => r.Desc).ToList(),
+                GroupScreens = roleUser.Select(r => new GroupScreen
+                {
+                    GroupName = r.Desc,
+                    ScreenId = MapScreenId(r.RoleName)
+                }).ToList(),
                 Gender = user.Gender,
-                StoreName = user.Store.StoreName
             };
 
-            if (roleUser.Any(x => x.RoleName == RoleTypeHelper.RoleOrderUser))
-                result.ScreenId.Add(1);
-            if (roleUser.Any(x => x.RoleName == RoleTypeHelper.RoleCookieUser))
-                result.ScreenId.Add(2);
-            if (roleUser.Any(x => x.RoleName == RoleTypeHelper.RolePayUser))
-                result.ScreenId.Add(3);
-            if (roleUser.Any(x => x.RoleName == RoleTypeHelper.RoleCustomerUser))
-                result.ScreenId.Add(4);
-
             return Ok(result);
+        }
+
+        private int MapScreenId(string roleName)
+        {
+            int screenId = 0;
+            switch (roleName)
+            {
+                case RoleTypeHelper.RoleOrderUser:
+                    screenId = (int)TypeScreen.USER_ORDER;
+                    break;
+                case RoleTypeHelper.RoleCookieUser:
+                    screenId = (int)TypeScreen.USER_COOKIE;
+                    break;
+                case RoleTypeHelper.RoleCustomerUser:
+                    screenId = (int)TypeScreen.USER_CUSTOMER;
+                    break;
+                case RoleTypeHelper.RolePayUser:
+                    screenId = (int)TypeScreen.USER_PAY;
+                    break;
+            }
+            return screenId;
         }
 
         [HttpPost("profile"), MapToApiVersion("1")]
