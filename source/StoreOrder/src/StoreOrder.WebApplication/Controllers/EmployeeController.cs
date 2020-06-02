@@ -503,8 +503,6 @@ namespace StoreOrder.WebApplication.Controllers
         public async Task<IActionResult> CreateOrder([FromBody] OrderProductDTO model)
         {
             await CheckIsSignoutedAsync();
-            int message = 0;
-            Order orderCreate = null;
             if (ModelState.IsValid)
             {
                 if (model.Products.Count == 0)
@@ -555,9 +553,7 @@ namespace StoreOrder.WebApplication.Controllers
                     // save to db
                     try
                     {
-                        await _context.SaveChangesAsync();
-                        message = 1;
-                        orderCreate = newOrder;
+                        await _context.SaveChangesAsync();                     
                         // update table to state busying
                         await UpdateTableStatus(model.TableId, (int)TypeTableStatus.Busying);
 
@@ -579,7 +575,7 @@ namespace StoreOrder.WebApplication.Controllers
                 }
             }
 
-            return Ok(orderCreate);
+            return Ok(await GetOrders(model.TableId, this.UserStoreId));
         }
 
         [HttpPost("order"), MapToApiVersion("2")]
@@ -587,8 +583,6 @@ namespace StoreOrder.WebApplication.Controllers
         public async Task<IActionResult> CreateOrderV2([FromForm] OrderProductDTO model)
         {
             await CheckIsSignoutedAsync();
-            int message = 0;
-            Order orderCreate = null;
             if (ModelState.IsValid)
             {
                 if (model.Products.Count == 0)
@@ -640,8 +634,6 @@ namespace StoreOrder.WebApplication.Controllers
                     try
                     {
                         await _context.SaveChangesAsync();
-                        message = 1;
-                        orderCreate = newOrder;
                         // update table to state busying
                         await UpdateTableStatus(model.TableId, (int)TypeTableStatus.Busying);
 
@@ -663,7 +655,7 @@ namespace StoreOrder.WebApplication.Controllers
                 }
             }
 
-            return Ok(orderCreate);
+            return Ok(await GetOrders(model.TableId, this.UserStoreId));
         }
 
         [HttpPut("order/{orderId}"), MapToApiVersion("1")]
@@ -773,7 +765,6 @@ namespace StoreOrder.WebApplication.Controllers
         public async Task<IActionResult> UpdateOrderV2([FromForm] OrderProductDTO model, string orderId, bool isOrder = true)
         {
             await CheckIsSignoutedAsync();
-            int message = 0;
             model.OrderId = orderId;
 
             if (ModelState.IsValid)
@@ -843,7 +834,6 @@ namespace StoreOrder.WebApplication.Controllers
                     try
                     {
                         await _context.SaveChangesAsync();
-                        message = 1;
                     }
                     catch (DbUpdateException ex)
                     {
