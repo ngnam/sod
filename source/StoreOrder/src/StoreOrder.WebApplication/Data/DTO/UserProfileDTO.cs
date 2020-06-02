@@ -9,6 +9,7 @@ namespace StoreOrder.WebApplication.Data.DTO
         public UserProfileDTO()
         {
             this.ScreenId = new HashSet<int>();
+            this.GroupName = new HashSet<string>();
         }
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -16,7 +17,7 @@ namespace StoreOrder.WebApplication.Data.DTO
         public ICollection<int> ScreenId { get; set; }
         public int? Gender { get; set; }
         public string StoreName { get; set; }
-        public string GroupName { get; set; }
+        public ICollection<string> GroupName { get; set; }
     }
 
     public class UserProfileUpdateDTO

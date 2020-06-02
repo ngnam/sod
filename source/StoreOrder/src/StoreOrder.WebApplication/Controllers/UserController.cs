@@ -51,7 +51,7 @@ namespace StoreOrder.WebApplication.Controllers
                 FirstName = user.FirstName,
                 GAvartar = "https://ragus.vn/wp-content/uploads/2019/10/Yua-Mikami-vlog-1.jpg",
                 LastName = user.LastName,
-                GroupName = "",
+                GroupName = roleUser.Select(r => r.Desc).ToList(),
                 Gender = user.Gender,
                 StoreName = user.Store.StoreName
             };
