@@ -14,6 +14,7 @@ namespace StoreOrder.WebApplication.Data.DTO
         public string LastName { get; set; }
         public string GAvartar { get; set; }
         public int? Gender { get; set; }
+        public string StoreName { get; set; }
         public ICollection<GroupScreen> GroupScreens { get; set; }
     }
 

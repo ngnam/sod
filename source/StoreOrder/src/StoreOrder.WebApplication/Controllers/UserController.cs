@@ -59,6 +59,7 @@ namespace StoreOrder.WebApplication.Controllers
                     ScreenId = MapScreenId(r.RoleName)
                 }).ToList(),
                 Gender = user.Gender,
+                StoreName = user.Store.StoreName
             };
 
             return Ok(result);

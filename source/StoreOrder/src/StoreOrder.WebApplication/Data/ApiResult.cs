@@ -63,9 +63,9 @@ namespace StoreOrder.WebApplication.Data
                 && IsValidProperty(filterColumn))
             {
                 source = source.Where(
-                    String.Format("{0}.Contains(@0)",
+                    String.Format("{0}.ToLower().Contains(@0)",
                     filterColumn),
-                    filterQuery);
+                    filterQuery.Trim().ToLower());
             }
 
             var count = await source.CountAsync();
