@@ -143,6 +143,7 @@ namespace StoreOrder.WebApplication.Controllers
                         TableCode = table.TableCode,
                         TableStatus = table.TableStatus
                     })
+                    .OrderBy(x => x.TableStatus)
                     });
 
 
