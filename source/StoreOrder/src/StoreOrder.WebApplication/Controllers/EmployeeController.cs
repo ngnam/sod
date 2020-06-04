@@ -1276,7 +1276,7 @@ namespace StoreOrder.WebApplication.Controllers
                         OptionId_OptionValueIds = odt.OptionId_OptionValueIds,
                         Price = odt.Price,
                         Status = odt.Status,
-                    }).ToList()
+                    }).OrderBy(x => x.Status).ToList()
                 }).FirstOrDefaultAsync();
             return result;
         }
