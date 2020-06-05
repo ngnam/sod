@@ -2,6 +2,7 @@ FROM mcr.microsoft.com/dotnet/core/sdk:3.1-alpine AS builder
 WORKDIR /source
 COPY source/StoreOrder/src/StoreOrder.WebApplication ./StoreOrderWebApplication
 #COPY . .
+RUN sudo apt-get update && apt-get install -y apt-utils libgdiplus libc6-dev
 RUN dotnet restore
 RUN dotnet publish -c Release -r linux-musl-x64 -o /app-store-order ./StoreOrderWebApplication/StoreOrder.WebApplication.csproj
 
