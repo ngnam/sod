@@ -13,6 +13,7 @@ using StoreOrder.WebApplication.Data.Models.Stores;
 using StoreOrder.WebApplication.Data.Orders;
 using StoreOrder.WebApplication.Data.Repositories.Interfaces;
 using StoreOrder.WebApplication.Data.Wrappers;
+using StoreOrder.WebApplication.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,25 +45,36 @@ namespace StoreOrder.WebApplication.Controllers
                 return Ok(new { isAuthenicated = HttpContext.User.Identity.IsAuthenticated });
             }
 
-            var user = await _authRepository.GetUserByUserNameOrEmailAsync(model.UserNameOrEmail);
-            if (user == null)
+            UserLogined userLogined = null;
+
+            if (ModelState.IsValid)
             {
-                _logger.LogInformation("Wrong username or email.");
-                throw new ApiException("Wrong username or email.", (int)HttpStatusCode.BadRequest);
+                // Validate Captcha Code
+                if (!Captcha.ValidateCaptchaCode(model.CaptchaCode, HttpContext))
+                {
+                    throw new ApiException("Incorrect Captcha Code", (int)HttpStatusCode.BadRequest);
+                }
+
+                var user = await _authRepository.GetUserByUserNameOrEmailAsync(model.UserNameOrEmail);
+                if (user == null)
+                {
+                    _logger.LogInformation("Wrong username or email.");
+                    throw new ApiException("Wrong username or email.", (int)HttpStatusCode.BadRequest);
+                }
+                else if (!_authRepository.VerifyPasswordHash(model.Password, user.HashPassword, user.SaltPassword))
+                {
+                    _logger.LogInformation("Wrong password.");
+                    throw new ApiException("Wrong password.", (int)HttpStatusCode.BadRequest);
+                }
+                else
+                {
+                    string currentUserId = Guid.NewGuid().ToString();
+                    userLogined = _authRepository.GenerateToken(user, currentUserId);
+                    // save to login
+                    //await _authRepository.SaveToUserLoginAsync(user, userLogined, currentUserId);
+                }
             }
-            else if (!_authRepository.VerifyPasswordHash(model.Password, user.HashPassword, user.SaltPassword))
-            {
-                _logger.LogInformation("Wrong password.");
-                throw new ApiException("Wrong password.", (int)HttpStatusCode.BadRequest);
-            }
-            else
-            {
-                string currentUserId = Guid.NewGuid().ToString();
-                var userLogined = _authRepository.GenerateToken(user, currentUserId);
-                // save to login
-                await _authRepository.SaveToUserLoginAsync(user, userLogined, currentUserId);
-                return Ok(userLogined);
-            }
+            return Ok(userLogined);
         }
 
         [HttpPost("login"), MapToApiVersion("2")]
@@ -74,25 +86,36 @@ namespace StoreOrder.WebApplication.Controllers
                 return Ok(new { isAuthenicated = HttpContext.User.Identity.IsAuthenticated });
             }
 
-            var user = await _authRepository.GetUserByUserNameOrEmailAsync(model.UserNameOrEmail);
-            if (user == null)
+            UserLogined userLogined = null;
+
+            if (ModelState.IsValid)
             {
-                _logger.LogInformation("Wrong username or email.");
-                throw new ApiException("Wrong username or email.", (int)HttpStatusCode.BadRequest);
+                // Validate Captcha Code
+                if (!Captcha.ValidateCaptchaCode(model.CaptchaCode, HttpContext))
+                {
+                    throw new ApiException("Incorrect Captcha Code", (int)HttpStatusCode.BadRequest);
+                }
+
+                var user = await _authRepository.GetUserByUserNameOrEmailAsync(model.UserNameOrEmail);
+                if (user == null)
+                {
+                    _logger.LogInformation("Wrong username or email.");
+                    throw new ApiException("Wrong username or email.", (int)HttpStatusCode.BadRequest);
+                }
+                else if (!_authRepository.VerifyPasswordHash(model.Password, user.HashPassword, user.SaltPassword))
+                {
+                    _logger.LogInformation("Wrong password.");
+                    throw new ApiException("Wrong password.", (int)HttpStatusCode.BadRequest);
+                }
+                else
+                {
+                    string currentUserId = Guid.NewGuid().ToString();
+                    userLogined = _authRepository.GenerateToken(user, currentUserId);
+                    // save to login
+                    //await _authRepository.SaveToUserLoginAsync(user, userLogined, currentUserId);
+                }
             }
-            else if (!_authRepository.VerifyPasswordHash(model.Password, user.HashPassword, user.SaltPassword))
-            {
-                _logger.LogInformation("Wrong password.");
-                throw new ApiException("Wrong password.", (int)HttpStatusCode.BadRequest);
-            }
-            else
-            {
-                string currentUserId = Guid.NewGuid().ToString();
-                var userLogined = _authRepository.GenerateToken(user, currentUserId);
-                // save to login
-                await _authRepository.SaveToUserLoginAsync(user, userLogined, currentUserId);
-                return Ok(userLogined);
-            }
+            return Ok(userLogined);
         }
 
         [HttpGet("tables"), MapToApiVersion("1")]
@@ -506,6 +529,12 @@ namespace StoreOrder.WebApplication.Controllers
             await CheckIsSignoutedAsync();
             if (ModelState.IsValid)
             {
+                // Validate Captcha Code
+                if (!Captcha.ValidateCaptchaCode(model.CaptchaCode, HttpContext))
+                {
+                    throw new ApiException("Incorrect Captcha Code", (int)HttpStatusCode.BadRequest);
+                }
+
                 if (model.Products.Count == 0)
                 {
                     throw new ApiException("Cần có ít nhất 1 sản phẩm trong đơn hàng.", (int)HttpStatusCode.BadRequest);
@@ -554,7 +583,7 @@ namespace StoreOrder.WebApplication.Controllers
                     // save to db
                     try
                     {
-                        await _context.SaveChangesAsync();                     
+                        await _context.SaveChangesAsync();
                         // update table to state busying
                         await UpdateTableStatus(model.TableId, (int)TypeTableStatus.Busying);
 
@@ -586,6 +615,12 @@ namespace StoreOrder.WebApplication.Controllers
             await CheckIsSignoutedAsync();
             if (ModelState.IsValid)
             {
+                // Validate Captcha Code
+                if (!Captcha.ValidateCaptchaCode(model.CaptchaCode, HttpContext))
+                {
+                    throw new ApiException("Incorrect Captcha Code", (int)HttpStatusCode.BadRequest);
+                }
+
                 if (model.Products.Count == 0)
                 {
                     throw new ApiException("Cần có ít nhất 1 sản phẩm trong đơn hàng.", (int)HttpStatusCode.BadRequest);
@@ -667,6 +702,12 @@ namespace StoreOrder.WebApplication.Controllers
             model.OrderId = orderId;
             if (ModelState.IsValid)
             {
+                // Validate Captcha Code
+                if (!Captcha.ValidateCaptchaCode(model.CaptchaCode, HttpContext))
+                {
+                    throw new ApiException("Incorrect Captcha Code", (int)HttpStatusCode.BadRequest);
+                }
+
                 // check products null
                 if (model.Products.Count == 0)
                 {
@@ -768,6 +809,12 @@ namespace StoreOrder.WebApplication.Controllers
 
             if (ModelState.IsValid)
             {
+                // Validate Captcha Code
+                if (!Captcha.ValidateCaptchaCode(model.CaptchaCode, HttpContext))
+                {
+                    throw new ApiException("Incorrect Captcha Code", (int)HttpStatusCode.BadRequest);
+                }
+
                 // check order is create or update order
                 if (!string.Equals(model.OrderId, "0"))
                 {
@@ -1168,6 +1215,12 @@ namespace StoreOrder.WebApplication.Controllers
             int message = 0;
             if (ModelState.IsValid)
             {
+                // Validate Captcha Code
+                if (!Captcha.ValidateCaptchaCode(model.CaptchaCode, HttpContext))
+                {
+                    throw new ApiException("Incorrect Captcha Code", (int)HttpStatusCode.BadRequest);
+                }
+
                 if (string.IsNullOrEmpty(orderId))
                 {
                     throw new ApiException("Order Id is Required", (int)HttpStatusCode.BadRequest);

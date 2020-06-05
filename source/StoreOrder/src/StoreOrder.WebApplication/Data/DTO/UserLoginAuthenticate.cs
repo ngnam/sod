@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StoreOrder.WebApplication.Data.DTO.Captchas;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace StoreOrder.WebApplication.Data.DTO
 {
-    public class UserLoginAuthenticate
+    public class UserLoginAuthenticate: CaptchaCodeModel
     {
         [Required]
         public string UserNameOrEmail { get; set; }

@@ -179,6 +179,13 @@ namespace StoreOrder.WebApplication
             //    .AddJsonProtocol(options => {
             //        options.PayloadSerializerOptions.WriteIndented = true;
             //    });
+
+            // add session support
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(20);
+                options.Cookie.HttpOnly = true;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -196,6 +203,8 @@ namespace StoreOrder.WebApplication
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseSession();
 
             //Add our new middleware to the pipeline
 
@@ -230,12 +239,12 @@ namespace StoreOrder.WebApplication
                 //   HttpTransportType.LongPolling;
 
                 endpoints.MapControllers();
+                
                 //endpoints.MapHub<PornHub>("/hubs/order", (options) =>
                 //{
                 //    options.Transports = desiredTransports;
                 //});
             });
-
         }
 
         private void ConfigureSwagger(IServiceCollection services)

@@ -243,8 +243,10 @@ namespace StoreOrder.WebApplication.Middlewares
         }
         private bool IsSwagger(HttpContext context)
         {
-            return context.Request.Path.StartsWithSegments("/swagger") || context.Request.Path.StartsWithSegments("/docs") 
-                || context.Request.Path.StartsWithSegments("/hubs/order")
+            return context.Request.Path.StartsWithSegments("/swagger") 
+                || context.Request.Path.StartsWithSegments("/docs") 
+                || context.Request.Path.Value.Contains("/CaptCha")
+                //|| context.Request.Path.StartsWithSegments("/hubs/order")
                 || context.Request.Path.Value.Contains("swagger.json");
 
         }

@@ -1,11 +1,12 @@
-﻿using StoreOrder.WebApplication.Data.Enums;
+﻿using StoreOrder.WebApplication.Data.DTO.Captchas;
+using StoreOrder.WebApplication.Data.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace StoreOrder.WebApplication.Data.DTO
 {
-    public class OrderProductDTO
+    public class OrderProductDTO : CaptchaCodeModel
     {
         public OrderProductDTO()
         {
