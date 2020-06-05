@@ -78,6 +78,17 @@ namespace StoreOrder.WebApplication.Data
             });
             #endregion
 
+            #region AddUserDetails 
+
+            modelBuilder.Entity<UserDetail>(c =>
+            {
+                c.ToTable("UserDetails", "Account");
+                c.HasKey(m => m.Id);
+                c.Property(m => m.Id).ValueGeneratedOnAdd();
+                c.HasOne(m => m.User).WithOne(mc => mc.UserDetail).HasForeignKey<UserDetail>(m => m.UserId).OnDelete(DeleteBehavior.Cascade);
+            });
+            #endregion
+
             // Role
             modelBuilder.Entity<Role>(c =>
             {
@@ -347,6 +358,7 @@ namespace StoreOrder.WebApplication.Data
         public DbSet<RoleToPermission> RoleToPermissions { get; set; }
         public DbSet<ExternalSignIn> ExternalSignIns { get; set; }
         public DbSet<UserLogin> UserLogins { get; set; }
+        public DbSet<UserDetail> UserDetails { get; set; }
         // Location
         public DbSet<Provider> Providers { get; set; }
         // Order

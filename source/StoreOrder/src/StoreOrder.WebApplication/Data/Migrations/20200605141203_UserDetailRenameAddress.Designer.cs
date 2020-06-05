@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using StoreOrder.WebApplication.Data;
@@ -9,9 +10,10 @@ using StoreOrder.WebApplication.Data;
 namespace StoreOrder.WebApplication.Data.Migrations
 {
     [DbContext(typeof(StoreOrderDbContext))]
-    partial class StoreOrderDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200605141203_UserDetailRenameAddress")]
+    partial class UserDetailRenameAddress
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -198,9 +200,6 @@ namespace StoreOrder.WebApplication.Data.Migrations
                     b.Property<string>("Address3")
                         .HasColumnType("character varying(550)")
                         .HasMaxLength(550);
-
-                    b.Property<string>("GAvartar")
-                        .HasColumnType("text");
 
                     b.Property<string>("ProvideId")
                         .HasColumnType("text");

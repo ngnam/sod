@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -16,6 +17,11 @@ namespace StoreOrder.WebApplication.Data.DTO
         public int? Gender { get; set; }
         public string StoreName { get; set; }
         public ICollection<GroupScreen> GroupScreens { get; set; }
+        public DateTime? BirthDay { get; set; }
+        public string ProviderId { get; set; }
+        public string Address1 { get; set; }
+        public string Address2 { get; set; }
+        public string Address3 { get; set; }
     }
 
     public class GroupScreen
@@ -36,7 +42,16 @@ namespace StoreOrder.WebApplication.Data.DTO
         public int? Gender { get; set; }
         [MaxLength(11)]
         public string PhoneNumber { get; set; }
-        [Required]
+        [Range(1954, 2015)]
+        public int? YearOfBirth { get; set; }
+        [Range(1, 12)]
+        public int? MonthOfBirth { get; set; }
+        [Range(1, 31)]
+        public int? DayOfBirth { get; set; }
+        public string ProviderId { get; set; }
+        public string Address1 { get; set; }
+        public string Address2 { get; set; }
+        public string Address3 { get; set; }
         public string CurrentPassword { get; set; }
         public string NewPassword { get; set; }
     }

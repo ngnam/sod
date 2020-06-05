@@ -43,5 +43,6 @@ namespace StoreOrder.WebApplication.Data.Models.Account
         public virtual ICollection<UserLogin> UserLogins { get; set; }
         public string StoreId { get; set; }
         public virtual Store Store { get; set; }
+        public virtual UserDetail UserDetail { get; set; }
     }
 }

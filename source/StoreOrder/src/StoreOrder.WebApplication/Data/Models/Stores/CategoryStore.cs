@@ -9,6 +9,8 @@ namespace StoreOrder.WebApplication.Data.Models.Stores
     {
         public string Id { get; set; }
         public string Name { get; set; }
+        public string SlugCode { get; set; }
+
         public ICollection<Store> Stores { get; set; }
     }
 }

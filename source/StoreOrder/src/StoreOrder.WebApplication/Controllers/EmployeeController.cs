@@ -664,7 +664,6 @@ namespace StoreOrder.WebApplication.Controllers
         public async Task<IActionResult> UpdateOrder([FromBody] OrderProductDTO model, string orderId, bool isOrder = true)
         {
             await CheckIsSignoutedAsync();
-            int message = 0;
             model.OrderId = orderId;
             if (ModelState.IsValid)
             {
@@ -739,7 +738,6 @@ namespace StoreOrder.WebApplication.Controllers
                     try
                     {
                         await _context.SaveChangesAsync();
-                        message = 1;
                     }
                     catch (DbUpdateException ex)
                     {

@@ -6,6 +6,7 @@ using StoreOrder.WebApplication.Controllers.ApiBase;
 using StoreOrder.WebApplication.Data;
 using StoreOrder.WebApplication.Data.DTO;
 using StoreOrder.WebApplication.Data.Enums;
+using StoreOrder.WebApplication.Data.Models.Account;
 using StoreOrder.WebApplication.Data.Repositories.Interfaces;
 using StoreOrder.WebApplication.Data.Wrappers;
 using System;
@@ -39,6 +40,7 @@ namespace StoreOrder.WebApplication.Controllers
                 .Include(u => u.UserToRoles)
                 .ThenInclude(u => u.Role)
                 .Include(u => u.Store)
+                .Include(u => u.UserDetail)
                 .FirstOrDefaultAsync(u => u.Id == this.CurrentUserId && u.IsActived == (int)TypeVerified.Verified);
 
             if (user == null)
@@ -51,7 +53,6 @@ namespace StoreOrder.WebApplication.Controllers
             var result = new UserProfileDTO
             {
                 FirstName = user.FirstName,
-                GAvartar = "https://ragus.vn/wp-content/uploads/2019/10/Yua-Mikami-vlog-1.jpg",
                 LastName = user.LastName,
                 GroupScreens = roleUser.Select(r => new GroupScreen
                 {
@@ -59,7 +60,13 @@ namespace StoreOrder.WebApplication.Controllers
                     ScreenId = MapScreenId(r.RoleName)
                 }).ToList(),
                 Gender = user.Gender,
-                StoreName = user.Store.StoreName
+                StoreName = user.Store.StoreName,
+                BirthDay = user.BirthDay,
+                ProviderId = user.UserDetail != null ? user.UserDetail?.ProvideId : string.Empty,
+                Address1 = user.UserDetail != null ? user.UserDetail?.Address1 : string.Empty,
+                Address2 = user.UserDetail != null ? user.UserDetail?.Address2 : string.Empty,
+                Address3 = user.UserDetail != null ? user.UserDetail?.Address3 : string.Empty,
+                GAvartar = user.UserDetail != null ? user.UserDetail.GAvartar : "https://ifg.onecmscdn.com/2019/06/18/screenshot3-1560840221436466431758.jpg"
             };
 
             return Ok(result);
@@ -107,18 +114,50 @@ namespace StoreOrder.WebApplication.Controllers
                 }
                 // update user
                 _context.Entry(user).State = EntityState.Modified;
-                user.FirstName = model.FirstName;
-                user.LastName = model.LastName;
-                user.Gender = model.Gender;
-                user.PhoneNumber = model.PhoneNumber;
+                user.FirstName = model.FirstName ?? "Nhân viên";
+                user.LastName = model.LastName ?? "ABC";
+                user.Gender = model.Gender ?? 1;
+                user.PhoneNumber = model.PhoneNumber ?? string.Empty;
                 user.UpdatedAt = DateTime.UtcNow;
 
-                if (!string.IsNullOrEmpty(model.NewPassword))
+                //// Update Birth day
+                //if (model.YearOfBirth != 0 && model.MonthOfBirth != 0 && model.DayOfBirth != 0)
+                //{
+                //    user.BirthDay = new DateTime(model.YearOfBirth, model.MonthOfBirth, model.DayOfBirth);
+                //}
+                // Update Birth day
+                if (model.YearOfBirth.HasValue && model.MonthOfBirth.HasValue && model.DayOfBirth.HasValue)
                 {
-                    var hashPass = Helpers.SercurityHelper.GenerateSaltedHash(model.NewPassword);
+                    user.BirthDay = new DateTime(model.YearOfBirth.Value, model.MonthOfBirth.Value, model.DayOfBirth.Value);
+                }
+
+                if (!string.IsNullOrEmpty(model.NewPassword) && model.NewPassword != "string")
+                {
+                    var hashPass = Helpers.SercurityHelper.GenerateSaltedHash(model.NewPassword.Trim());
                     user.HashPassword = hashPass.Hash;
                     user.SaltPassword = hashPass.Salt;
                 }
+
+                // add User Detail
+                if (user.UserDetail != null)
+                {
+                    // update
+                    user.UserDetail.ProvideId = model.ProviderId ?? string.Empty;
+                    user.UserDetail.Address1 = model.Address1 ?? string.Empty;
+                    user.UserDetail.Address2 = model.Address2 ?? string.Empty;
+                    user.UserDetail.Address3 = model.Address3 ?? string.Empty;
+                    user.UserDetail.GAvartar = model.GAvartar ?? string.Empty;
+                } else
+                {
+                    UserDetail newUserDetail = new UserDetail();
+                    newUserDetail.ProvideId = model.ProviderId ?? string.Empty;
+                    newUserDetail.Address1 = model.Address1 ?? string.Empty;
+                    newUserDetail.Address2 = model.Address2 ?? string.Empty;
+                    newUserDetail.Address3 = model.Address3 ?? string.Empty;
+                    newUserDetail.GAvartar = model.GAvartar ?? string.Empty;
+                    user.UserDetail = newUserDetail;
+                }
+
                 // save to database
                 try
                 {
@@ -167,12 +206,41 @@ namespace StoreOrder.WebApplication.Controllers
                 user.PhoneNumber = model.PhoneNumber;
                 user.UpdatedAt = DateTime.UtcNow;
 
+                // Update Birth day
+                if (model.YearOfBirth.HasValue && model.MonthOfBirth.HasValue && model.DayOfBirth.HasValue)
+                {
+                    user.BirthDay = new DateTime(model.YearOfBirth.Value, model.MonthOfBirth.Value, model.DayOfBirth.Value);
+                }
+
                 if (!string.IsNullOrEmpty(model.NewPassword))
                 {
                     var hashPass = Helpers.SercurityHelper.GenerateSaltedHash(model.NewPassword);
                     user.HashPassword = hashPass.Hash;
                     user.SaltPassword = hashPass.Salt;
                 }
+
+                // add User Detail
+                var userDetail = await _context.UserDetails.FindAsync(user.Id);
+                if (userDetail != null)
+                {
+                    // update
+                    userDetail.ProvideId = model.ProviderId ?? string.Empty;
+                    userDetail.Address1 = model.Address1 ?? string.Empty;
+                    userDetail.Address2 = model.Address2 ?? string.Empty;
+                    userDetail.Address3 = model.Address3 ?? string.Empty;
+                    userDetail.GAvartar = model.GAvartar ?? string.Empty;
+                }
+                else
+                {
+                    UserDetail newUserDetail = new UserDetail();
+                    newUserDetail.ProvideId = model.ProviderId ?? string.Empty;
+                    newUserDetail.Address1 = model.Address1 ?? string.Empty;
+                    newUserDetail.Address2 = model.Address2 ?? string.Empty;
+                    newUserDetail.Address3 = model.Address3 ?? string.Empty;
+                    newUserDetail.GAvartar = model.GAvartar ?? string.Empty;
+                    _context.UserDetails.Add(newUserDetail);
+                }
+
                 // save to database
                 try
                 {
