@@ -20,6 +20,7 @@
 * [Add serilog](https://andrewlock.net/adding-serilog-to-the-asp-net-core-generic-host/) - `Update-Database -c AdminLogDbContext`
 * [Multiple translate database](docs/translator.md)
 * [Sercurity](docs/sercurity.md)
+* [Heroku Build pack apt](https://elements.heroku.com/buildpacks/ivahero/heroku-buildpack-apt)
 
 ## Environment
 
@@ -44,6 +45,11 @@ COMMANDS
   maintenance:off  take the app out of maintenance mode
   maintenance:on   put the app into maintenance mode
 ```
+
+* Herku checkout 
+`heroku run bash -a myApp`
+`heroku buildpacks:add --index 1 heroku-community/apt`
+`heroku buildpacks -a myApp`
 
 ## License
 
