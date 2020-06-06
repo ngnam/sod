@@ -12,6 +12,7 @@ namespace StoreOrder.WebApplication.Data.Models.Stores
         public int? Location { get; set; }
         public int? LocationUnit { get; set; }
         public int? TableStatus { get; set; }
+        public int? TableOrder { get; set; }
         public string StoreId { get; set; }
         public virtual Store Store { get; set; }
         public virtual ICollection<Order> Orders { get; set; }

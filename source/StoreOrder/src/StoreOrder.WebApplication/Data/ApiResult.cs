@@ -85,6 +85,9 @@ namespace StoreOrder.WebApplication.Data
                     );
             }
 
+            // check if pagesize client > pagesize
+            if (pageSize > count) { pageSize = count; }
+
             source = source
                 .Skip(pageIndex * pageSize)
                 .Take(pageSize);

@@ -23,6 +23,8 @@
 * [Heroku Build pack apt](https://elements.heroku.com/buildpacks/ivahero/heroku-buildpack-apt)
 * [Heroku Clear Build Cache](https://help.heroku.com/18PI5RSY/how-do-i-clear-the-build-cache)
 * [Heroku Nano](https://elements.heroku.com/buildpacks/velizarn/heroku-buildpack-nano#buildpack-instructions)
+- If did a workaround, in my .bashrc i have added: `alias nano='export TERM=xterm && nano'`. It help to fix `Error opening terminal: unknown nano`
+
 ## Environment
 
 * [Postgres 12.2](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads)

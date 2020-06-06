@@ -16,27 +16,6 @@ namespace StoreOrder.WebApplication
     {
         public static void Main(string[] args)
         {
-            string connectionstring = Configuration.GetConnectionString("AdminLogDbConnection");
-            string tableName = "logs";
-            //Used columns (Key is a column name) 
-            //Column type is writer's constructor parameter
-            IDictionary<string, ColumnWriterBase> columnWriters = new Dictionary<string, ColumnWriterBase>
-            {
-                {"message", new RenderedMessageColumnWriter(NpgsqlDbType.Text) },
-                {"message_template", new MessageTemplateColumnWriter(NpgsqlDbType.Text) },
-                {"level", new LevelColumnWriter(true, NpgsqlDbType.Varchar) },
-                {"time_stamp", new TimestampColumnWriter(NpgsqlDbType.Timestamp) },
-                {"exception", new ExceptionColumnWriter(NpgsqlDbType.Text) },
-                {"log_event", new LogEventSerializedColumnWriter(NpgsqlDbType.Jsonb) },
-                {"properties", new PropertiesColumnWriter(NpgsqlDbType.Jsonb) }
-            };
-            Log.Logger = new LoggerConfiguration()
-                                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-                                .Enrich.WithThreadId()
-                                .Enrich.FromLogContext()
-                                .WriteTo.PostgreSQL(connectionstring, tableName, columnWriters, schemaName: "logging")
-                                .CreateLogger();
-
             try
             {
                 // CreateHostBuilder(args).Build().Run();
@@ -47,6 +26,7 @@ namespace StoreOrder.WebApplication
                     try
                     {
                         DbInitializer.InitializeAsync(services).Wait();
+                        InitSerilog.InitializeAsync(services, Configuration).Wait();
                     }
                     catch (Exception ex)
                     {

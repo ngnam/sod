@@ -13,6 +13,7 @@ namespace StoreOrder.WebApplication.Data.DTO
         public int? Location { get; set; }
         public int? LocationUnit { get; set; }
         public int? TableStatus { get; set; }
+        public int? TableOrder { get; set; }
         public string StoreId { get; set; }
     }
 

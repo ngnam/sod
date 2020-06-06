@@ -1,2 +1,3 @@
 https://buildpack-registry.s3.amazonaws.com/buildpacks/heroku-community/apt.tgz
 https://github.com/ngnam/dotnetcore-buildpack
+https://github.com/velizarn/heroku-buildpack-nano

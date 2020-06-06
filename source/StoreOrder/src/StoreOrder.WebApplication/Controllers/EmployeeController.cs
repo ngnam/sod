@@ -174,11 +174,12 @@ namespace StoreOrder.WebApplication.Controllers
                         StoreId = table.StoreId,
                         TableName = table.TableName,
                         TableCode = table.TableCode,
-                        TableStatus = table.TableStatus
+                        TableStatus = table.TableStatus,
+                        TableOrder = table.TableOrder
                     })
-                    .OrderBy(x => x.TableStatus)
-                    });
-
+                    .OrderBy(x => x.TableOrder)
+                    })
+                    .OrderBy(c => c.location);
 
             return Ok(new
             {
