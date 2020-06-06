@@ -10,7 +10,7 @@ namespace StoreOrder.WebApplication.Helpers
 {
     public static class Captcha
     {
-        const string Letters = "2346789ABCDEFGHJKLMNPRTUVWXYZ";
+        const string Letters = "2346789ABCDEFGHJKLMNPRTUVWXYZabcdefghjkmnprtuvwxy";
 
         public static string GenerateCaptchaCode(int numLength = 4)
         {

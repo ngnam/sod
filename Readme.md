@@ -53,6 +53,11 @@ COMMANDS
 
 * See: [Release log](/RELEASE.MD)
 
+## You can clear the build cache for an app using the following commands:
+
+	`$ heroku plugins:install heroku-repo`
+	`$ heroku repo:purge_cache -a appname`
+
 # Donate
 If you find this project useful — or just feeling generous, consider buying me a beer or a coffee. Cheers! :beers: :coffee:
 |               |               |
