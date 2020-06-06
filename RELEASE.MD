@@ -23,3 +23,10 @@
 - Update api order/{orderId}/confirm-pay
 * Date 30/5/2020
 - Update api update product status - order detail
+* Date 6/6/2020
+- Update api profiles
+- Add Captcha image sercurity for APIs:
+	- employee/login (post)
+	- employee/order (post)
+	- employee/order/{orderId} (put)
+	- order/{orderId}/confirm-pay POST
