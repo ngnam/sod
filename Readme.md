@@ -21,6 +21,7 @@
 * [Multiple translate database](docs/translator.md)
 * [Sercurity](docs/sercurity.md)
 * [Heroku Build pack apt](https://elements.heroku.com/buildpacks/ivahero/heroku-buildpack-apt)
+* [Heroku Clear Build Cache](https://help.heroku.com/18PI5RSY/how-do-i-clear-the-build-cache)
 
 ## Environment
 
