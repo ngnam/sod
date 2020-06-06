@@ -2,10 +2,4 @@ version: 1.0.{build}
 image: Ubuntu
 
 build_script:
-  - RUN apt-get update \
-    && apt-get install -y --allow-unauthenticated \
-        libc6-dev \
-        libgdiplus \
-        libx11-dev \
-     && rm -rf /var/lib/apt/lists/*
   - docker build -t StoreOrderWebApplication .
