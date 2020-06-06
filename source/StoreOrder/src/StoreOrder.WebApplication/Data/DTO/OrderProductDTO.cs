@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace StoreOrder.WebApplication.Data.DTO
 {
-    public class OrderProductDTO : CaptchaCodeModel
+    public class OrderProductDTO
     {
         public OrderProductDTO()
         {

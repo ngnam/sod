@@ -53,14 +53,14 @@ namespace StoreOrder.WebApplication.Controllers
 
             if (ModelState.IsValid)
             {
-                if (this.IsValidateCaptcha)
-                {
-                    // Validate Captcha Code
-                    if (!Captcha.ValidateCaptchaCode(model.CaptchaCode, HttpContext))
-                    {
-                        throw new ApiException("Incorrect Captcha Code", (int)HttpStatusCode.BadRequest);
-                    }
-                }
+                //if (this.IsValidateCaptcha)
+                //{
+                //    // Validate Captcha Code
+                //    if (!Captcha.ValidateCaptchaCode(model.CaptchaCode, HttpContext))
+                //    {
+                //        throw new ApiException("Incorrect Captcha Code", (int)HttpStatusCode.BadRequest);
+                //    }
+                //}
 
                 var user = await _authRepository.GetUserByUserNameOrEmailAsync(model.UserNameOrEmail);
                 if (user == null)
@@ -97,14 +97,14 @@ namespace StoreOrder.WebApplication.Controllers
 
             if (ModelState.IsValid)
             {
-                if (this.IsValidateCaptcha)
-                {
-                    // Validate Captcha Code
-                    if (!Captcha.ValidateCaptchaCode(model.CaptchaCode, HttpContext))
-                    {
-                        throw new ApiException("Incorrect Captcha Code", (int)HttpStatusCode.BadRequest);
-                    }
-                }
+                //if (this.IsValidateCaptcha)
+                //{
+                //    // Validate Captcha Code
+                //    if (!Captcha.ValidateCaptchaCode(model.CaptchaCode, HttpContext))
+                //    {
+                //        throw new ApiException("Incorrect Captcha Code", (int)HttpStatusCode.BadRequest);
+                //    }
+                //}
 
                 var user = await _authRepository.GetUserByUserNameOrEmailAsync(model.UserNameOrEmail);
                 if (user == null)
@@ -540,14 +540,14 @@ namespace StoreOrder.WebApplication.Controllers
             await CheckIsSignoutedAsync();
             if (ModelState.IsValid)
             {
-                if (this.IsValidateCaptcha)
-                {
-                    // Validate Captcha Code
-                    if (!Captcha.ValidateCaptchaCode(model.CaptchaCode, HttpContext))
-                    {
-                        throw new ApiException("Incorrect Captcha Code", (int)HttpStatusCode.BadRequest);
-                    }
-                }
+                //if (this.IsValidateCaptcha)
+                //{
+                //    // Validate Captcha Code
+                //    if (!Captcha.ValidateCaptchaCode(model.CaptchaCode, HttpContext))
+                //    {
+                //        throw new ApiException("Incorrect Captcha Code", (int)HttpStatusCode.BadRequest);
+                //    }
+                //}
 
                 if (model.Products.Count == 0)
                 {
@@ -629,14 +629,14 @@ namespace StoreOrder.WebApplication.Controllers
             await CheckIsSignoutedAsync();
             if (ModelState.IsValid)
             {
-                if (this.IsValidateCaptcha)
-                {
-                    // Validate Captcha Code
-                    if (!Captcha.ValidateCaptchaCode(model.CaptchaCode, HttpContext))
-                    {
-                        throw new ApiException("Incorrect Captcha Code", (int)HttpStatusCode.BadRequest);
-                    }
-                }
+                //if (this.IsValidateCaptcha)
+                //{
+                //    // Validate Captcha Code
+                //    if (!Captcha.ValidateCaptchaCode(model.CaptchaCode, HttpContext))
+                //    {
+                //        throw new ApiException("Incorrect Captcha Code", (int)HttpStatusCode.BadRequest);
+                //    }
+                //}
 
                 if (model.Products.Count == 0)
                 {
@@ -719,14 +719,14 @@ namespace StoreOrder.WebApplication.Controllers
             model.OrderId = orderId;
             if (ModelState.IsValid)
             {
-                if (this.IsValidateCaptcha)
-                {
-                    // Validate Captcha Code
-                    if (!Captcha.ValidateCaptchaCode(model.CaptchaCode, HttpContext))
-                    {
-                        throw new ApiException("Incorrect Captcha Code", (int)HttpStatusCode.BadRequest);
-                    }
-                }
+                //if (this.IsValidateCaptcha)
+                //{
+                //    // Validate Captcha Code
+                //    if (!Captcha.ValidateCaptchaCode(model.CaptchaCode, HttpContext))
+                //    {
+                //        throw new ApiException("Incorrect Captcha Code", (int)HttpStatusCode.BadRequest);
+                //    }
+                //}
 
                 // check products null
                 if (model.Products.Count == 0)
@@ -829,14 +829,14 @@ namespace StoreOrder.WebApplication.Controllers
 
             if (ModelState.IsValid)
             {
-                if (this.IsValidateCaptcha)
-                {
-                    // Validate Captcha Code
-                    if (!Captcha.ValidateCaptchaCode(model.CaptchaCode, HttpContext))
-                    {
-                        throw new ApiException("Incorrect Captcha Code", (int)HttpStatusCode.BadRequest);
-                    }
-                }
+                //if (this.IsValidateCaptcha)
+                //{
+                //    // Validate Captcha Code
+                //    if (!Captcha.ValidateCaptchaCode(model.CaptchaCode, HttpContext))
+                //    {
+                //        throw new ApiException("Incorrect Captcha Code", (int)HttpStatusCode.BadRequest);
+                //    }
+                //}
 
                 // check order is create or update order
                 if (!string.Equals(model.OrderId, "0"))
@@ -1238,14 +1238,14 @@ namespace StoreOrder.WebApplication.Controllers
             int message = 0;
             if (ModelState.IsValid)
             {
-                if (this.IsValidateCaptcha)
-                {
-                    // Validate Captcha Code
-                    if (!Captcha.ValidateCaptchaCode(model.CaptchaCode, HttpContext))
-                    {
-                        throw new ApiException("Incorrect Captcha Code", (int)HttpStatusCode.BadRequest);
-                    }
-                }
+                //if (this.IsValidateCaptcha)
+                //{
+                //    // Validate Captcha Code
+                //    if (!Captcha.ValidateCaptchaCode(model.CaptchaCode, HttpContext))
+                //    {
+                //        throw new ApiException("Incorrect Captcha Code", (int)HttpStatusCode.BadRequest);
+                //    }
+                //}
 
                 if (string.IsNullOrEmpty(orderId))
                 {
@@ -1390,14 +1390,14 @@ namespace StoreOrder.WebApplication.Controllers
             return message;
         }
 
-        private bool _IsValidateCaptcha;
-        protected bool IsValidateCaptcha
-        {
-            get
-            {
-                _IsValidateCaptcha = _configuration.GetSection("IsValidateCaptcha").Get<bool>();
-                return this._IsValidateCaptcha;
-            }
-        }
+        //private bool _IsValidateCaptcha;
+        //protected bool IsValidateCaptcha
+        //{
+        //    get
+        //    {
+        //        _IsValidateCaptcha = _configuration.GetSection("IsValidateCaptcha").Get<bool>();
+        //        return this._IsValidateCaptcha;
+        //    }
+        //}
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StoreOrder.WebApplication.Helpers;
 using System.IO;
@@ -8,6 +9,7 @@ namespace StoreOrder.WebApplication.Controllers
     [Route("[controller]")]
     [ApiController]
     [ApiVersion("1")]
+    [Authorize(Roles ="CCXXLL")]
     public class CaptChaController : ControllerBase
     {
         [HttpGet(""), MapToApiVersion("1")]

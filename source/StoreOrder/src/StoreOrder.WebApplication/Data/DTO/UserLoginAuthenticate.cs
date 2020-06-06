@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace StoreOrder.WebApplication.Data.DTO
 {
-    public class UserLoginAuthenticate: CaptchaCodeModel
+    public class UserLoginAuthenticate
     {
         [Required]
         public string UserNameOrEmail { get; set; }
