@@ -220,8 +220,9 @@ namespace StoreOrder.WebApplication
                 //c.SwaggerEndpoint("/swagger/v1/swagger.json", "API");
                 foreach (var apiVersion in provider.ApiVersionDescriptions.OrderBy(version => version.ToString()))
                 {
+                    string swagger = env.IsDevelopment() ? $"/StoreOrder.WebApplication/swagger/{apiVersion.GroupName}/swagger.json" : $"/swagger/{apiVersion.GroupName}/swagger.json";
                     c.SwaggerEndpoint(
-                        $"/swagger/{apiVersion.GroupName}/swagger.json",
+                         swagger,
                          $"StoreOrder.WebApplication {apiVersion.GroupName}"
                     );
                     c.DocExpansion(DocExpansion.None);
@@ -239,7 +240,7 @@ namespace StoreOrder.WebApplication
                 //   HttpTransportType.LongPolling;
 
                 endpoints.MapControllers();
-                
+
                 //endpoints.MapHub<PornHub>("/hubs/order", (options) =>
                 //{
                 //    options.Transports = desiredTransports;
